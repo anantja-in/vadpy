@@ -18,10 +18,12 @@ class VADpy(object):
         manager = ModuleManager(self)
 
         for module, options in modules:
-            if module in manager:
-                self._modules.append(
-                    manager.enable(module, options))
+            assert module in manager, 'Cannot continue: Module "{0}" has not been loaded'.format(module)
 
+            self._modules.append(
+                manager.enable(module, options))
+
+            
     def run(self):
         for module in self._modules:
             module.run()

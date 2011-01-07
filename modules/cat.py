@@ -51,5 +51,5 @@ class Cat(Module):
                            source_file_path, 
                            os.path.join(gt_dir, source_file), 
                            flags)
-            )
+        
         

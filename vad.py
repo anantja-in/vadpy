@@ -19,7 +19,7 @@ def main():
         log.critical(str(e))
         exc_type, exc_value, exc_traceback = sys.exc_info()
         traceback.print_tb(exc_traceback, limit = None, file = sys.stdout)
-        print(str(e))
+        print("\n{0}".format(str(e)))
 
 def setup_logging():
     console_format = '%(levelname)-8s: %(message)s'
