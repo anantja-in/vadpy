@@ -4,6 +4,7 @@ import os
 from vadpy.data import Section, Data
 from vadpy.module import Module
 from vadpy.options import  Option
+from vadpy.element import Element
 
 import logging 
 log = logging.getLogger(__name__)
@@ -41,14 +42,14 @@ class Cat(Module):
 
             
             # concatenate data                    
-            # out_io = io.FileIO(outdata_path, 'a')
-            # data_io = io.FileIO(element.data_path)            
-            # out_io.write(data_io.read())
-            # data_io.close()
+            out_io = io.FileIO(outdata_path, 'a')
+            data_io = io.FileIO(element.data_path)            
+            out_io.write(data_io.read())
+            data_io.close()
         
         new_elem = Element(self.name, 
-                           os.path.getsize(source_file_path) / (fs * (bps / 8.0)),
-                           source_file_path, 
+                           os.path.getsize(output_path) / (fs * (bps / 8.0)),
+                           output_path, 
                            os.path.join(gt_dir, source_file), 
                            flags)
         

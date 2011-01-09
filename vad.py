@@ -32,7 +32,7 @@ def setup_logging():
         loglevel = logging.CRITICAL
     else: #'-i' in sys.argv or '--info' in sys.argv:
         loglevel = logging.INFO
-
+ 
     # Logging to terminal
     logging.basicConfig(level = loglevel, format = console_format)
 

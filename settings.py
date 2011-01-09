@@ -2,8 +2,8 @@ PATH = ['/home/zaur/Documents/Study/vadpy2/src/modules',
         '/media/devel/thesis/vadpy2/src/modules'
         ]
 
-#ROOT = '/home/zaur/Documents/Study/vadpy2'
-ROOT = '/media/devel/thesis/vadpy2'
+ROOT = '/home/zaur/Documents/Study/vadpy2'
+#ROOT = '/media/devel/thesis/vadpy2'
 
 def format(macro):
     return macro.format(root = ROOT,

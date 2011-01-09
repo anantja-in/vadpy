@@ -25,4 +25,6 @@ class Pipeline(object):
                 i += count
             else:
                 return 
-        
+
+    def flush(self):
+        self._entities = []
