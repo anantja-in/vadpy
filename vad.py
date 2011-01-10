@@ -12,8 +12,7 @@ log = logging.getLogger(__name__)
 def main():
     try:
         setup_logging()
-        str_args = ' '.join(sys.argv)
-        vadpy = VADpy(settings, str_args)        
+        vadpy = VADpy(settings)
         vadpy.run()
     except Exception as e:
         log.critical(str(e))

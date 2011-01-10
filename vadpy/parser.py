@@ -1,3 +1,4 @@
+import sys
 import logging
 import re
 from copy import deepcopy 
@@ -6,58 +7,82 @@ from .error import ParseError
 
 log = logging.getLogger(__name__)
 
-def parse(settings, args):
-    # vad.py [OPTIONS] ! module property1=val property2=val ... \
-    #                    property_flag1 property_flag2 ... ! module2 ... !
-    # Cases:
-    # ! corpus ! intput ! VAD program ! error_metrics ! output
-    # 
-    args += ' '
-    args = macro_replace(args, settings)
 
-    argv = args.split('!')[1:]
-    modules = []
-    
-    if len(argv) == 1:
+class SeqOptions(object):
+    def __init__(self, 
+                 macros = {}, 
+                 format_func = str):
+        
+        self._macros = macros
+        self._format = format_func
+        
+        self.help_required = False
+
+    def parse(self):
+        help_modules = self._parse_help()
+
+        if self.help_required:
+            return help_modules
+        else:
+            return self._parse_args
+        
+    def _parse_help(self):
+        argv = sys.argv
+        if len(argv) == 1 or len(argv) >= 2 and argv[1] in ('-h' or '--help'):
+            self.help_required = True
+            if len(argv) == 3:
+                return [(argv[3], None),]
         return []
+        
+    def _parse_args(self)
+        # vad.py [OPTIONS] ! module property1=val property2=val ... \
+        #                    property_flag1 property_flag2 ... ! module2 ... !
+        # Cases:
+        # ! corpus ! intput ! VAD program ! error_metrics ! output
+        # 
+        args = ' '.join(sys.argv) + ' '
+        args = self._macro_replace(args)
 
-    for sarg in argv:
-        module = None
-        quote = False
-        module_args = {}
-        buf = ''
-        for char in sarg: #iostamps re=(?P<hh>\d+):(?P<mm>\d+):(?P<ss>\d+) split=" " 
-            if char != ' ':
-                if char == '"':
-                    quote = not quote
-                else:
-                    buf += char
+        argv = args.split('!')[1:]
+        modules = []
 
-            if char == ' ':
-                if quote:
-                    buf += char
-                elif len(buf):
-                    if not module: # create a module
-                        module = buf
-                        buf = ''
+        if len(argv) == 1:        
+            return []
+
+        for sarg in argv:
+            module = None
+            quote = False
+            module_args = {}
+            buf = ''
+            for char in sarg: #iostamps re=(?P<hh>\d+):(?P<mm>\d+):(?P<ss>\d+) split=" " 
+                if char != ' ':
+                    if char == '"':
+                        quote = not quote
                     else:
-                        if not quote: # not module and NOT quote (e.g. quotation is finished)
-                            if '=' in buf:
-                                name, val = buf.split('=')
-                                module_args[name] = val
-                                buf = ''
-        if module:
-            modules.append( (module, deepcopy(module_args)) )
-    
-    return modules
+                        buf += char
 
+                if char == ' ':
+                    if quote:
+                        buf += char
+                    elif len(buf):
+                        if not module: # create a module
+                            module = buf
+                            buf = ''
+                        else:
+                            if not quote: # not module and NOT quote (e.g. quotation is finished)
+                                if '=' in buf:
+                                    name, val = buf.split('=')
+                                    module_args[name] = val
+                                    buf = ''
+            if module:
+                modules.append( (module, deepcopy(module_args)) )
+        return modules
 
-def macro_replace(s, settings):
-    s_old = s
-    for macro in settings.MACROS:
-        s = s.replace(' ' + macro + ' ', 
-                      ' ' + settings.format(settings.MACROS[macro]) + ' ')
-    if s != s_old:
-        s = macro_replace(s, settings)
-    return s
-    
+    def _macro_replace(self, s):
+        s_old = s
+        for macro in self._macros:
+            s = s.replace(' ' + macro + ' ', 
+                          ' ' + self._format(self._macros[macro]) + ' ')
+        if s != s_old:
+            s = self._macro_replace(s)
+        return s
