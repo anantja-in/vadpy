@@ -91,9 +91,21 @@ class IOStamps(IOModule):
 
     def write(self, data, path):
         with open(path, 'w') as f:
-            for section in data:
-                f.write('{0}\t{1}\t{2}\n'.format(section[0], section[1], int(section[2])))
-                   
+            start_section = None
+            previos_section = None # (i-1_th section)
+
+            for section in data:                
+                if not start_section: # first processed section
+                    voiced = section.voiced
+                    start_section = section
+
+                if start_section.voiced != section.voiced: # sections differ
+                    if not section.voiced:                 # start_section is voiced                        
+                        f.write('{0} {1}\n'.format(start_section.start, previos_section.end))
+                    else: 
+                        start_section = section
+
+                previos_section = section             
        
 
 

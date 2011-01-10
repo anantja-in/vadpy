@@ -13,7 +13,7 @@ def main():
     try:
         setup_logging()
         str_args = ' '.join(sys.argv)
-        vadpy = VADpy(settings, str_args)
+        vadpy = VADpy(settings, str_args)        
         vadpy.run()
     except Exception as e:
         log.critical(str(e))
@@ -31,7 +31,7 @@ def setup_logging():
     elif  '-q' in sys.argv or '--quiet' in sys.argv:
         loglevel = logging.CRITICAL
     else: #'-i' in sys.argv or '--info' in sys.argv:
-        loglevel = logging.INFO
+        loglevel = logging.INFO    
  
     # Logging to terminal
     logging.basicConfig(level = loglevel, format = console_format)

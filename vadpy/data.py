@@ -1,13 +1,13 @@
 import math
 
 class Section(object):
-   def __init__(self, start, end, decision, frame_len):
+   def __init__(self, start, end, voiced, frame_len):
       """Initialize Section object
       
       core     -- EvalCore object
       start    -- Section's start (in seconds)
       end      -- Section's end  (in seconds)
-      decision -- Boolean VAD decision for the section (True / False)
+      voiced   -- Boolean VAD decision for the section (True / False)
       score    -- Soft VAD score
       """
       assert end - start >= 0, 'Error creating Section object: ' \
@@ -16,7 +16,7 @@ class Section(object):
                                'Section start: {0}; end: {1};'.format(start,end)
       self.start = start
       self.end = end
-      self.decision = decision
+      self.voiced = voiced
       self.count = int(round(self.duration / frame_len))
 
    @property
@@ -24,7 +24,7 @@ class Section(object):
       return self.end - self.start
       
    def __str__(self):
-      return '{0} - {1} :{2}]'.format(self.start, self.end, self.decision)
+      return '{0} - {1} :{2}]'.format(self.start, self.end, self.voiced)
 
 
 def extend_sections(element, sections, frame_len):
@@ -39,14 +39,14 @@ def extend_sections(element, sections, frame_len):
             if sec.start < frame_len: # just a small glitch, no need to insert a new section
                 sec.start = 0
             else:                
-                sections.insert(0, Section(0, sec.end, sec.decision, frame_len))        
+                sections.insert(0, Section(0, sec.end, sec.voiced, frame_len))        
 
         sec = sections[-1]
         if sec.end != element.length:
             if abs(sec.end - element.length) < frame_len:
                 sec.end = element.length
             else:
-                sections.append(Section(sec.end, element.length, sec.decision, frame_len))
+                sections.append(Section(sec.end, element.length, sec.voiced, frame_len))
     return sections
 
         
@@ -94,26 +94,26 @@ class Data(object):
         self._iter_frame_counter += 1
         self._iter_time_pos += self._frame_len # calculate frame's time 'start' position
 
-        return self._iter_time_pos, self._iter_time_pos + self._frame_len, self._iter_section.decision
+        return self._iter_time_pos, self._iter_time_pos + self._frame_len, self._iter_section.voiced
 
 
     def merge(self):
-        """Sections merging by decision value
+        """Sections merging by voiced value
 
         The method merges Sections objects if 
-        two consecutive Section objects have same decision values
+        two consecutive Section objects have same voiced values
         """
         sections = self._sections
         # first check, do we actually need to merge sections?
         merge_required = False
-        prev_decision = sections[0].decision
+        prev_voiced = sections[0].voiced
 
         for section in sections[1:]:
-            if section.decision == prev_decision: # yeap, merge is required
+            if section.voiced == prev_voiced: # yeap, merge is required
                 merge_required = True 
                 break;
             else:
-                prev_decision = section.decision   # no, continue
+                prev_voiced = section.voiced   # no, continue
 
         # Now merge.. 
         if not merge_required:
@@ -121,26 +121,26 @@ class Data(object):
 
         merged_sections = []
         prev_section = sections[0]
-        prev_decision = prev_section.decision
+        prev_voiced = prev_section.voiced
 
         big_section_start = prev_section.start
 
         for section in sections[1:]:
-            if section.decision != prev_decision:
+            if section.voiced != prev_voiced:
                 merged_sections.append(Section(big_section_start, 
                                                prev_section.end,
-                                               prev_decision,
+                                               prev_voiced,
                                                self._frame_len))
 
                 big_section_start = section.start
 
             prev_section = section
-            prev_decision = section.decision
+            prev_voiced = section.voiced
 
         # last section
         merged_sections.append(Section(big_section_start, 
                                        prev_section.end,
-                                       prev_decision,
+                                       prev_voiced,
                                        self._frame_len))
         self._sections = merged_sections
 
@@ -168,8 +168,8 @@ class Data(object):
                 if first_small_section:          # there was a small section before current
                     # update counters
                     small_sections_total_length += section.duration
-                    small_sections_voiced +=  section.decision
-                    small_sections_unvoiced += (not section.decision)
+                    small_sections_voiced +=  section.voiced
+                    small_sections_unvoiced += (not section.voiced)
                
                 if small_sections_total_length > frame_len: # let's create a Section object
                     new_section = Section(first_small_section.start,
@@ -188,14 +188,14 @@ class Data(object):
 
                 # update counters
                 small_sections_total_length += section.duration
-                small_sections_voiced +=  section.decision
-                small_sections_unvoiced += (not section.decision)
+                small_sections_voiced +=  section.voiced
+                small_sections_unvoiced += (not section.voiced)
             else:                          # this is not a small section but..
                 if first_small_section:     # ..there was a small section before
-                    # update counters (!) - multiply current decision to section.count
+                    # update counters (!) - multiply current voiced to section.count
                     small_sections_total_length += section.duration
-                    small_sections_voiced +=  section.decision * section.count
-                    small_sections_unvoiced += (not section.decision) * section.count
+                    small_sections_voiced +=  section.voiced * section.count
+                    small_sections_unvoiced += (not section.voiced) * section.count
                     
                     if small_sections_total_length > frame_len: # make a single Section
                         new_section = Section(first_small_section.start,

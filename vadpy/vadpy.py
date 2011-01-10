@@ -22,7 +22,7 @@ class VADpy(object):
 
             self._modules.append(
                 manager.enable(module, options))
-
+        
             
     def run(self):
         for module in self._modules:

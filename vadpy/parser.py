@@ -17,7 +17,7 @@ def parse(settings, args):
 
     argv = args.split('!')[1:]
     modules = []
-
+    
     if len(argv) == 1:
         return []
 
@@ -60,5 +60,4 @@ def macro_replace(s, settings):
     if s != s_old:
         s = macro_replace(s, settings)
     return s
-        
     
