@@ -11,8 +11,8 @@ log = logging.getLogger(__name__)
 
 class Cat(Module):
     """Concatenates all elements' data and GT into one element"""
-    outdir = Option()
-    name = Option()
+    outdir = Option(description = 'Optput directory, to which the concatenated data should be written')
+    name = Option(description = 'New element\'s name' )
     
     def __init__(self, vadpy, options):
         super(Cat, self).__init__(vadpy, options)
@@ -43,13 +43,13 @@ class Cat(Module):
             
             # concatenate data                    
             out_io = io.FileIO(outdata_path, 'a')
-            data_io = io.FileIO(element.data_path)            
+            data_io = io.FileIO(element.source_path)
             out_io.write(data_io.read())
             data_io.close()
         
         new_elem = Element(self.name, 
-                           os.path.getsize(output_path) / (fs * (bps / 8.0)),
-                           output_path, 
+                           os.path.getsize(outdata_path) / (fs * (bps / 8.0)),
+                           outdata_path, 
                            os.path.join(gt_dir, source_file), 
                            flags)
         

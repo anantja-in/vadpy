@@ -105,10 +105,8 @@ class IOStamps(IOModule):
                     else: 
                         start_section = section
 
-                previos_section = section             
+                previos_section = section
        
-
-
 
     def _get_seconds(self, stamp):
         match = self._reo.match(stamp) # re match

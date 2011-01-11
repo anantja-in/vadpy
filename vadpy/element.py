@@ -15,5 +15,8 @@ class Element(object):
         self.flags = flags
         self.length = length               # file length in seconds
 
-        # defined by VAD element
-        self.vad_output_path = None
+        # defined by VAD module
+        # self.vad_output_path = None
+
+        # definet by IO module (reading GT)
+        # self.gt_data = None

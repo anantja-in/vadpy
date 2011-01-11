@@ -16,9 +16,23 @@ class ModuleMetaclass(type):
         for item in class_dict:
             val = class_dict[item]
             if type(val) == Option: 
-                val.module = classname.lower() # add module's name to option
+                val.module = classname.lower() # add module's name to option                
+                if not val.name:
+                    val.name = item
 
         return type.__new__(meta, classname, bases, class_dict)
+
+    def __str__(cls):
+        shelp = 'VADpy module ' + cls.__name__ + '\n' + cls.__doc__ + '\n'
+        first_option = True
+        for attr in dir(cls): 
+            objattr = getattr(cls, attr)
+            if type(objattr) == Option: # option found
+                if first_option:
+                    first_option = False
+                    shelp += 'Options:\n' + 'Name'.ljust(20) + 'Description\n'
+                shelp += objattr.name.ljust(20) + objattr.description + '\n'
+        return shelp
 
 
 class Module(object):
@@ -54,6 +68,7 @@ class Module(object):
     def run(self):
         log.info('Running {0}'.format(self.__class__.__name__))
 
+    
 
 class DBModule(Module):
     root = Option()

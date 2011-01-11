@@ -25,12 +25,16 @@ class VADpy(object):
 
         if self.options.help_required:
             # print module help
-            if modules:
-                module = manager[modules[0]]
-                print(module.__doc__)
+            if modules: # modules is a simple string variable here
+                if modules in self.settings.MACROS:
+                    print('\n{0} macro: ', self.settings.MACROS[modules])
+                else:
+                    module = manager[modules]
+                    print('\n{0}'.format(module))
             else:
-                # print general program help help
-                pass
+                # print general program help
+                print 'VADpy help'
+            
             exit()
                 
         for module, options in modules:

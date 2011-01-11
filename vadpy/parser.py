@@ -24,17 +24,17 @@ class SeqOptions(object):
         if self.help_required:
             return help_modules
         else:
-            return self._parse_args
+            return self._parse_args()
         
     def _parse_help(self):
         argv = sys.argv
         if len(argv) == 1 or len(argv) >= 2 and argv[1] in ('-h' or '--help'):
             self.help_required = True
             if len(argv) == 3:
-                return [(argv[3], None),]
-        return []
+                return argv[2]
+        return None
         
-    def _parse_args(self)
+    def _parse_args(self):
         # vad.py [OPTIONS] ! module property1=val property2=val ... \
         #                    property_flag1 property_flag2 ... ! module2 ... !
         # Cases:
