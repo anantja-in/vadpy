@@ -1,15 +1,14 @@
+# Required constants
 PATH = ['/home/zaur/Documents/Study/vadpy2/src/modules', 
         '/media/devel/thesis/vadpy2/src/modules'
         ]
 
 ROOT = '/home/zaur/Documents/Study/vadpy2'
 ROOT = '/media/devel/thesis/vadpy2'
+BINDIR = ROOT + '/bin'
+OUTDIR = ROOT + '/output'
 
-def format(macro):
-    return macro.format(root = ROOT,
-                        bindir = ROOT + '/bin',
-                        outdir = ROOT + '/output')
-
+# Macros 
 MACROS = {   
     'nist' : 'dbnist root="{root}/databases/NIST" source-dir=DATA gt-dir=GT',
     #'ionist' : 'iostamps re=(?P<ss>\d.+) split=" " action=read frame-len=0.008', 

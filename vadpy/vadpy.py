@@ -10,7 +10,7 @@ class VADpy(object):
     def __init__(self, settings):
         self.settings = settings
         self.pipeline = Pipeline(self)
-        self.options = SeqOptions(settings.MACROS, settings.format)
+        self.options = SeqOptions(settings)
 
         self._modules = []
         self._parse_arguments()
@@ -27,7 +27,7 @@ class VADpy(object):
             # print module help
             if modules: # modules is a simple string variable here
                 if modules in self.settings.MACROS:
-                    print('\n{0} macro: ', self.settings.MACROS[modules])
+                    print('VADpy macro: {0} '.format(self.settings.MACROS[modules]))
                 else:
                     module = manager[modules]
                     print('\n{0}'.format(module))

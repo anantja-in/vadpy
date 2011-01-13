@@ -3,8 +3,8 @@ import logging
 log = logging.getLogger(__name__)
 
 UNDEFINED = 0
-LITTLE_ENDIAN = 2
-BIG_ENDIAN = 4
+LITTLE_ENDIAN = 0x2
+BIG_ENDIAN = 0x4
 
 class Element(object):
     def __init__(self, source_name, length, source_path, gt_path, flags = UNDEFINED):

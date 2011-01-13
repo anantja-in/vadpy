@@ -9,12 +9,10 @@ log = logging.getLogger(__name__)
 
 
 class SeqOptions(object):
-    def __init__(self, 
-                 macros = {}, 
-                 format_func = str):
-        
-        self._macros = macros
-        self._format = format_func
+    def __init__(self, settings):
+
+        self._settings = settings
+        self._macros = settings.MACROS
         
         self.help_required = False
 
@@ -86,3 +84,8 @@ class SeqOptions(object):
         if s != s_old:
             s = self._macro_replace(s)
         return s
+
+    def _format(self, macro):
+        return macro.format(root = self._settings.ROOT,
+                            bindir = self._settings.BINDIR,
+                            outdir = self._settings.OUTDIR)
