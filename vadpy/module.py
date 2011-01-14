@@ -217,7 +217,8 @@ class MatlabVADModuleBase(VADModule):
 
         # check if all elements in stream have same flags
         flags = pipeline[0].flags
-        assert all(element.flags == flags for element in pipeline), "Elements' flags are different"
+        pipeline.flags_differ(raise_error = True)
+
         # set internal flags for matlab engine
         endianness = flags & LITTLE_ENDIAN and 'l' or 'b'
 

@@ -30,7 +30,9 @@ class Cat(Module):
 
         if os.path.exists(outdata_path): os.remove(outdata_path)
         if os.path.exists(outgt_path): os.remove(outgt_path)
-            
+
+        vadpy.pipeline.flags_differ(raise_error = True)
+
         for element in self.vadpy.pipeline:
             # concatenate gt
             for section in element.gt_data._sections:
@@ -39,7 +41,6 @@ class Cat(Module):
             sections.append(element.gt_data._sections)
 
             shift += element.length
-
             
             # concatenate data                    
             out_io = io.FileIO(outdata_path, 'a')

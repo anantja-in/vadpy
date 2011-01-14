@@ -2,7 +2,7 @@ import logging
 import os
 
 from vadpy.module import DBModule
-from vadpy.element import LITTLE_ENDIAN
+from vadpy.pipeline import LITTLE_ENDIAN
 from vadpy.options import Option
 
 log = logging.getLogger(__name__)
