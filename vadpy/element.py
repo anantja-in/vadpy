@@ -4,6 +4,10 @@ log = logging.getLogger(__name__)
 
 class Element(object):
     def __init__(self, source_name, length, source_path, gt_path):
+        """
+
+        length - length in seconds
+        """
         # defined by DB element
         self.source_name = source_name
         self.source_path = source_path

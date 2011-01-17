@@ -1,30 +1,30 @@
 import math
 
 class Section(object):
-   def __init__(self, start, end, voiced, frame_len):
-      """Initialize Section object
-      
-      core     -- EvalCore object
-      start    -- Section's start (in seconds)
-      end      -- Section's end  (in seconds)
-      voiced   -- Boolean VAD decision for the section (True / False)
-      score    -- Soft VAD score
-      """
-      assert end - start >= 0, 'Error creating Section object: ' \
-                               'Section\'s start stamp is in ' \
-                               'future relatively to end stamp.\n' \
-                               'Section start: {0}; end: {1};'.format(start,end)
-      self.start = start
-      self.end = end
-      self.voiced = voiced
-      self.count = int(round(self.duration / frame_len))
+    def __init__(self, start, end, voiced, frame_len):
+        """Initialize Section object
+        
+        core     -- EvalCore object
+        start    -- Section's start (in seconds)
+        end      -- Section's end  (in seconds)
+        voiced   -- Boolean VAD decision for the section (True / False)
+        score    -- Soft VAD score
+        """
+        assert end - start >= 0, 'Error creating Section object: ' \
+            'Section\'s start stamp is in ' \
+            'future relatively to end stamp.\n' \
+            'Section start: {0}; end: {1};'.format(start,end)
+        self.start = start
+        self.end = end
+        self.voiced = voiced
+        self.count = int(round(self.duration / frame_len))
 
-   @property
-   def duration(self):
-      return self.end - self.start
-      
-   def __str__(self):
-      return '{0} - {1} :{2}]'.format(self.start, self.end, self.voiced)
+    @property
+    def duration(self):
+        return self.end - self.start
+   
+    def __str__(self):
+        return '{0} - {1} :{2}]'.format(self.start, self.end, self.voiced)
 
 
 def extend_sections(element, sections, frame_len):
@@ -66,6 +66,15 @@ class Data(object):
 
         self.merge()
         self.adjust_sections_length()
+      
+    @property 
+    def frame_len(self):
+        return self._frame_len
+
+    @frame_len.setter
+    def frame_len(self, value):
+        assert value > 0, "Frame length must be a positive number"
+        self._frame_len = value
         
     def __len__(self):
         return self._length
@@ -95,7 +104,6 @@ class Data(object):
         self._iter_time_pos += self._frame_len # calculate frame's time 'start' position
 
         return self._iter_time_pos, self._iter_time_pos + self._frame_len, self._iter_section.voiced
-
 
     def merge(self):
         """Sections merging by voiced value
@@ -143,7 +151,6 @@ class Data(object):
                                        prev_voiced,
                                        self._frame_len))
         self._sections = merged_sections
-
 
     def adjust_sections_length(self):
         """Frame dimension sections formatting according to frame_len option

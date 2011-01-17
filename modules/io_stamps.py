@@ -47,7 +47,7 @@ class IOStamps(IOModule):
 
         elif self.action == 'write':
             for element in self.vadpy.pipeline:
-                self.write(element.gt_data, element.gt_path + '.amr1')
+                self.write(element.gt_data, element.gt_path)
                
     def read(self, path):
         log.debug(('Parsing: {0}').format(path))

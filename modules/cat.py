@@ -13,6 +13,7 @@ class Cat(Module):
     """Concatenates all elements' data and GT into one element"""
     outdir = Option(description = 'Optput directory, to which the concatenated data should be written')
     name = Option(description = 'New element\'s name' )
+    frame_len = Option('frame-len', description = 'GT data frame length')
     
     def __init__(self, vadpy, options):
         super(Cat, self).__init__(vadpy, options)
@@ -31,8 +32,6 @@ class Cat(Module):
         if os.path.exists(outdata_path): os.remove(outdata_path)
         if os.path.exists(outgt_path): os.remove(outgt_path)
 
-        vadpy.pipeline.flags_differ(raise_error = True)
-
         for element in self.vadpy.pipeline:
             # concatenate gt
             for section in element.gt_data._sections:
@@ -48,10 +47,15 @@ class Cat(Module):
             out_io.write(data_io.read())
             data_io.close()
         
+        fs = self.vadpy.pipeline.fs
+        bps = self.vadpy.pipeline.bps
+        
         new_elem = Element(self.name, 
                            os.path.getsize(outdata_path) / (fs * (bps / 8.0)),
                            outdata_path, 
-                           os.path.join(gt_dir, source_file), 
-                           flags)
-        
-        
+                           outgt_path)
+
+        new_elem.gt_data = Data(sections, )
+
+        self.vadpy.pipeline.flush(flush_flags = False)
+        self.vadpy.pipeline.add(new_elem)

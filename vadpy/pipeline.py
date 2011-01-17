@@ -1,3 +1,5 @@
+import collections
+
 UNDEFINED = 0
 LITTLE_ENDIAN = 0x2
 BIG_ENDIAN = 0x4
@@ -13,14 +15,17 @@ class Pipeline(object):
         self._elements = []
         self._flags = UNDEFINED
 
-    def add(self, elements):
+    def add(self, *elements):
         self._elements.extend(elements)
+
+
 
     def __getitem__(self, item):
         return self._elements[item]
 
     def __iter__(self):
-        return self._elements.__iter__()
+        if self.is_ready(raise_error = True):
+            return self._elements.__iter__()
 
     def __contains__(self, entity):
         return entity in self._elements
@@ -37,12 +42,16 @@ class Pipeline(object):
             else:
                 return 
 
-    def flush(self):
+    def flush(self, flush_flags = True):
         self._elements = []
-        self._flags = UNDEFINED
+        if flush_flags:
+            self._flags = UNDEFINED
 
-    def is_ready():
-        return all(self.flags != UNDEFINED, self.bps, self.fs)
+    def is_ready(self, raise_error = False):
+        is_ready = all([self.flags != UNDEFINED, self.bps, self.fs])
+        if raise_error:
+            assert is_ready, 'The pipeline is not ready to be processed'
+        return is_ready
 
     @property
     def bps(self):

@@ -216,12 +216,8 @@ class MatlabVADModuleBase(VADModule):
 
         self._execlist = ['-r', '{__bracket__}'] + self._execlist + [' {__bracket__}']
 
-        # check if all elements in stream have same flags
-        flags = pipeline[0].flags
-        pipeline.flags_differ(raise_error = True)
-
         # set internal flags for matlab engine
-        endianness = flags & LITTLE_ENDIAN and 'l' or 'b'
+        endianness = pipeline.flags & LITTLE_ENDIAN and 'l' or 'b'
 
         self._execargs['endianness'] = endianness
         
