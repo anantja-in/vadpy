@@ -4,7 +4,7 @@ PATH = ['/home/zaur/Documents/Study/vadpy2/src/modules',
         ]
 
 ROOT = '/home/zaur/Documents/Study/vadpy2'
-ROOT = '/media/devel/thesis/vadpy2'
+#ROOT = '/media/devel/thesis/vadpy2'
 BINDIR = ROOT + '/bin'
 OUTDIR = ROOT + '/output'
 

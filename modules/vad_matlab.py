@@ -1,7 +1,7 @@
 import logging 
 
 from vadpy.module import MatlabVADModuleBase
-from vadpy.element import LITTLE_ENDIAN, BIG_ENDIAN
+from vadpy.pipeline import LITTLE_ENDIAN, BIG_ENDIAN
 from vadpy.options import Option
 
 log = logging.getLogger(__name__)
