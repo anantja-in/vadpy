@@ -18,8 +18,6 @@ class Pipeline(object):
     def add(self, *elements):
         self._elements.extend(elements)
 
-
-
     def __getitem__(self, item):
         return self._elements[item]
 

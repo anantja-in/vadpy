@@ -7,7 +7,7 @@ class ModuleError(VADpyError):
 class ModuleNotFoundError(VADpyError):
     def __init__(self, name):
         super(ModuleNotFoundError, self).__init__(
-            'Module {0} could not be found').format(name)
+            'Module {0} could not be found'.format(name))
         
 class ParseError(VADpyError):
     def __init__(self, message):

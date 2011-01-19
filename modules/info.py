@@ -32,6 +32,4 @@ class Info(Module):
                                           source_path = element.source_path, 
                                           gt_path = element.gt_path,
                                           length = element.length,)
-                print(query)
-                
-        
+                print(query)            

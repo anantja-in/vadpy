@@ -52,11 +52,11 @@ def extend_sections(element, sections, frame_len):
         
 class Data(object):
     """Data store for GT or VAD data"""
-    def __init__(self, sections, frame_len):
+    def __init__(self, sections, frame_len = 1):
         """Initialize Generic Data object 
         
-        sections -- list of Section objects with GT/VAD data
-        path     -- GT/VAD file's path
+        sections  -- list of Section objects with GT/VAD data
+        frame_len -- length of every data frame in seconds
         """
         assert sections, 'At least one section should be supplied to create Data object'
 
@@ -66,18 +66,12 @@ class Data(object):
 
         self.merge()
         self.adjust_sections_length()
-      
-    @property 
-    def frame_len(self):
-        return self._frame_len
 
-    @frame_len.setter
-    def frame_len(self, value):
-        assert value > 0, "Frame length must be a positive number"
-        self._frame_len = value
+    def __str__(self):
+        return "Data object at {0}; Sections count: {1}; frame length: {2}".format(hex(id(self)), self._count, self._frame_len)
         
     def __len__(self):
-        return self._length
+        return self._count
 
     def __iter__(self):
         self._iter_time_pos = self._sections[0].start - self._frame_len
@@ -220,3 +214,16 @@ class Data(object):
                     ret_sections.append(section)
 
         self._sections = ret_sections
+
+    @property
+    def sections(self):
+        return self._sections
+      
+    @property 
+    def frame_len(self):
+        return self._frame_len
+
+    @frame_len.setter
+    def frame_len(self, value):
+        assert value > 0, "Frame length must be a positive number"
+        self._frame_len = value

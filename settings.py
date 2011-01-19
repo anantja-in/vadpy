@@ -4,14 +4,14 @@ PATH = ['/home/zaur/Documents/Study/vadpy2/src/modules',
         ]
 
 ROOT = '/home/zaur/Documents/Study/vadpy2'
-#ROOT = '/media/devel/thesis/vadpy2'
+ROOT = '/media/devel/thesis/vadpy2'
 BINDIR = ROOT + '/bin'
 OUTDIR = ROOT + '/output'
 
 # Macros 
 MACROS = {   
     'nist' : 'dbnist root="{root}/databases/NIST" source-dir=DATA gt-dir=GT',
-    'onist' : 'iostamps res="" split="" action=write frame-len=0.008', 
+    'onist' : 'iostamps re="" split="" action=write frame-len=0.008', 
     'inist' : 'iosingled action=read frame-len=0.008 k=1', 
    
     # vad modules
@@ -21,5 +21,5 @@ MACROS = {
     'mtrain' : 'matlab engine=train',
     'mtest' : 'matlab engine=test',
 
-    'dbcat': 'cat outdir="{outdir}" frame-len=0.008'
+    'dbcat': 'cat outdir="{outdir}"'
 }

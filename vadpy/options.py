@@ -1,3 +1,5 @@
+import collections
+
 class Option(object):
     def __init__(self, 
                  name = None,
@@ -15,6 +17,8 @@ class Option(object):
         self.parse_type = parse_type
         self.parse_func = parse_func
         self.default = default
+
+        assert not parse_func or isinstance(parse_func, collections.Callable), 'Option has uncallable parse_func argument'
 
     def parse(self, value):
         value = self.parse_type(value) # type conversion

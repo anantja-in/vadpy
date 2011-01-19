@@ -13,7 +13,9 @@ class Cat(Module):
     """Concatenates all elements' data and GT into one element"""
     outdir = Option(description = 'Optput directory, to which the concatenated data should be written')
     name = Option(description = 'New element\'s name' )
-    frame_len = Option('frame-len', description = 'GT data frame length')
+    frame_len = Option('frame-len', 'GT data frame length', float)
+    cat_gt = Option('gt', 'Concatenate GT', bool, default = True)
+    cat_data = Option('data', 'Concatenate data', bool, default = True)
     
     def __init__(self, vadpy, options):
         super(Cat, self).__init__(vadpy, options)
@@ -33,19 +35,21 @@ class Cat(Module):
         if os.path.exists(outgt_path): os.remove(outgt_path)
 
         for element in self.vadpy.pipeline:
-            # concatenate gt
-            for section in element.gt_data._sections:
-                section.start += shift
-                section.end += shift
-            sections.append(element.gt_data._sections)
+            if self.cat_gt:
+                # concatenate gt
+                for section in element.gt_data.sections:
+                    section.start += shift
+                    section.end += shift
+                    sections.append(section)
 
-            shift += element.length
-            
-            # concatenate data                    
-            out_io = io.FileIO(outdata_path, 'a')
-            data_io = io.FileIO(element.source_path)
-            out_io.write(data_io.read())
-            data_io.close()
+                shift += element.length
+
+            if self.cat_data:
+                # concatenate data                    
+                out_io = io.FileIO(outdata_path, 'a')
+                data_io = io.FileIO(element.source_path)
+                out_io.write(data_io.read())
+                data_io.close()
         
         fs = self.vadpy.pipeline.fs
         bps = self.vadpy.pipeline.bps
@@ -55,7 +59,7 @@ class Cat(Module):
                            outdata_path, 
                            outgt_path)
 
-        new_elem.gt_data = Data(sections, )
+        new_elem.gt_data = Data(sections, self.frame_len)
 
         self.vadpy.pipeline.flush(flush_flags = False)
         self.vadpy.pipeline.add(new_elem)

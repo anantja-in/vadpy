@@ -46,7 +46,8 @@ class IOStamps(IOModule):
                     self.frame_len)
 
         elif self.action == 'write':
-            for element in self.vadpy.pipeline:
+            for element in self.vadpy.pipeline:                
+                element.gt_data.frame_len = self.frame_len
                 self.write(element.gt_data, element.gt_path)
                
     def read(self, path):
@@ -94,7 +95,7 @@ class IOStamps(IOModule):
             start_section = None
             previos_section = None # (i-1_th section)
 
-            for section in data:                
+            for section in data.sections:  
                 if not start_section: # first processed section
                     voiced = section.voiced
                     start_section = section
