@@ -1,7 +1,7 @@
 import logging 
 
 from vadpy.module import SimpleVADModuleBase
-from vadpy.pipeline import BIG_ENDIAN
+from vadpy.element import BIG_ENDIAN
 
 log = logging.getLogger(__name__)
 

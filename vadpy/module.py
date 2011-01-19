@@ -3,7 +3,6 @@ import logging
 import subprocess
 
 from .element import Element
-from .pipeline import UNDEFINED, BIG_ENDIAN, LITTLE_ENDIAN
 from .error import VADpyError, MissingArgumentError
 from .common import listdir
 from .options import Option
@@ -81,14 +80,11 @@ class DBModule(Module):
         self.gt_dir = os.path.join(self.root, self.gt_dir)
 
 
-    def elements_from_dirs(self, source_name, source_dir, gt_dir, *regexps):
+    def elements_from_dirs(self, source_name, source_dir, gt_dir, flags, *regexps):
         """Create elements by finding data files and corresponding gt files in given directories"""
         elements = []
         source_files = listdir(source_dir, *regexps)
         gt_files = set(listdir(gt_dir, *regexps))
-
-        fs = self.vadpy.pipeline.fs
-        bps = self.vadpy.pipeline.bps
 
         for source_file in source_files:
             source_file_path = os.path.join(source_dir, source_file)
@@ -96,11 +92,11 @@ class DBModule(Module):
                 continue
             if source_file in gt_files:
                 elements.append(
-                    Element(source_name, 
-                            os.path.getsize(source_file_path) / (fs * (bps / 8.0)),
+                    Element(source_name,
                             source_file_path, 
-                            os.path.join(gt_dir, source_file))                            
-                    )
+                            os.path.join(gt_dir, source_file),
+                            flags)
+                    )                            
             else:
                 raise VADpyError('Cannot find a GT file for corresponding source file {0}'.format(source_file))
 
