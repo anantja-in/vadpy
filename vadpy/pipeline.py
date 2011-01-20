@@ -19,6 +19,9 @@ class Pipeline(object):
     def __contains__(self, entity):
         return entity in self._elements
 
+    def __len__(self):
+        return len(self._elements)
+
     def slice(self, count):
         """Generator, returns items from pipe by 'count' slices"""
         i = 0
@@ -40,3 +43,6 @@ class Pipeline(object):
         if raise_error:
             assert is_ready, 'The pipeline is not ready to be processed'
         return is_ready
+
+    def is_monotonic(self):
+        return len(set(elem.flags for elem in self._elements)) <= 1

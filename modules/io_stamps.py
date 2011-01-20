@@ -47,7 +47,7 @@ class IOStamps(IOModule):
 
         elif self.action == 'write':
             for element in self.vadpy.pipeline:                
-                element.gt_data.frame_len = self.frame_len
+                element.gt_data.frame_len = self.frame_len # this is crucial! 
                 self.write(element.gt_data, element.gt_path)
                
     def read(self, path):
@@ -92,22 +92,27 @@ class IOStamps(IOModule):
 
     def write(self, data, path):
         with open(path, 'w') as f:
-            start_section = None
+            begin_section = None
             previos_section = None # (i-1_th section)
 
-            for section in data.sections:  
-                if not start_section: # first processed section
-                    voiced = section.voiced
-                    start_section = section
+            try:
+                # although it's expected that data.sections contain
+                # consequtevely changing sections (voiced/unvoiced/voiced/unvoiced/...)
+                # we can still insure ourselves against several consequtive voiced or unvoiced sections.
+                segment_start = data.sections[0]
+                
+                for section in data.sections:
+                    if segment_start.voiced != section.voiced: # sections differ
+                        if not section.voiced:                 # segment_start....previous_section segment is voiced
+                            f.write('{0} {1}\n'.format(segment_start.start, previos_section.end))
+                        segment_start = section
+                    previos_section = section
 
-                if start_section.voiced != section.voiced: # sections differ
-                    if not section.voiced:                 # start_section is voiced                        
-                        f.write('{0} {1}\n'.format(start_section.start, previos_section.end))
-                    else: 
-                        start_section = section
-
-                previos_section = section
-       
+                if segment_start.voiced: # finalize
+                    f.write('{0} {1}\n'.format(segment_start.start, previos_section.end))
+                    
+            except IndexError:
+                pass
 
     def _get_seconds(self, stamp):
         match = self._reo.match(stamp) # re match
