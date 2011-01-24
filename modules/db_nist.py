@@ -8,7 +8,9 @@ from vadpy.options import Option
 log = logging.getLogger(__name__)
 
 class DBNIST(DBModule):
-    dataset = Option(default = "all")
+    """NIST 2005 corpus module"""
+    dataset = Option(description = 'The dataset (directory name in source-dir) to be used. Leave blank for reading files from source-dir',
+                     default = '')
 
     def __init__(self, vadpy, options):
         super(DBNIST, self).__init__(vadpy, options)
@@ -16,8 +18,8 @@ class DBNIST(DBModule):
     def run(self):
         super(DBNIST, self).run()
 
-        if self.dataset != "all":
-            source_dir = os.path.join(self.source_dir, self.dataset)    
+        if self.dataset:
+            source_dir = os.path.join(self.source_dir, self.dataset)
         else:
             source_dir = self.source_dir
 

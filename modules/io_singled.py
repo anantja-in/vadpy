@@ -29,11 +29,11 @@ class IOSingleD(IOModule):
                 element.gt_data =  Data(self.read(element.gt_path), self.frame_len)
 
         elif self.action == 'write':
-            for element in self.vadpy.pipeline:
-                self.write(element.gt_data, element.gt_path + '.x')
+            for element in self.vadpy.pipeline:                
+                self.write(element.gt_data, element.gt_path)
                 
     def read(self, path):
-        log.debug(('Parsing: {0}').format(path))
+        super(IOSingleD, self).read(path)
 
         sections = []
 
@@ -66,7 +66,9 @@ class IOSingleD(IOModule):
 
 
     def write(self, data, path):
-        # with open(path, 'w') as f:
+        super(self, IOSingleD).write())
+        with open(path, 'w') as f:
         #     for section in data:
         #         f.write('{0}\t{1}\t{2}\n'.format(section[0], section[1], int(section[2])))
         pass
+    

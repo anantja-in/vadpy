@@ -41,18 +41,14 @@ class IOStamps(IOModule):
         
         if self.action == 'read':
             for element in self.vadpy.pipeline:
-                element.gt_data =  Data(
-                    extend_sections(element, self.read(element.gt_path), self.frame_len),
-                    self.frame_len)
-
+                element.gt_data =  Data(extend_sections(element, self.read(element.gt_path), self.frame_len),
+                                        self.frame_len)
         elif self.action == 'write':
             for element in self.vadpy.pipeline:                
-                element.gt_data.frame_len = self.frame_len # this is crucial! 
                 self.write(element.gt_data, element.gt_path)
                
     def read(self, path):
-        log.debug(('Parsing: {0}').format(path))
-
+        super(IOStamps, self).read(path)
         sections = []
 
         previous_time_from = 0
@@ -91,6 +87,7 @@ class IOStamps(IOModule):
 
 
     def write(self, data, path):
+        super(IOStamps, self).write(data, path)
         with open(path, 'w') as f:
             begin_section = None
             previos_section = None # (i-1_th section)

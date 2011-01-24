@@ -4,16 +4,16 @@ PATH = ['/home/zaur/Documents/Study/vadpy2/src/modules',
         ]
 
 ROOT = '/home/zaur/Documents/Study/vadpy2'
-ROOT = '/media/devel/thesis/vadpy2'
+#ROOT = '/media/devel/thesis/vadpy2'
 BINDIR = ROOT + '/bin'
 OUTDIR = ROOT + '/output'
 
 # Macros 
 MACROS = {   
     'nist' : 'dbnist root="{root}/databases/NIST" source-dir=DATA gt-dir=GT',
-    'onist' : 'iostamps re="" split="" action=write frame-len=0.008', 
-    'inist' : 'iosingled action=read frame-len=0.008 k=1', 
-   
+    'inist' : 'iosingled action=read frame-len=0.08 k=1', 
+    'ostamps' : 'iostamps re="" split="" action=wrcd ite frame-len=0.08', 
+
     # vad modules
     'g729' : 'vadg729 outdir="{outdir}/g729" exec-path="{bindir}/g729/g729vad" ',
     'matlab' : 'vadmatlab outdir="{outdir}/matlab" bin=matlab mopts="-nojvm, -nosplash" ' \

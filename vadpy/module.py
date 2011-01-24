@@ -22,7 +22,7 @@ class ModuleMetaclass(type):
         return type.__new__(meta, classname, bases, class_dict)
 
     def __str__(cls):
-        shelp = 'VADpy module ' + cls.__name__ + '\n' + cls.__doc__ + '\n'
+        shelp = 'VADpy module ' + cls.__name__ + '\n' + str(cls.__doc__) + '\n'
         first_option = True
         for attr in dir(cls): 
             objattr = getattr(cls, attr)
@@ -56,7 +56,7 @@ class Module(object):
                 name = option.name or attr
                 if name in options:
                     setattr(self, attr, option.parse(options[name])) # replace Option object with value
-                elif option.default:
+                elif option.default != None:
                     setattr(self, attr, option.parse(option.default))
                 else:
                     raise MissingArgumentError(option.module, name)
@@ -70,9 +70,9 @@ class Module(object):
     
 
 class DBModule(Module):
-    root = Option()
-    source_dir = Option('source-dir')
-    gt_dir = Option('gt-dir')
+    root = Option(description = 'Root directory of current database')
+    source_dir = Option('source-dir', description = 'Source directory (relatively to root dir)')
+    gt_dir = Option('gt-dir', description = 'Ground Truth directory (relatively to root dir)')
 
     def __init__(self, vadpy, options):
         super(DBModule, self).__init__(vadpy, options)
@@ -110,10 +110,17 @@ class IOModule(Module):
     def __init__(self, vadpy, options):
         super(IOModule, self).__init__(vadpy, options)
 
+    def run(self):
+        if self.action == 'write':
+            for element in self.vadpy.pipeline:                
+                element.gt_data.frame_len = self.frame_len # this is crucial!                
+
     def read(self, path):
+        log.debug(('Reading {0}').format(path))
         pass
 
     def write(self, data, path):
+        log.debug('Writing to {0}'.format(path))
         pass
 
 
