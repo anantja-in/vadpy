@@ -88,4 +88,6 @@ class SeqOptions(object):
     def _format(self, macro):
         return macro.format(root = self._settings.ROOT,
                             bindir = self._settings.BINDIR,
-                            outdir = self._settings.OUTDIR)
+                            outdir = self._settings.OUTDIR,
+                            dbdir = self._settings.DBDIR,
+                            framelen = self._settings.FRAMELEN,)

@@ -2,7 +2,7 @@ import logging
 import re
 from datetime import timedelta
 
-from vadpy.data import Section, Data
+from vadpy.data import Section, Data, extend_sections
 from vadpy.module import IOModule
 from vadpy.options import  Option
 
@@ -14,7 +14,7 @@ class IOSingleD(IOModule):
     The format is: 
     <time_from (in seconds)> <time_to (in seconds)> <decision (0|1) [<score>])
     """   
-    k_factor = Option('k', parse_type = int)
+    k_factor = Option('k', parse_type = int, default = '1')
 
     def __init__(self, vadpy, options):
         super(IOSingleD, self).__init__(vadpy, options)
@@ -26,7 +26,8 @@ class IOSingleD(IOModule):
        
         if self.action == 'read':
             for element in self.vadpy.pipeline:
-                element.gt_data =  Data(self.read(element.gt_path), self.frame_len)
+                element.gt_data =  Data(extend_sections(element, self.read(element.gt_path), self.frame_len),
+                                        self.frame_len)
 
         elif self.action == 'write':
             for element in self.vadpy.pipeline:                
@@ -66,9 +67,8 @@ class IOSingleD(IOModule):
 
 
     def write(self, data, path):
-        super(self, IOSingleD).write())
+        super(IOSingleD, self).write(data, path)
         with open(path, 'w') as f:
-        #     for section in data:
-        #         f.write('{0}\t{1}\t{2}\n'.format(section[0], section[1], int(section[2])))
-        pass
+            for section in data:
+                f.write('{0} {1} {2}\n'.format(section[0], section[1], int(section[2])) )                
     
