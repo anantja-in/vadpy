@@ -127,8 +127,10 @@ class IOModule(Module):
 class VADModule(Module):
     """Base class for all types of VAD modules"""
     # 
-    outdir = Option(parse_func = os.path.abspath) 
-    outpath = Option(default = '{outdir}/{source}/{filename}')
+    outdir = Option(parse_func = os.path.abspath, 
+                    description = 'VAD\'s output directory') 
+    outpath = Option(default = '{outdir}/{source}/{filename}',
+                     description = 'Output path template: {{outdir}}; {{source}}; {{filename}};')
     # filename corresponds to source_path's filename (template)
 
     def __init__(self, vadpy, options):
@@ -165,7 +167,7 @@ class SimpleVADModuleBase(VADModule):
       
     def run(self):
         super(SimpleVADModule, self).run() 
-        
+
         for element in self.vadpy.pipeline:
             self._set_outfile_path(element)
             # execution options list
