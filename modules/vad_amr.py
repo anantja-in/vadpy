@@ -2,6 +2,7 @@ import logging
 
 from vadpy.module import SimpleVADModuleBase
 from vadpy.element import BIG_ENDIAN, LITTLE_ENDIAN
+from vadpy.options import Option
 
 log = logging.getLogger(__name__)
 
@@ -19,12 +20,14 @@ class VADAMR(SimpleVADModuleBase):
         super(VADAMR, self).run()
 
     def _get_exec_options(self, element):
-        opt_before_args = 'MR122' # see allmodes.txt in AMR source directory
+        opt_before_args = ['MR122', ] # see allmodes.txt in AMR source directory
+        opt_after_args = []
         if element.flags & BIG_ENDIAN:
-            opt_after_args = ['b']
+            opt_after_args = ['b', ]
         elif elements.flags & LITTLE_ENDIAN:
-            opt_after_args = ['l']
+            opt_after_args = ['l', ]
 
+        assert not opt_after_args, 'Non-compatible endianness'
         return opt_before_args, opt_after_args
 
     def __init__(self, vadpy, options):

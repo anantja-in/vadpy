@@ -9,11 +9,11 @@ log = logging.getLogger(__name__)
 
 
 class SeqOptions(object):
-    def __init__(self, settings):
+    def __init__(self, vadpy):
 
-        self._settings = settings
-        self._macros = settings.MACROS
-        
+        self._vadpy = vadpy
+        self._macros = vadpy.settings.MACROS
+        self._format_args = self._vadpy.settings.format_args
         self.help_required = False
 
     def parse(self):
@@ -80,14 +80,7 @@ class SeqOptions(object):
         s_old = s
         for macro in self._macros:
             s = s.replace(' ' + macro + ' ', 
-                          ' ' + self._format(self._macros[macro]) + ' ')
+                          ' ' + (self._macros[macro].format(**self._format_args)) + ' ')
         if s != s_old:
             s = self._macro_replace(s)
         return s
-
-    def _format(self, macro):
-        return macro.format(root = self._settings.ROOT,
-                            bindir = self._settings.BINDIR,
-                            outdir = self._settings.OUTDIR,
-                            dbdir = self._settings.DBDIR,
-                            framelen = self._settings.FRAMELEN,)

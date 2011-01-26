@@ -67,6 +67,14 @@ class Module(object):
     def run(self):
         log.info('Running {0}'.format(self.__class__.__name__))
 
+    @property
+    def format_args(self):
+        """Dynamic (built from module's arguments) and static (built from settings.format_args string formatting arguments dictionary"""
+        ret_args = {'modname' : self.__class__.__name__, 
+                      }
+        ret_args.update(self.vadpy.settings.format_args)
+        return ret_args
+        
     
 
 class DBModule(Module):
@@ -126,11 +134,10 @@ class IOModule(Module):
 
 class VADModule(Module):
     """Base class for all types of VAD modules"""
-    # 
-    outdir = Option(parse_func = os.path.abspath, 
-                    description = 'VAD\'s output directory') 
-    outpath = Option(default = '{outdir}/{source}/{filename}',
-                     description = 'Output path template: {{outdir}}; {{source}}; {{filename}};')
+    voutdir = Option(default = '{outdir}/{modname}', 
+                     description = 'VAD output directory')
+    outpath = Option(default = '{voutdir}/{srcname}/{srcfile}',
+                     description = 'Output path template (using Element and Module format arguments)')
     # filename corresponds to source_path's filename (template)
 
     def __init__(self, vadpy, options):
@@ -138,10 +145,11 @@ class VADModule(Module):
 
     def _set_outfile_path(self, element):
         source_dir, source_file = os.path.split(element.source_path)
-        element.vad_output_path = self.outpath.format(
-            outdir = self.outdir, 
-            source = element.source_name, 
-            filename = source_file)
+        args = self.format_args
+        args.update(element.format_args)
+        args['voutdir'] = self.voutdir.format(**self.format_args)
+        element.vad_output_path = self.outpath.format(**args)
+                                                      
         # create directory (recursively)
         vad_output_dir = os.path.dirname(element.vad_output_path)
         if not os.path.exists(vad_output_dir):
@@ -158,7 +166,7 @@ class SimpleVADModuleBase(VADModule):
     exec_path = Option('exec-path', parse_func = os.path.abspath)
 
     def __init__(self, vadpy, options):
-        super(SimpleVADModule, self).__init__(vadpy, options)
+        super(SimpleVADModuleBase, self).__init__(vadpy, options)
         self._cmd = '{execpath} {vadoptions} {in_path} {out_path}' # command-line to run VAD
 
     def _get_exec_options(self, element):
@@ -166,7 +174,7 @@ class SimpleVADModuleBase(VADModule):
         return [], []
       
     def run(self):
-        super(SimpleVADModule, self).run() 
+        super(SimpleVADModuleBase, self).run() 
 
         for element in self.vadpy.pipeline:
             self._set_outfile_path(element)

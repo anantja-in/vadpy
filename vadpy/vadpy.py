@@ -10,7 +10,7 @@ class VADpy(object):
     def __init__(self, settings):
         self.settings = settings
         self.pipeline = Pipeline(self)
-        self.options = SeqOptions(settings)
+        self.options = SeqOptions(self)
 
         self._modules = []
         self._parse_arguments()

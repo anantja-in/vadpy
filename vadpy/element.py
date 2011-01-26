@@ -24,17 +24,14 @@ class Element(object):
         self.source_name = source_name
         self.source_path = source_path
         self.gt_path = gt_path
+        self.gt_data = None         # definet by IO module (reading GT)
 
         self.flags = flags
         self.length = 0               # file length in seconds
         if set_length:
-            self.set_length()         # calculate and set length value
-        
-        # defined by VAD module
-        # self.vad_output_path = None
-
-        # definet by IO module (reading GT)
-        # self.gt_data = None
+            self.set_length()         # calculate and set length value            
+        self.vad_output_path = ''   # defined by VAD module
+        self.vad_data = None        # defined by IO module (reading VAD output)
 
     def set_length(self):
         self.length = os.path.getsize(self.source_path) / (self.fs * (self.bps / 8.0)) 
@@ -58,3 +55,18 @@ class Element(object):
     @flags.setter
     def flags(self, value):
         self._flags = value
+
+    @property
+    def format_args(self):
+        """Dynamic (built from element's arguments) string formatting arguments dictionary"""        
+        source_dir, source_file = os.path.split(self.source_path)
+        gt_dir, gt_file = os.path.split(self.source_path)
+        vout_dir, vout_file = os.path.split(self.vad_output_path)
+        return {'srcname' : self.source_name, 
+                'srcdir' : source_dir, 
+                'srcfile' : source_file, 
+                'gtdir' : gt_dir, 
+                'gtfile' : gt_file, 
+                'voutdir' : vout_dir, 
+                'voutfile' : vout_file, 
+                }
