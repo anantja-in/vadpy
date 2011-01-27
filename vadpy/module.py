@@ -138,6 +138,9 @@ class VADModule(Module):
                      description = 'VAD output directory')
     outpath = Option(default = '{voutdir}/{srcname}/{srcfile}',
                      description = 'Output path template (using Element and Module format arguments)')
+    overwrite = Option(default = False, parse_type = bool,  
+                       description = 'Indicates if the module must overwrite existing VAD output')
+
     # filename corresponds to source_path's filename (template)
 
     def __init__(self, vadpy, options):
@@ -178,6 +181,8 @@ class SimpleVADModuleBase(VADModule):
 
         for element in self.vadpy.pipeline:
             self._set_outfile_path(element)
+            if not self.overwrite and os.path.exists(element.vad_output_path):
+                continue
             # execution options list
             options_before_args, options_after_args = self._get_exec_options(element)
 
@@ -234,10 +239,12 @@ class MatlabVADModuleBase(VADModule):
 
         self._execargs['endianness'] = endianness
         
-        for elements in pipeline.slice(self.filecount):
+        for elements in (elem for elem in pipeline.slice(self.filecount)
+                         if self.overwrite or not os.path.exists(elem.vad_output_path)):
             for element in elements:
                 self._set_outfile_path(element)
-
+                
+                
             in_paths = ';'.join(elem.source_path for elem in elements)
             gt_paths = ';'.join(elem.gt_path for elem in elements)
             out_paths = ';'.join(elem.vad_output_path for elem in elements)

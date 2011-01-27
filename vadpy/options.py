@@ -21,8 +21,14 @@ class Option(object):
         assert not parse_func or isinstance(parse_func, collections.Callable), 'Option has uncallable parse_func argument'
 
     def parse(self, value):
-        value = self.parse_type(value) # type conversion
+        if self.parse_func: 
+            try:
+                value = self.parse_func(value)
+            except AttributeError:
+                pass
+        elif self.parse_type == bool and not isinstance(value, bool):
+            value = value.lower() not in ['', '""', "''", 'no', 'false']
+        else:
+            value = self.parse_type(value) # type conversion
         
-        if self.parse_func and hasattr(self.parse_func, '__call__'):
-            value = self.parse_func(value)
         return value

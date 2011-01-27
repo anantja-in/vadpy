@@ -20,8 +20,8 @@ MACROS = {
     'osingle' : 'iosingled action=write frame-len={oframelen}',
 
     # vad modules
-    'g729' : 'vadg729 outvdir="{outdir}/g729" exec-path="{bindir}/g729/g729vad" ',
-    'amr1' : 'vadamr outvdir="{outdir}/amr1" exec-path="{bindir}/amr/amr1" ',
+    'g729' : 'vadg729 voutdir="{outdir}/g729" exec-path="{bindir}/g729/g729vad" ',
+    'amr1' : 'vadamr voutdir="{outdir}/amr1" exec-path="{bindir}/amr/amr1" ',
     'amr2' : 'vadamr voutdir="{outdir}/amr2" exec-path="{bindir}/amr/amr2" ',
     'matlab' : 'vadmatlab voutdir="{outdir}/matlab" bin=matlab mopts="-nojvm, -nosplash" ' \
                'scriptdir={bindir}/matlab engine=vad script="" fread=600 filecount=128 args=""',

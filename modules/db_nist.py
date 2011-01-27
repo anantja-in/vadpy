@@ -25,7 +25,7 @@ class DBNIST(DBModule):
 
         flags = LITTLE_ENDIAN | FS_8000 | BPS_16
 
-        elements = self.elements_from_dirs('nist', source_dir, self.gt_dir, flags)
+        elements = self.elements_from_dirs('NIST', source_dir, self.gt_dir, flags)
 
         self.vadpy.pipeline.add(*elements)
         log.debug('Added {0} elements to stream'.format(len(elements)))
