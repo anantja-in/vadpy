@@ -3,34 +3,20 @@ import collections
 class Option(object):
     def __init__(self, 
                  name = None,
-                 description = '', 
-                 parse_type = str, 
-                 parse_func = None,
-                 default = None):
+                 parser = str,
+                 description = '',):
         """
-
-        default - default value (string, as if recieved from command-line)
+        name        - Option's name, (if empty, it's then automatically set by ModuleMetaClass)
+        parser      - Callable parser (function or type) that parses option's value
+        description - Option's description
         """
         self.description = description
-        self.parse_type = parse_type
-        self.parse_func = parse_func
-        self.default = default
+        self.parser = parser
         self.name = name                # if None, will be set from attribute name by ModuleMetaClass
         self.module = None              # set by ModuleMetaclass 
 
-        assert not parse_func or isinstance(parse_func, collections.Callable), 'Option has uncallable parse_func argument'
-    
     def parse(self, value):
-        if self.parse_func: 
-#            try:
-            value = self.parse_func(value)
-            # except AttributeError:
-            #     pass
-        elif self.parse_type == bool and not isinstance(value, bool):
-            value = value.lower() not in ['', '""', "''", 'no', 'false']
-        else:
-            value = self.parse_type(value) # type conversion
-        
+        value = self.parser(value)            
         return value
 
     @property
@@ -45,3 +31,6 @@ class Option(object):
             self.description = self.description.format(option = value)
         self._name = value
 
+
+def bool_parser(value):
+    value = value.lower() not in ['', '""', "''", 'no', 'false']    

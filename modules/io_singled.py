@@ -2,19 +2,19 @@ import logging
 import re
 from datetime import timedelta
 
-from vadpy.labels import Section, Labels, extend_sections
-from vadpy.module import IOModule
+from vadpy.labels import Section
+from vadpy.module import GenericIOModuleBase
 from vadpy.options import  Option
 
 log = logging.getLogger(__name__)
 
-class IOSingleD(IOModule):
+class IOSingleD(GenericIOModuleBase):
     """Parse GT/VAD files with decisions-only strings
 
     The format is: 
     <time_from (in seconds)> <time_to (in seconds)> <decision (0|1) [<score>])
     """   
-    k_factor = Option('k', parse_type = int, default = '1')
+    k_factor = Option('k', parser = int)
 
     def __init__(self, vadpy, options):
         super(IOSingleD, self).__init__(vadpy, options)
@@ -23,15 +23,6 @@ class IOSingleD(IOModule):
 
     def run(self):
         super(IOSingleD, self).run()
-       
-        if self.action == 'read':
-            for element in self.vadpy.pipeline:
-                element.gt_labels =  Labels(extend_sections(element, self.read(element.gt_path), self.frame_len),
-                                        self.frame_len)
-
-        elif self.action == 'write':
-            for element in self.vadpy.pipeline:                
-                self.write(element.gt_labels, element.gt_path)
                 
     def read(self, path):
         super(IOSingleD, self).read(path)

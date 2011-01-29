@@ -68,9 +68,8 @@ class Labels(object):
             self.merge()
             self.adjust_sections_length()
 
-
     def __str__(self):
-        return "Labels object at {0}; Sections count: {1}; frame length: {2}".format(hex(id(self)), self._count, self._frame_len)
+        return "Labels object. Sections count: {0}; Frame length: {1}".format(self._count, self._frame_len)
         
     def __len__(self):
         return self._count

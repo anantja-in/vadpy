@@ -2,12 +2,12 @@ import logging
 import re
 from datetime import timedelta
 
-from vadpy.labels import Section, Labels, extend_sections
-from vadpy.module import Option, IOModule
+from vadpy.labels import Section
+from vadpy.module import Option, GenericIOModuleBase
 
 log = logging.getLogger(__name__)
 
-class IOStamps(IOModule):
+class IOStamps(GenericIOModuleBase):
     """Parse GT/VAD files with positive decisions-only strings
 
     The format is: 
@@ -35,17 +35,8 @@ class IOStamps(IOModule):
         super(IOStamps, self).__init__(vadpy, options)
         self._reo = re.compile(self.res)
 
-
     def run(self):
         super(IOStamps, self).run()
-        
-        if self.action == 'read':
-            for element in self.vadpy.pipeline:
-                element.gt_labels =  Labels(extend_sections(element, self.read(element.gt_path), self.frame_len),
-                                        self.frame_len)
-        elif self.action == 'write':
-            for element in self.vadpy.pipeline:                
-                self.write(element.gt_labels, element.gt_path)
                
     def read(self, path):
         super(IOStamps, self).read(path)
@@ -64,7 +55,6 @@ class IOStamps(IOModule):
                 stamp_from, stamp_to = line.split(self.splitstr)
                 time_from = self._get_seconds(stamp_from)
                 time_to = self._get_seconds(stamp_to)
-
 
                 if previous_time_to >= time_from: # overlapping sections:
                     time_from = previous_time_to

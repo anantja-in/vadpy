@@ -5,8 +5,8 @@ import subprocess
 from . import common
 from .element import Element
 from .error import VADpyError, MissingArgumentError
-from .options import Option
-
+from .options import Option, bool_parser
+from .labels import Labels, extend_sections
 
 log = logging.getLogger(__name__)
 
@@ -15,7 +15,7 @@ class ModuleMeta(type):
     def __new__(meta, classname, bases, class_dict):
         for item in class_dict:                    
             attr = class_dict[item]
-            if type(attr) == Option: 
+            if isinstance(attr, Option):
                 attr.module = classname.lower() # add module's name to option                
                 if not attr.name:
                     attr.name = item
@@ -23,14 +23,14 @@ class ModuleMeta(type):
 
     def __str__(cls):
         shelp = 'VADpy module {0}\n{1}\n' \
-                'Options:\n{s_name}description'.format(cls.__name__ , 
+                'Options:\n{s_name}Description'.format(cls.__name__ , 
                                                        str(cls.__doc__),
                                                        s_name = 'Name'.ljust(20))
         options = (objattr for objattr in (getattr(cls, attr) for attr in dir(cls))
                    if isinstance(objattr, Option))
 
         for opt in options: 
-            shelp += '{name}{desc}\n'.format(name =  opt.name.ljust(20),
+            shelp += '\n{name}{desc}'.format(name =  opt.name.ljust(20),
                                              desc = opt.description)
         return shelp
 
@@ -56,8 +56,6 @@ class Module(object):
                 name = option.name or attr
                 if name in options:
                     setattr(self, attr, option.parse(options[name])) # replace Option object with value
-                elif option.default != None:
-                    setattr(self, attr, option.parse(option.default))
                 else:
                     raise MissingArgumentError(option.module, name)
 
@@ -111,8 +109,14 @@ class DBModule(Module):
 
 class IOModule(Module):
     action = Option()
-    frame_len = Option('frame-len', parse_type = float)
-    
+    frame_len = Option('frame-len', float)
+    labels_attr = Option('labels-attr', 
+                         description = 'Read/Write GT labels from/to defined element\'s attribute containing Labels object. ' \
+                                       'In most cases the value will be: gt_labels or vad_labels ' )
+    path_attr = Option('path-attr', 
+                       description = 'Read/Write data GT labels from/to defined element\'s attribute containing a valid path. ' \
+                                     'In most cases the value will be: gt_path or vout_path')
+
     def __init__(self, vadpy, options):
         super(IOModule, self).__init__(vadpy, options)
 
@@ -129,18 +133,35 @@ class IOModule(Module):
         log.debug('Writing to {0}'.format(path))
         pass
 
+class GenericIOModuleBase(IOModule):
+    """A IO Module's base class with generic run() method
+
+    Run() uses current action according to labels_attr and path_attr options. 
+    """    
+    def run(self):
+        super(GenericIOModuleBase, self).run()
+        
+        if self.action == 'read':
+            for element in self.vadpy.pipeline:                
+                path = getattr(element, self.path_attr)
+                labels = Labels(extend_sections(element, self.read(path), self.frame_len),
+                                self.frame_len)
+                setattr(element, self.labels_attr, labels)
+        elif self.action == 'write':
+            for element in self.vadpy.pipeline:
+                path = getattr(element, self.path_attr)
+                labels = getattr(element, self.labels_attr)
+                self.write(labels, path)
+
 
 class VADModule(Module):
     """Base class for all types of VAD modules"""
-    outdir = Option(default = '{outdir}/{modname}', 
-                    description = 'VAD output directory')
-    outpath = Option(default = '{voutdir}/{srcname}/{srcfile}',
-                     description = 'Output path template (using Element and Module format arguments)')
-    overwrite = Option(default = False, parse_type = bool,  
+    voutdir = Option(description = 'VAD output directory')
+    outpath = Option(description = 'Output path template (using Element and Module format arguments)')
+    overwrite = Option(parser = bool_parser, 
                        description = 'Indicates if the module must overwrite existing VAD output')
-
+                       
     # filename corresponds to source_path's filename (template)
-
     def __init__(self, vadpy, options):
         super(VADModule, self).__init__(vadpy, options)
 
@@ -148,11 +169,11 @@ class VADModule(Module):
         source_dir, source_file = os.path.split(element.source_path)
         args = self.format_args
         args.update(element.format_args)
-        args['voutdir'] = self.outdir.format(**self.format_args)
-        element.vad_output_path = self.outpath.format(**args)
+        args['voutdir'] = self.voutdir.format(**self.format_args)
+        element.vout_path = self.outpath.format(**args)
                                                       
         # create directory (recursively)
-        vad_output_dir = os.path.dirname(element.vad_output_path)
+        vad_output_dir = os.path.dirname(element.vout_path)
         if not os.path.exists(vad_output_dir):
             os.makedirs(vad_output_dir)
 
@@ -164,7 +185,7 @@ class SimpleVADModuleBase(VADModule):
     that require no training and can produce a single VAD output file by processing
     a single input file. 
     """    
-    exec_path = Option('exec-path', parse_func = os.path.abspath)
+    exec_path = Option('exec-path', parser = os.path.abspath)
 
     def __init__(self, vadpy, options):
         super(SimpleVADModuleBase, self).__init__(vadpy, options)
@@ -179,15 +200,17 @@ class SimpleVADModuleBase(VADModule):
 
         for element in self.vadpy.pipeline:
             self._set_outfile_path(element)
-            if not self.overwrite and os.path.exists(element.vad_output_path):
+            if not self.overwrite and os.path.exists(element.vout_path):
+                log.debug('File already exists: {0}'.format(element.vout_path))
                 continue
+
             # execution options list
             options_before_args, options_after_args = self._get_exec_options(element)
 
             lstrun = [self.exec_path,]
             lstrun.extend(options_before_args)
             lstrun.append(element.source_path)
-            lstrun.append(element.vad_output_path)
+            lstrun.append(element.vout_path)
             lstrun.extend(options_after_args)
 
             log.debug('Starting the VAD as {0}'.format(lstrun))
@@ -210,7 +233,7 @@ class MatlabVADModuleBase(VADModule):
     engine = Option(description = 'A path to VADpy-to-MATLAB engine\'s function name')
     scriptdir = Option(description = 'A directory in which VAD algorithms scripts are located; Matlab working directory')
     filecount = Option(description = 'Amount of files to be passed to Matlab engine at a time', 
-                       parse_type = int)
+                       parser = int)
 
     def __init__(self, vadpy, options):
         super(MatlabVADModuleBase, self).__init__(vadpy, options)
@@ -238,14 +261,14 @@ class MatlabVADModuleBase(VADModule):
         self._execargs['endianness'] = endianness
         
         for elements in (elem for elem in pipeline.slice(self.filecount)
-                         if self.overwrite or not os.path.exists(elem.vad_output_path)):
+                         if self.overwrite or not os.path.exists(elem.vout_path)):
             for element in elements:
                 self._set_outfile_path(element)
                 
                 
             in_paths = ';'.join(elem.source_path for elem in elements)
             gt_paths = ';'.join(elem.gt_path for elem in elements)
-            out_paths = ';'.join(elem.vad_output_path for elem in elements)
+            out_paths = ';'.join(elem.vout_path for elem in elements)
 
             self._execargs['in_paths'] = in_paths
             self._execargs['gt_paths'] = gt_paths

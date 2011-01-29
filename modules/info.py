@@ -6,17 +6,25 @@ from vadpy.element import *
 
 log = logging.getLogger(__name__)
 
-class Info(Module):
+class ModInfo(Module):
     """Prints known information about every element in the stream"""
-    action = Option(default = 'show')
-    query = Option(default = 'Source:\t\t{source}\nPath:\t\t{source_path}\nGT path:\t{gt_path}\nLength:\t\t{length} s.\n')
+    action = Option()
+
     
     def __init__(self, vadpy, options):
-        super(Info, self).__init__(vadpy, options)
+        super(ModInfo, self).__init__(vadpy, options)
 
     def run(self):
-        super(Info, self).run()
+        super(ModInfo, self).run()
 
+        query = 'Source:\t\t{source_name}\n' \
+            'Path:\t\t{source_path}\n' \
+            'GT path:\t{gt_path}\n' \
+            'GT labels:\t{gt_labels}\n' \
+            'Vout path:\t{vout_path}\n' \
+            'VAD labels:\t{vad_labels}\n' \
+            'Length:\t\t{length} s.\n'
+        
         if self.action == 'show':            
             # todo
             # print('Pipeline: ')
@@ -29,8 +37,5 @@ class Info(Module):
             #         flags += 'Encoding: Big endian;'
 
             for element in self.vadpy.pipeline:
-                query = self.query.format(source = element.source_name, 
-                                          source_path = element.source_path, 
-                                          gt_path = element.gt_path,
-                                          length = element.length,)
-                print(query)            
+                print(query.format(**element.__dict__))
+

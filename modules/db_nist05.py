@@ -12,9 +12,8 @@ class DBNIST05(DBModule):
     SOURCE_NAME = 'NIST05'
     FLAGS       = LITTLE_ENDIAN | FS_8000 | BPS_16
 
-    dataset = Option(description = 'The dataset (directory name in source-dir) to be used. Leave blank for reading files from source-dir',
-                     default = '')
-
+    dataset = Option(description = 'The dataset (directory name in source-dir) to be used. Leave blank for reading files from source-dir')
+                     
     def __init__(self, vadpy, options):
         super(DBNIST05, self).__init__(vadpy, options)
 
