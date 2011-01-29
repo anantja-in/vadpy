@@ -1,3 +1,4 @@
+import sys
 import logging 
 
 log = logging.getLogger(__name__)
@@ -25,16 +26,22 @@ class VADpy(object):
 
         if self.options.help_required:
             # print module help
-            if modules: # modules is a simple string variable here
+            if modules: # "modules" is a simple string variable here
                 if modules in self.settings.MACROS:
                     print('VADpy macro: {0} '.format(self.settings.MACROS[modules]))
                 else:
                     module = manager[modules]
-                    print('\n{0}'.format(module))
+                    print(module)
             else:
+                exec_name = sys.argv[0]
                 # print general program help
-                print 'VADpy help'
-            
+                print('VADpy - the ultimate VAD framework')
+                print('Usage:\n{0} [OPTIONS] [MODULES SEQUENCE]'.format(exec_name))
+                print('Modules:\n{s_name}description'.format(s_name = 'Name'.ljust(20, ' ')))
+                                                             
+                for module in manager:
+                    mod = manager[module]
+                    print('{0}{1}'.format(mod.__name__ .ljust(20, ' '), str(mod.__doc__).split('\n')[0]))
             exit()
                 
         for module, options in modules:

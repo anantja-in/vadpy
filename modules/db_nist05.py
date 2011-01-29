@@ -7,25 +7,23 @@ from vadpy.options import Option
 
 log = logging.getLogger(__name__)
 
-class DBNIST(DBModule):
+class DBNIST05(DBModule):
     """NIST 2005 corpus module"""
+    SOURCE_NAME = 'NIST05'
+    FLAGS       = LITTLE_ENDIAN | FS_8000 | BPS_16
+
     dataset = Option(description = 'The dataset (directory name in source-dir) to be used. Leave blank for reading files from source-dir',
                      default = '')
 
     def __init__(self, vadpy, options):
-        super(DBNIST, self).__init__(vadpy, options)
+        super(DBNIST05, self).__init__(vadpy, options)
 
     def run(self):
-        super(DBNIST, self).run()
+        super(DBNIST05, self).run()
+        source_dir = os.path.join(self.source_dir, self.dataset)
 
-        if self.dataset:
-            source_dir = os.path.join(self.source_dir, self.dataset)
-        else:
-            source_dir = self.source_dir
-
-        flags = LITTLE_ENDIAN | FS_8000 | BPS_16
-
-        elements = self.elements_from_dirs('NIST', source_dir, self.gt_dir, flags)
-
+        elements = self.elements_from_dirs(self.SOURCE_NAME, source_dir, self.gt_dir, self.FLAGS)
         self.vadpy.pipeline.add(*elements)
         log.debug('Added {0} elements to stream'.format(len(elements)))
+
+

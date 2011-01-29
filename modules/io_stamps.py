@@ -2,7 +2,7 @@ import logging
 import re
 from datetime import timedelta
 
-from vadpy.data import Section, Data, extend_sections
+from vadpy.labels import Section, Labels, extend_sections
 from vadpy.module import Option, IOModule
 
 log = logging.getLogger(__name__)
@@ -41,11 +41,11 @@ class IOStamps(IOModule):
         
         if self.action == 'read':
             for element in self.vadpy.pipeline:
-                element.gt_data =  Data(extend_sections(element, self.read(element.gt_path), self.frame_len),
+                element.gt_labels =  Labels(extend_sections(element, self.read(element.gt_path), self.frame_len),
                                         self.frame_len)
         elif self.action == 'write':
             for element in self.vadpy.pipeline:                
-                self.write(element.gt_data, element.gt_path)
+                self.write(element.gt_labels, element.gt_path)
                
     def read(self, path):
         super(IOStamps, self).read(path)
@@ -86,19 +86,19 @@ class IOStamps(IOModule):
         return sections
 
 
-    def write(self, data, path):
-        super(IOStamps, self).write(data, path)
+    def write(self, labels, path):
+        super(IOStamps, self).write(labels, path)
         with open(path, 'w') as f:
             begin_section = None
             previos_section = None # (i-1_th section)
 
             try:
-                # although it's expected that data.sections contain
+                # although it's expected that labels.sections contain
                 # consequtevely changing sections (voiced/unvoiced/voiced/unvoiced/...)
                 # we can still insure ourselves against several consequtive voiced or unvoiced sections.
-                segment_start = data.sections[0]
+                segment_start = labels.sections[0]
                 
-                for section in data.sections:
+                for section in labels.sections:
                     if segment_start.voiced != section.voiced: # sections differ
                         if not section.voiced:                 # segment_start....previous_section segment is voiced
                             f.write('{0} {1}\n'.format(segment_start.start, previos_section.end))

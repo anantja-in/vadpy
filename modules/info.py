@@ -7,6 +7,7 @@ from vadpy.element import *
 log = logging.getLogger(__name__)
 
 class Info(Module):
+    """Prints known information about every element in the stream"""
     action = Option(default = 'show')
     query = Option(default = 'Source:\t\t{source}\nPath:\t\t{source_path}\nGT path:\t{gt_path}\nLength:\t\t{length} s.\n')
     

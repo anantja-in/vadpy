@@ -50,15 +50,15 @@ def extend_sections(element, sections, frame_len):
     return sections
 
         
-class Data(object):
-    """Data store for GT or VAD data"""
+class Labels(object):
+    """Labels store for GT or VAD labels"""
     def __init__(self, sections, frame_len = None):
-        """Initialize Generic Data object 
+        """Initialize Generic Labels object 
         
-        sections  -- list of Section objects with GT/VAD data
-        frame_len -- length of every data frame in seconds
+        sections  -- list of Section objects with GT/VAD labels
+        frame_len -- length of every labels frame in seconds
         """
-        assert sections, 'At least one section should be supplied to create Data object'
+        assert sections, 'At least one section should be supplied to create Labels object'
 
         self._sections = sections
         self._frame_len = frame_len
@@ -70,7 +70,7 @@ class Data(object):
 
 
     def __str__(self):
-        return "Data object at {0}; Sections count: {1}; frame length: {2}".format(hex(id(self)), self._count, self._frame_len)
+        return "Labels object at {0}; Sections count: {1}; frame length: {2}".format(hex(id(self)), self._count, self._frame_len)
         
     def __len__(self):
         return self._count

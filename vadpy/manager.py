@@ -12,7 +12,14 @@ class ModuleManager(object):
     def __init__(self, vadpy):
         self.vadpy = vadpy
         self._modules_dirs = vadpy.settings.PATH
-        self._modules = {}      # enabled modules {name : module}
+        self._modules = {}          # enabled modules {name : module}
+        self._sorted_mod_names = [] # modules' names sorted by base class
+        self._base_modules = [module.Module, 
+                              module.IOModule, 
+                              module.DBModule, 
+                              module.VADModule, 
+                              module.SimpleVADModuleBase, 
+                              module.MatlabVADModuleBase]
         self._scan()             # find and store modules 
             
     def enable(self, name, options):
@@ -49,8 +56,9 @@ class ModuleManager(object):
                     continue
                     
                 module_classes = [attr for attr in pymod.__dict__.values()
-                                   if isinstance(attr, type) and
-                                   issubclass (attr, module.Module)]
+                                  if isinstance(attr, type) and
+                                  issubclass (attr, module.Module) and 
+                                  attr not in self._base_modules]
                 if len(module_classes) == 0:
                     log.debug('No Module sub-classes found in {0}'.format(path))
 
@@ -64,7 +72,7 @@ class ModuleManager(object):
         return self._modules[key]
 
     def __iter__(self):
-        return self._modules.__iter__()
+        return (name for name, cls in sorted(self._modules.items(), key=lambda p: p[1].__bases__)).__iter__()
 
     def __contains__(self, item):
         return item in self._modules

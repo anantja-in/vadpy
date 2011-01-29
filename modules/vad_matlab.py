@@ -8,6 +8,7 @@ log = logging.getLogger(__name__)
 
 
 class VADMatlab(MatlabVADModuleBase):
+    """Matlab-based VADs helper module"""
     script = Option(description = 'VAD function name')
     fread = Option(description = 'Length of a signal in each fread iteration (in seconds)')
     args = Option(description = 'Additional arguments to be passed to matlab script')

@@ -1,7 +1,7 @@
 import io
 import os
 
-from vadpy.data import Section, Data
+from vadpy.labels import Section, Labels
 from vadpy.module import Module
 from vadpy.options import  Option
 from vadpy.element import Element, UNDEFINED
@@ -39,7 +39,7 @@ class Cat(Module):
 
         if self.cat_gt: # concatenate gt
             for element in pipeline:
-                for section in element.gt_data.sections:
+                for section in element.gt_labels.sections:
                     section.start += shift
                     section.end += shift
                     sections.append(section)
@@ -57,7 +57,7 @@ class Cat(Module):
                            outgt_path, 
                            flags)
 
-        new_elem.gt_data = Data(sections)
+        new_elem.gt_labels = Labels(sections)
 
         self.vadpy.pipeline.flush()
         self.vadpy.pipeline.add(new_elem)

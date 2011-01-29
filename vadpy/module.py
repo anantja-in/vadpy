@@ -2,41 +2,41 @@ import os
 import logging 
 import subprocess
 
+from . import common
 from .element import Element
 from .error import VADpyError, MissingArgumentError
-from .common import listdir
 from .options import Option
+
 
 log = logging.getLogger(__name__)
 
 
-class ModuleMetaclass(type):
+class ModuleMeta(type):
     def __new__(meta, classname, bases, class_dict):
-        for item in class_dict:
-            val = class_dict[item]
-            if type(val) == Option: 
-                val.module = classname.lower() # add module's name to option                
-                if not val.name:
-                    val.name = item
-
+        for item in class_dict:                    
+            attr = class_dict[item]
+            if type(attr) == Option: 
+                attr.module = classname.lower() # add module's name to option                
+                if not attr.name:
+                    attr.name = item
         return type.__new__(meta, classname, bases, class_dict)
 
     def __str__(cls):
-        shelp = 'VADpy module ' + cls.__name__ + '\n' + str(cls.__doc__) + '\n'
-        first_option = True
-        for attr in dir(cls): 
-            objattr = getattr(cls, attr)
-            if type(objattr) == Option: # option found
-                if first_option:
-                    first_option = False
-                    shelp += 'Options:\n' + 'Name'.ljust(20) + 'Description\n'
-                shelp += objattr.name.ljust(20) + objattr.description + '\n'
+        shelp = 'VADpy module {0}\n{1}\n' \
+                'Options:\n{s_name}description'.format(cls.__name__ , 
+                                                       str(cls.__doc__),
+                                                       s_name = 'Name'.ljust(20))
+        options = (objattr for objattr in (getattr(cls, attr) for attr in dir(cls))
+                   if isinstance(objattr, Option))
+
+        for opt in options: 
+            shelp += '{name}{desc}\n'.format(name =  opt.name.ljust(20),
+                                             desc = opt.description)
         return shelp
 
 
 class Module(object):
-    __metaclass__ = ModuleMetaclass
-
+    __metaclass__ =  ModuleMeta
     description = ''
     author = ''
     version = ''
@@ -63,7 +63,7 @@ class Module(object):
 
     def __del__(self):
         pass
-
+    
     def run(self):
         log.info('Running {0}'.format(self.__class__.__name__))
 
@@ -76,7 +76,6 @@ class Module(object):
         return ret_args
         
     
-
 class DBModule(Module):
     root = Option(description = 'Root directory of current database')
     source_dir = Option('source-dir', description = 'Source directory (relatively to root dir)')
@@ -87,12 +86,12 @@ class DBModule(Module):
         self.source_dir = os.path.join(self.root, self.source_dir)
         self.gt_dir = os.path.join(self.root, self.gt_dir)
 
-
     def elements_from_dirs(self, source_name, source_dir, gt_dir, flags, *regexps):
         """Create elements by finding data files and corresponding gt files in given directories"""
+        assert source_name, 'Source name cannot be blank'
         elements = []
-        source_files = listdir(source_dir, *regexps)
-        gt_files = set(listdir(gt_dir, *regexps))
+        source_files = common.listdir(source_dir, *regexps)
+        gt_files = set(common.listdir(gt_dir, *regexps))
 
         for source_file in source_files:
             source_file_path = os.path.join(source_dir, source_file)
@@ -107,21 +106,20 @@ class DBModule(Module):
                     )                            
             else:
                 raise VADpyError('Cannot find a GT file for corresponding source file {0}'.format(source_file))
-
         return elements
 
 
 class IOModule(Module):
     action = Option()
     frame_len = Option('frame-len', parse_type = float)
-
+    
     def __init__(self, vadpy, options):
         super(IOModule, self).__init__(vadpy, options)
 
     def run(self):
         if self.action == 'write':
             for element in self.vadpy.pipeline:                
-                element.gt_data.frame_len = self.frame_len # this is crucial!                
+                element.gt_labels.frame_len = self.frame_len # this is crucial!                
 
     def read(self, path):
         log.debug(('Reading {0}').format(path))
@@ -134,8 +132,8 @@ class IOModule(Module):
 
 class VADModule(Module):
     """Base class for all types of VAD modules"""
-    voutdir = Option(default = '{outdir}/{modname}', 
-                     description = 'VAD output directory')
+    outdir = Option(default = '{outdir}/{modname}', 
+                    description = 'VAD output directory')
     outpath = Option(default = '{voutdir}/{srcname}/{srcfile}',
                      description = 'Output path template (using Element and Module format arguments)')
     overwrite = Option(default = False, parse_type = bool,  
@@ -150,7 +148,7 @@ class VADModule(Module):
         source_dir, source_file = os.path.split(element.source_path)
         args = self.format_args
         args.update(element.format_args)
-        args['voutdir'] = self.voutdir.format(**self.format_args)
+        args['voutdir'] = self.outdir.format(**self.format_args)
         element.vad_output_path = self.outpath.format(**args)
                                                       
         # create directory (recursively)
