@@ -3,7 +3,7 @@ import logging
 import subprocess
 
 from . import common
-from .element import Element
+from .element import Element, LITTLE_ENDIAN
 from .error import VADpyError, MissingArgumentError
 from .options import Option, bool_parser
 from .labels import Labels, extend_sections
@@ -98,8 +98,8 @@ class DBModule(Module):
             if source_file in gt_files:
                 elements.append(
                     Element(source_name,
-                            source_file_path, 
-                            os.path.join(gt_dir, source_file),
+                            os.path.abspath(source_file_path), 
+                            os.path.abspath( os.path.join(gt_dir, source_file)),
                             flags)
                     )                            
             else:
@@ -131,13 +131,16 @@ class IOModule(Module):
 
     def write(self, data, path):
         log.debug('Writing to {0}'.format(path))
-        pass
+        dir_path = os.path.dirname(path)
+        if not os.path.exists(dir_path):
+            os.makedirs(dir_path)
+
 
 class GenericIOModuleBase(IOModule):
     """A IO Module's base class with generic run() method
 
     Run() uses current action according to labels_attr and path_attr options. 
-    """    
+    """        
     def run(self):
         super(GenericIOModuleBase, self).run()
         
@@ -153,7 +156,6 @@ class GenericIOModuleBase(IOModule):
                 labels = getattr(element, self.labels_attr)
                 self.write(labels, path)
 
-
 class VADModule(Module):
     """Base class for all types of VAD modules"""
     voutdir = Option(description = 'VAD output directory')
@@ -165,17 +167,28 @@ class VADModule(Module):
     def __init__(self, vadpy, options):
         super(VADModule, self).__init__(vadpy, options)
 
-    def _set_outfile_path(self, element):
+    def run(self):
+        super(VADModule, self).run()
+        for element in self.vadpy.pipeline:                            
+            element.vout_path = self._get_vout_path(element)           # set every element's vout_path attribute          
+            vad_output_dir = os.path.dirname(element.vout_path)        # create output paths that don't exist
+            if not os.path.exists(vad_output_dir):
+                os.makedirs(vad_output_dir)
+
+    def _get_vout_path(self, element, **kwargs):
+        """The method returns an output path for current VAD executable (The path is based on VADpy's configuration)
+
+        This method can be effectively extended by sub classes. 
+        Arguments:
+        element - element whose vout_path should be generated       
+        kwargs  - additional keyword arguments to use while formatting
+        """
         source_dir, source_file = os.path.split(element.source_path)
-        args = self.format_args
-        args.update(element.format_args)
-        args['voutdir'] = self.voutdir.format(**self.format_args)
-        element.vout_path = self.outpath.format(**args)
-                                                      
-        # create directory (recursively)
-        vad_output_dir = os.path.dirname(element.vout_path)
-        if not os.path.exists(vad_output_dir):
-            os.makedirs(vad_output_dir)
+        format_args = self.format_args.copy()
+        format_args.update(element.format_args)
+        format_args.update(kwargs)
+        format_args['voutdir'] = self.voutdir.format(**format_args)        
+        return os.path.abspath(self.outpath.format(**format_args))
 
         
 class SimpleVADModuleBase(VADModule):
@@ -199,7 +212,6 @@ class SimpleVADModuleBase(VADModule):
         super(SimpleVADModuleBase, self).run() 
 
         for element in self.vadpy.pipeline:
-            self._set_outfile_path(element)
             if not self.overwrite and os.path.exists(element.vout_path):
                 log.debug('File already exists: {0}'.format(element.vout_path))
                 continue
@@ -255,28 +267,30 @@ class MatlabVADModuleBase(VADModule):
 
         self._execlist = ['-r', '{__bracket__}'] + self._execlist + [' {__bracket__}']
 
-        # set internal flags for matlab engine
-        endianness = pipeline.flags & LITTLE_ENDIAN and 'l' or 'b'
-
-        self._execargs['endianness'] = endianness
         
-        for elements in (elem for elem in pipeline.slice(self.filecount)
-                         if self.overwrite or not os.path.exists(elem.vout_path)):
-            for element in elements:
-                self._set_outfile_path(element)
-                
-                
-            in_paths = ';'.join(elem.source_path for elem in elements)
-            gt_paths = ';'.join(elem.gt_path for elem in elements)
-            out_paths = ';'.join(elem.vout_path for elem in elements)
+        # set internal flags for matlab engine
+        
+        assert pipeline.monotonic, "Cannot process non-monotonic pipeline (elements' flags differ"
+        
+        for elements in pipeline.slice(self.filecount):  # slice generator is used(!)
+            elements = [elem for elem in elements
+                        if self.overwrite or not os.path.exists(elem.vout_path)]
+            if not elements:
+                return 
 
+            self._execargs['endianness'] = elements[0].flags & LITTLE_ENDIAN and 'l' or 'b'
+            
+            for elem in elements:
+                in_paths = ';'.join(elem.source_path for elem in elements)
+                gt_paths = ';'.join(elem.gt_path for elem in elements)
+                out_paths = ';'.join(elem.vout_path for elem in elements)
+                               
             self._execargs['in_paths'] = in_paths
             self._execargs['gt_paths'] = gt_paths
             self._execargs['out_paths'] = out_paths
             
             sexec = ' '.join(self._execlist)
             sexec = sexec.format(**self._execargs)
-
             lstrun = [self.bin, self.mopts, sexec]
 
             log.debug('Starting MATLAB-based codec:\t {0} {1} {2}'.format(self.bin, self.mopts, sexec))

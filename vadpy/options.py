@@ -33,4 +33,4 @@ class Option(object):
 
 
 def bool_parser(value):
-    value = value.lower() not in ['', '""', "''", 'no', 'false']    
+    return value.lower() not in ['', '""', "''", 'no', 'false']

@@ -9,7 +9,7 @@ from vadpy.options import  Option
 log = logging.getLogger(__name__)
 
 class IOSingleD(GenericIOModuleBase):
-    """Parse GT/VAD files with decisions-only strings
+    """Parse GT/VAD output Label files with decisions-only strings
 
     The format is: 
     <time_from (in seconds)> <time_to (in seconds)> <decision (0|1) [<score>])

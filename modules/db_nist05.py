@@ -21,7 +21,7 @@ class DBNIST05(DBModule):
         super(DBNIST05, self).run()
         source_dir = os.path.join(self.source_dir, self.dataset)
 
-        elements = self.elements_from_dirs(self.SOURCE_NAME, source_dir, self.gt_dir, self.FLAGS)
+        elements = self.elements_from_dirs(self.SOURCE_NAME, source_dir, self.gt_dir, self.FLAGS, '^j.*')
         self.vadpy.pipeline.add(*elements)
         log.debug('Added {0} elements to stream'.format(len(elements)))
 
