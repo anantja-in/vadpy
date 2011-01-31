@@ -46,6 +46,8 @@ MACROS = {
     'ovstamps'  : 'dft_iostamps mcr_labels_vad re="" split="" action=write', 
     'ovsingle'  : 'dft_iosingled mcr_labels_vad action=write',
     'ovgapless' : 'dft_iogapless mcr_labels_vad action=write',
+    # VAD->IO shortcuts
+    'iamr'      : 'ivsingle',
     
     # VAD modulse
     'g729'     : 'vadg729 mcr_basevad voutdir="{outdir}/g729" exec-path="{bindir}/g729/g729vad" ',

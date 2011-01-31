@@ -99,7 +99,7 @@ class DBModule(Module):
                 elements.append(
                     Element(source_name,
                             os.path.abspath(source_file_path), 
-                            os.path.abspath( os.path.join(gt_dir, source_file)),
+                            os.path.abspath(os.path.join(gt_dir, source_file)),
                             flags)
                     )                            
             else:
@@ -304,3 +304,18 @@ class MatlabVADModuleBase(VADModule):
                                     )
             stdoutdata, stderrdata = proc.communicate()
             assert not stderrdata, stderrdata
+
+
+
+class CompareModule(Module):
+    """Base module for comparing elements' labels (and printing the output to stdout)
+    """
+    inputs = Option(parser = )
+    sep_sources = Option('sep-sources', bool_parser, 'Treat files from every source separately.')
+
+    def __init__(self, vadpy, options):
+        super(CompareModule, self).__init__(vadpy, options)
+
+    def run(self):
+        pass
+    
