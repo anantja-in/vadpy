@@ -37,7 +37,6 @@ class ModuleMeta(type):
 
 class Module(object):
     __metaclass__ =  ModuleMeta
-    description = ''
     author = ''
     version = ''
 
@@ -310,11 +309,12 @@ class MatlabVADModuleBase(VADModule):
 class CompareModule(Module):
     """Base module for comparing elements' labels (and printing the output to stdout)
     """
-    inputs = Option(parser = )
+    inputs = Option(description = 'Input labels\' attributes separated by ",". In most cases those are gt_labels,vad_labels')
     sep_sources = Option('sep-sources', bool_parser, 'Treat files from every source separately.')
 
     def __init__(self, vadpy, options):
         super(CompareModule, self).__init__(vadpy, options)
+        self.inputs = self.inputs.split(',')
 
     def run(self):
         pass

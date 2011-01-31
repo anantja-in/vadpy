@@ -20,6 +20,7 @@ MACROS = {
     'mcr_basevad'    : 'voutdir="{{outdir}}/{{modname}}" outpath="{{voutdir}}/{{srcname}}/{{srcfile}}" overwrite=No',
     'mcr_labels_vad' : 'labels-attr="vad_labels" path-attr="vout_path"',
     'mcr_labels_gt'  : 'labels-attr=gt_labels path-attr=gt_path',
+    'mcr_compare'    : 'sep-sources=Yes inputs=gt_labels,vad_labels',
 
     # Default modules' configurations
     'dft_dbnist05'  : 'dbnist05 dataset=""',
@@ -29,14 +30,15 @@ MACROS = {
     'dft_iogapless' : 'iogapless mcr_io',
     'dft_matlab'    : 'vadmatlab mcr_basevad voutdir="{outdir}/matlab/{{engine}}_{{script}}" bin=matlab mopts="-nojvm, -nosplash" ' \
                       'scriptdir={bindir}/matlab fread=600 filecount=128 args=""',
-    'dft_info' : 'modinfo action=show',
-    'dft_cat'  : 'modcat gt=yes source=yes',
-    'dft_edit' : 'modedit attr="" value={{attr}}',
+    'dft_info'       : 'modinfo action=show',
+    'dft_cat'        : 'modcat gt=yes source=yes',
+    'dft_edit'       : 'modedit attr="" value={{attr}}',
+    'dft_confusion'  : 'modconfusion mcr_compare',
 
     # DB modules
     'nist05' : 'dft_dbnist05 root="{dbdir}/NIST05" source-dir=DATA gt-dir=GT/ASR',
-    'nist08' : 'dft_dbnist08 root="{dbdir}/NIST08" source-dir=DATA gt-dir=GT',
-    
+    'nist08' : 'dft_dbnist08 root="{dbdir}/NIST08" source-dir=DATA gt-dir=GT',    
+
     #IO modules
     'inist'     : 'dft_iostamps re=(?P<ss>\d.+) split=" " action=read labels-attr=gt_labels path-attr=gt_path ',
     'isingle'   : 'dft_iosingled mcr_labels_gt action=read ', 
@@ -60,5 +62,6 @@ MACROS = {
     # Other modules
     'cat'  : 'dft_cat',
     'info' : 'dft_info',
-    'edit' : 'dft_edit', 
+    'edit'      : 'dft_edit', 
+    'confusion' : 'dft_confusion',
 }

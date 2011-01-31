@@ -33,4 +33,11 @@ class Option(object):
 
 
 def bool_parser(value):
-    return value.lower() not in ['', '""', "''", 'no', 'false']
+    value = value.lower()
+    if value in ['', '""', "''", 'no', 'false']:
+        return False
+    elif value in ['true', 'yes']:
+        return True
+    else:
+        raise Error('What kind of boolean do you think "{0}" is?'.format(value))
+
