@@ -228,6 +228,7 @@ class Labels(object):
     def frame_len(self, value):
         assert value > 0, "Frame length must be a positive number"
         self._frame_len = value        
-        self.merge()
-        self.adjust_sections_length()
+        if self._frame_len != value:
+            self.merge()
+            self.adjust_sections_length()
 

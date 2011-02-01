@@ -1,10 +1,10 @@
-# Required constants
+import os
 
 # modules PATH
 PATH = ['./modules',
         ]
 
-ROOT = '..'                 # {root}
+ROOT = os.path.abspath('..')
 
 format_args = {
     'root' : ROOT, 

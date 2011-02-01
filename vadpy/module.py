@@ -121,9 +121,11 @@ class IOModule(Module):
 
     def run(self):
         if self.action == 'write':
-            for element in self.vadpy.pipeline:                
-                element.gt_labels.frame_len = self.frame_len # this is crucial!                
-
+            for element in self.vadpy.pipeline:
+                labels = getattr(element, self.labels_attr)
+                if labels:
+                    setattr(labels, 'frame_len', self.frame_len) # settings frame-len is crucial!                
+                
     def read(self, path):
         log.debug(('Reading {0}').format(path))
         pass
