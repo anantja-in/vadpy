@@ -23,15 +23,15 @@ class ModuleMeta(type):
 
     def __str__(cls):
         shelp = 'VADpy module {0}\n{1}\n' \
-                'Options:\n{s_name}Description'.format(cls.__name__ , 
-                                                       str(cls.__doc__),
-                                                       s_name = 'Name'.ljust(20))
+                'Options:\n{2:<20}Description'.format(cls.__name__ , 
+                                                      str(cls.__doc__),
+                                                      'Name')
         options = (objattr for objattr in (getattr(cls, attr) for attr in dir(cls))
                    if isinstance(objattr, Option))
 
         for opt in options: 
-            shelp += '\n{name}{desc}'.format(name =  opt.name.ljust(20),
-                                             desc = opt.description)
+            shelp += '\n{0:<20}{1}'.format(opt.name, opt.description)
+                                           
         return shelp
 
 

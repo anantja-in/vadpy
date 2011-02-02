@@ -1,4 +1,6 @@
 #!/bin/bash
+
+clear
 echo "Welcome to VADpy 2.0 demostration"
 echo 
 echo 
@@ -24,23 +26,19 @@ echo "You've just seen the information about elements inside the pipeline"
 read -s -p "[Next >>]"
 
 clear
-echo "Let's try parsing the GT of NIST-05 corpus:"
-echo "vad.py ! nist05 ! inist ! info # Press [Enter] to execute"
+echo "Another important consept of VADpy modules' sequence are Options."
+echo "Options are OPTIONAL. This means that you can always add a module to the sequence without specifying it's options."
+echo "Let's try parsing the GT of NIST-05's 'train' set:"
+echo "vad.py ! nist05 dataset=train ! inist ! info # Press [Enter] to execute"
 read -s
-./vad.py ! nist05 ! inist ! info | less
+./vad.py ! nist05 dataset=train ! inist ! info | less
 echo 
 echo "Have you noticed that every Element has a gt_labels attribute filled?"
 echo "If not, pay attention on next step!"
 read -s -p "[Next >>]"
 
 clear
-echo "The next goal is to execute a VAD and parse it's output."
-echo "vad.py ! nist05 ! amr1 ! inist ! iamr ! info # Press [Enter] to execute"
-./vad.py ! nist05 ! amr1 ! inist ! iamr ! info | less
-
-
-clear
-echo "The next goal is to execute a VAD and parse it's output:"
+echo "This time, the goal is to execute a VAD and parse it's output:"
 echo "vad.py ! nist05 ! amr1 ! inist ! iamr ! info # Press [Enter] to execute"
 read -s
 ./vad.py ! nist05 ! amr1 ! inist ! iamr ! info | less
@@ -70,22 +68,26 @@ echo "Do the FRR and FAR of AMR1 and AMR2 results differ much? How do you think,
 read -s -p "[Next >>]"
 
 clear 
-echo "Even though logging looks horrible, it is recommended to have hat option turned on."
-echo "Note that logging goes to stderr. Modules (e.g. info, confusion) print their output to stdout."
-echo 
-echo "This means, you can redirect the output to a file:"
-echo "vad.py ! nist05 ! amr2 ! inist ! iamr ! confusion > amr2_nist_frr_far.txt # Press [Enter] to execute"
-read -s 
-./vad.py ! nist05 ! amr2 ! inist ! iamr ! confusion > amr2_nist_frr_far.txt
-read -s -p "[Next >>]"
-
-clear 
 echo "Even though the log might look horrible, it is recommended to have debug option turned on."
 echo "Note that logging goes to stderr. Modules (e.g. info, confusion) print their output to stdout."
 echo 
 echo "This means, you can redirect the output to a file:"
-echo "vad.py ! nist05 ! amr2 ! inist ! iamr ! confusion > amr2_nist_frr_far.txt # Press [Enter] to execute"
+echo "vad.py ! nist05 ! amr2 ! inist ! iamr ! confusion > $HOME/amr2_nist_frr_far.txt # Press [Enter] to execute"
 read -s 
-./vad.py ! nist05 ! amr2 ! inist ! iamr ! confusion > amr2_nist_frr_far.txt
+./vad.py ! nist05 ! amr2 ! inist ! iamr ! confusion > $HOME/amr2_nist_frr_far.txt
 echo "You can check that file later :)"
 read -s -p "[Next >>]"
+
+clear 
+echo "I hope that the concept of VADpy modules sequence is clear enough :)" 
+echo "To get a list of available modules type:
+echo "vad.py -h # Press [Enter] to execute"
+read -s
+/vad.py -h
+
+echo "To get a documentation on a module or a macro, add an argument to -h option. For example:"
+echo "vad.py -h dbnist05 # Press [Enter] to execute"
+./vad.py -h dbnist05
+
+echo "This is the end of the demo. Please stay tuned, the demo will be updated very soon!"
+

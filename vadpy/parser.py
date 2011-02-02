@@ -26,7 +26,7 @@ class SeqOptions(object):
         
     def _parse_help(self):
         argv = sys.argv
-        if len(argv) == 1 or len(argv) >= 2 and argv[1] in ('-h' or '--help'):
+        if len(argv) <= 1 or len(argv) >= 2 and argv[1] in ('-h' or '--help'):
             self.help_required = True
             if len(argv) == 3:
                 return argv[2]

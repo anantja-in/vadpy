@@ -36,12 +36,12 @@ class VADpy(object):
                 exec_name = sys.argv[0]
                 # print general program help
                 print('VADpy - the ultimate VAD framework')
-                print('Usage:\n{0} [OPTIONS] [MODULES SEQUENCE]'.format(exec_name))
-                print('Modules:\n{s_name}description'.format(s_name = 'Name'.ljust(20, ' ')))
+                print('Usage:\n{0} [OPTIONS] [MODULES SEQUENCE]\n'.format(exec_name))
+                print('Modules:\n{0:<20}Description'.format('Name'))
                                                              
                 for module in manager:
                     mod = manager[module]
-                    print('{0}{1}'.format(mod.__name__ .ljust(20, ' '), str(mod.__doc__).split('\n')[0]))
+                    print('{0:<20}{1}'.format(mod.__name__, str(mod.__doc__).split('\n')[0]))
             exit()
                 
         for module, options in modules:
