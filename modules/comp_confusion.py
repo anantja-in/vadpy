@@ -47,7 +47,7 @@ class ModConfusion(CompareModule):
             # Calculate False alarm and Miss rate
             tp = 0; tn = 0; fp = 0; fn = 0;
             for valA, valB in voicedAB:
-                if valA:                # concluding, valA is Ground truth value 'Voiced'
+                if valA:                # concluding, valA is a value 'Voiced' Ground Truth section
                   if valB: tp += 1      # true positive
                   else:    fp += 1      # false positive, false alarm
                 else:                     
@@ -73,8 +73,8 @@ class ModConfusion(CompareModule):
             tp_fp = tp + fp
             tn_fn = tn + fn
 
-            tp /= tp_fp
-            tn /= tn_fn
+            #tp /= tp_fp
+            #tn /= tn_fn
             fp /= tp_fp
             fn /= tn_fn
 
@@ -82,8 +82,8 @@ class ModConfusion(CompareModule):
             fn *= 100
             # print the stuff to stdout
             print(source_name)
-            print('FRR: {0:.10}%'.format(fp))
-            print('FAR: {0:.10}%'.format(fn))
+            print('FRR: {0:.3}%'.format(fp))
+            print('FAR: {0:.3}%'.format(fn))
             print('')
 
     

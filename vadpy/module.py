@@ -120,6 +120,7 @@ class IOModule(Module):
         super(IOModule, self).__init__(vadpy, options)
 
     def run(self):
+        super(IOModule, self).run()
         if self.action == 'write':
             for element in self.vadpy.pipeline:
                 labels = getattr(element, self.labels_attr)
@@ -128,7 +129,6 @@ class IOModule(Module):
                 
     def read(self, path):
         log.debug(('Reading {0}').format(path))
-        pass
 
     def write(self, data, path):
         log.debug('Writing to {0}'.format(path))
@@ -319,5 +319,5 @@ class CompareModule(Module):
         self.inputs = self.inputs.split(',')
 
     def run(self):
-        pass
+        super(CompareModule, self).run()
     
