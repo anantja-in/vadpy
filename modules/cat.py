@@ -10,15 +10,13 @@ import logging
 log = logging.getLogger(__name__)
 
 class ModCat(Module):
-    """Concatenates all elements' source data and GT labels into one element
+    """Concatenates all elements' source data and GT labels into one element"""
 
-    "outpath" option formatting fields:
-    {root etc.}      - Module/Settings formatting arguments
-    """
-    outpath = Option(description = 'Optput directory, to which the concatenated data should be written. Module/Path formatting is available.')
-    name = Option(description = 'New element\'s name' )
-    cat_gt = Option('gt', bool_parser, 'Concatenate GT')
-    cat_source = Option('source', bool_parser, 'Concatenate source data')
+    outpath = Option(description = 'Optput directory, to which the concatenated data should be written. ' \
+                         'Module/Path formatting is available.')
+    source_name = Option('source-name', description = 'New element\'s source name (bool)' )
+    cat_gt = Option('gt', bool_parser, 'Concatenate GT (bool)')
+    cat_source = Option('source', bool_parser, 'Concatenate source data (bool)')
 
     def __init__(self, vadpy, options):
         super(ModCat, self).__init__(vadpy, options)
@@ -38,8 +36,9 @@ class ModCat(Module):
         previous_time_to =   0        
         shift = 0
 
-        outsource_path = os.path.abspath(self.outpath.format(**self.format_args))
-
+        outsource_path = self.format_path(self.outpath)
+        gt_labels = None
+        
         if self.cat_gt: # concatenate gt
             for element in pipeline:
                 for section in element.gt_labels.sections:
@@ -47,6 +46,9 @@ class ModCat(Module):
                     section.end += shift
                     sections.append(section)
                 shift += element.length
+            gt_labels = Labels(sections,
+                               self.vadpy.pipeline.flush(),
+                               self.vadpy.pipeline.add(new_elem))
 
         if self.cat_source: # concatenate source
             out_io = io.FileIO(outsource_path, 'w')
@@ -55,10 +57,5 @@ class ModCat(Module):
                 out_io.write(source_io.read())
             source_io.close()            
 
-        new_elem = Element(self.name,             
-                           outsource_path, 
-                           '',
-                           flags)
-        new_elem.gt_labels = Labels(sections)
-        self.vadpy.pipeline.flush()
-        self.vadpy.pipeline.add(new_elem)
+        new_elem = Element(self.source_name, outsource_path, '', flags)
+        new_elem.gt_labels = gt_labels

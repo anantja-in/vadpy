@@ -89,9 +89,12 @@ class DBModule(Module):
                                            dataset = self.dataset)
         self.gt_dir = self.format_path(self.gt_dir, 
                                        dataset = self.dataset)
-        
+
     def elements_from_dirs(self, source_name, source_dir, gt_dir, flags, *regexps):
-        """Create elements by finding data files and corresponding gt files in given directories"""
+        """Create elements by finding data files and corresponding gt files in given directories
+        
+        This method is a helper for classes that inherit from DBModule
+        """
         assert source_name, 'Source name cannot be blank'
         elements = []
         source_files = common.listdir(source_dir, *regexps)
@@ -99,13 +102,14 @@ class DBModule(Module):
 
         for source_file in source_files:
             source_file_path = os.path.join(source_dir, source_file)
+            gt_file_path = os.path.join(gt_dir, source_file)
             if os.path.isdir(source_file_path):
                 continue
-            if source_file in gt_files:
+            if source_file in gt_files or not se:
                 elements.append(
                     Element(source_name,
                             os.path.abspath(source_file_path), 
-                            os.path.abspath(os.path.join(gt_dir, source_file)),
+                            os.path.abspath(gt_file_path),
                             flags)
                     )                            
             else:
@@ -163,6 +167,7 @@ class GenericIOModuleBase(IOModule):
                 path = getattr(element, self.path_attr)
                 labels = getattr(element, self.labels_attr)
                 self.write(labels, path)
+
 
 class VADModule(Module):
     """Base class for all types of VAD modules"""

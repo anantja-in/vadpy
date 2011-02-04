@@ -8,7 +8,7 @@ from vadpy.options import Option
 log = logging.getLogger(__name__)
 
 class DBAURORA(DBModule):
-    """AURORA2 corpus module"""
+    """AURORA2z corpus module"""
     FLAGS       = BIG_ENDIAN | FS_8000 | BPS_16
                      
     def __init__(self, vadpy, options):
