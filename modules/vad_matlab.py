@@ -11,7 +11,7 @@ class VADMatlab(MatlabVADModuleBase):
     """Matlab-based VADs helper module
 
     Path formatting:
-    {script} - uses "script" option's value in path, e.g. ... voutdir="{outdir}/matlab/{{script}}"
+    {script} - uses "script" option's value in path, e.g. ... voutdir="{outroot}/matlab/{{script}}"
     """
     script = Option(description = 'VAD function name')
     fread = Option(description = 'Length of a signal in each fread iteration (in seconds)')

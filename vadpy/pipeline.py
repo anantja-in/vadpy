@@ -1,6 +1,10 @@
 import collections
+import logging 
 
 from .element import UNDEFINED
+
+log = logging.getLogger(__name__)
+
 
 class Pipeline(object):
     def __init__(self, vadpy):
@@ -8,6 +12,7 @@ class Pipeline(object):
 
     def add(self, *elements):
         self._elements.extend(elements)
+        log.debug('{0} elements have been added to the pipeline'.format(len(elements)))
 
     def __getitem__(self, item):
         return self._elements[item]

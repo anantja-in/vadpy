@@ -61,11 +61,11 @@ class Element(object):
         source_dir, source_file = os.path.split(self.source_path)
         gt_dir, gt_file = os.path.split(self.source_path)
         vout_dir, vout_file = os.path.split(self.vout_path)
-        return {'srcname' : self.source_name, 
-                'srcdir' : source_dir, 
-                'srcfile' : source_file, 
-                'gtdir' : gt_dir, 
-                'gtfile' : gt_file, 
-                'voutdir' : vout_dir, 
-                'voutfile' : vout_file, 
+        return {'e_srcname' : self.source_name, 
+                'e_srcdir' : source_dir, 
+                'e_srcfile' : source_file, 
+                'e_gtdir' : gt_dir, 
+                'e_gtfile' : gt_file, 
+                'e_voutdir' : vout_dir, 
+                'e_voutfile' : vout_file, 
                 }

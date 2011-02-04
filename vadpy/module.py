@@ -64,24 +64,31 @@ class Module(object):
     def run(self):
         log.info('Running {0}'.format(self.__class__.__name__))
 
-    @property
-    def format_args(self):
-        """Dynamic (built from module's arguments) and static (built from settings.format_args string formatting arguments dictionary"""
-        ret_args = {'modname' : self.__class__.__name__, 
-                      }
-        ret_args.update(self.vadpy.settings.format_args)
-        return ret_args
-        
-    
+    def format_path(self, path, **kwargs):
+        """Formats path via static and dynamic format arguments
+
+        The static arguments are built from settings.format_args
+        The dynamic arguments are built from module's arguments
+        """
+        format_args = {'modname' : self.__class__.__name__, 
+                       }
+        format_args.update(self.vadpy.settings.format_args)
+        format_args.update(kwargs)             
+        return os.path.abspath( path.format(**format_args) )
+
+            
 class DBModule(Module):
-    root = Option(description = 'Root directory of current database')
+    source_name = Option('source-name', description = "Element's source name")
     source_dir = Option('source-dir', description = 'Source directory (relatively to root dir)')
-    gt_dir = Option('gt-dir', description = 'Ground Truth directory (relatively to root dir)')
+    gt_dir = Option('gt-dir', description = 'Ground Truth directory (relatively to root dir)')    
+    dataset = Option(description = 'The dataset path format attribute (see source_dir and gt_dir)')
 
     def __init__(self, vadpy, options):
         super(DBModule, self).__init__(vadpy, options)
-        self.source_dir = os.path.join(self.root, self.source_dir)
-        self.gt_dir = os.path.join(self.root, self.gt_dir)
+        self.source_dir = self.format_path(self.source_dir, 
+                                           dataset = self.dataset)
+        self.gt_dir = self.format_path(self.gt_dir, 
+                                       dataset = self.dataset)
 
     def elements_from_dirs(self, source_name, source_dir, gt_dir, flags, *regexps):
         """Create elements by finding data files and corresponding gt files in given directories"""
@@ -104,7 +111,6 @@ class DBModule(Module):
             else:
                 raise VADpyError('Cannot find a GT file for corresponding source file {0}'.format(source_file))
         return elements
-
 
 class IOModule(Module):
     action = Option()
@@ -173,6 +179,7 @@ class VADModule(Module):
         for element in self.vadpy.pipeline:                            
             element.vout_path = self._get_vout_path(element)           # set every element's vout_path attribute          
             vad_output_dir = os.path.dirname(element.vout_path)        # create output paths that don't exist
+
             if not os.path.exists(vad_output_dir):
                 os.makedirs(vad_output_dir)
 
@@ -183,13 +190,11 @@ class VADModule(Module):
         Arguments:
         element - element whose vout_path should be generated       
         kwargs  - additional keyword arguments to use while formatting
-        """
-        source_dir, source_file = os.path.split(element.source_path)
-        format_args = self.format_args.copy()
-        format_args.update(element.format_args)
-        format_args.update(kwargs)
-        format_args['voutdir'] = self.voutdir.format(**format_args)        
-        return os.path.abspath(self.outpath.format(**format_args))
+        """        
+        return self.format_path(self.outpath, 
+                                voutdir = self.voutdir, 
+                                **dict(element.format_args,**kwargs))
+                                
 
         
 class SimpleVADModuleBase(VADModule):
