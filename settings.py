@@ -23,7 +23,6 @@ MACROS = {
     'mcr_compare'    : 'sep-sources=Yes inputs=gt_labels,vad_labels',
 
     # Default modules' configurations
-    'dft_dbnist08'  : 'dbnist08 source-name=NIST08 dataset="" dataunits="" channels=""',
     'dft_iosingled' : 'iosingled mcr_io k=1',
     'dft_iostamps'  : 'iostamps mcr_io re="" split=""',
     'dft_iogapless' : 'iogapless mcr_io',

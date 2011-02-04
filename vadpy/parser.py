@@ -43,16 +43,13 @@ class SeqOptions(object):
 
         argv = args.split('!')[1:]
         modules = []
-
-        if len(argv) == 1:        
-            return []
-
+        
         for sarg in argv:
             module = None
             quote = False
             module_args = {}
             buf = ''
-            for char in sarg: #iostamps re=(?P<hh>\d+):(?P<mm>\d+):(?P<ss>\d+) split=" " 
+            for char in sarg: 
                 if char != ' ':
                     if char == '"':
                         quote = not quote

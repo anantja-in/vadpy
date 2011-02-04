@@ -9,11 +9,6 @@ BIG_ENDIAN = 0x4
 FS_8000 = 0x8
 BPS_16 = 0x10
 
-_FS_FLAGS = [FS_8000, ]
-_BPS_FLAGS = [BPS_16, ]
-_ENDIAN_FLAGS = [LITTLE_ENDIAN, BIG_ENDIAN, ]
-
-
 class Element(object):
     def __init__(self, source_name, source_path, gt_path, flags = UNDEFINED, set_length = True):
         """
@@ -52,7 +47,7 @@ class Element(object):
         return self._flags
 
     @flags.setter
-    def flags(self, value):
+    def flags(self, value):        
         self._flags = value
 
     @property

@@ -13,6 +13,7 @@ class DBNIST05(DBModule):
                      
     def __init__(self, vadpy, options):
         super(DBNIST05, self).__init__(vadpy, options)
+        self.source_dir = os.path.join(self.source_dir, self.dataset)
 
     def run(self):
         super(DBNIST05, self).run()

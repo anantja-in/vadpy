@@ -89,7 +89,7 @@ class DBModule(Module):
                                            dataset = self.dataset)
         self.gt_dir = self.format_path(self.gt_dir, 
                                        dataset = self.dataset)
-
+        
     def elements_from_dirs(self, source_name, source_dir, gt_dir, flags, *regexps):
         """Create elements by finding data files and corresponding gt files in given directories"""
         assert source_name, 'Source name cannot be blank'
@@ -112,6 +112,7 @@ class DBModule(Module):
                 raise VADpyError('Cannot find a GT file for corresponding source file {0}'.format(source_file))
         return elements
 
+    
 class IOModule(Module):
     action = Option()
     frame_len = Option('frame-len', float)

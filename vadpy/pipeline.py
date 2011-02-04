@@ -1,10 +1,9 @@
-import collections
 import logging 
+import collections
 
 from .element import UNDEFINED
 
 log = logging.getLogger(__name__)
-
 
 class Pipeline(object):
     def __init__(self, vadpy):
