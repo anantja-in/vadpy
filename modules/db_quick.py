@@ -13,7 +13,7 @@ FLAGS = {'undefined' : element.UNDEFINED,
          'be' : element.BIG_ENDIAN,
          '8000hz' : element.FS_8000,
          '16bps' : element.BPS_16,
-    }
+         }
 
 
 class DBQUICK(DBModule):
@@ -26,6 +26,7 @@ class DBQUICK(DBModule):
     16bps   - 16 bits per frame
     """
     flags = Option(description = 'Flags describing data in the database. ')
+    re = Option(description = 'Reqular expression filter')
 
     def __init__(self, vadpy, options):
         super(DBQUICK, self).__init__(vadpy, options)
@@ -43,5 +44,6 @@ class DBQUICK(DBModule):
         elements = self.elements_from_dirs(self.source_name, 
                                            self.source_dir, 
                                            self.gt_dir, 
-                                           self.flags)
+                                           self.flags, 
+                                           self.re)
         self.vadpy.pipeline.add(*elements)

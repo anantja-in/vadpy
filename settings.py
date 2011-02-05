@@ -65,6 +65,6 @@ MACROS = {
     'edit' :  'modedit attr="" value="{{attr}}" from_attr="" to_attr=""',
     'edit'      : 'dft_edit', 
     'confusion' : 'modconfusion mcr_compare',
-    'agreement' : 'modagreement mcr_compare', 
+    'agreement' : 'modagreement mcr_compare re=""', 
     'multivad'  : 'modmultivad out-labels-attr="vad_labels"'
 }
