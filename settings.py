@@ -11,7 +11,7 @@ format_args = {
     'binroot' : ROOT + '/bin',
     'outroot' : ROOT + '/output',
     'dbroot' :  ROOT + '/databases',
-    'framelen' : 0.01,            
+    'framelen' : 0.005,            
 }
 
 MACROS = {   
@@ -29,10 +29,6 @@ MACROS = {
     'dft_matlab'    : 'vadmatlab mcr_basevad voutdir="{outroot}/matlab/{{engine}}_{{script}}" ' \
                       'bin=matlab mopts="-nojvm, -nosplash" ' \
                       'scriptdir={binroot}/matlab fread=600 filecount=128 args=""',
-    'dft_info'       : 'modinfo action=show',
-    'dft_cat'        : 'modcat gt=yes source=yes',
-    'dft_edit'       : 'modedit attr="" value="{{attr}}" from_attr="" to_attr=""',
-    'dft_confusion'  : 'modconfusion mcr_compare',
 
     # DB modules
     'nist05' : 'dbnist05 source-name=NIST05 dataset="" ' \
@@ -53,7 +49,8 @@ MACROS = {
     'ovgapless' : 'dft_iogapless mcr_labels_vad action=write',
     # VAD->IO shortcuts
     'iamr'      : 'ivsingle',
-    
+    'ig729'     : 'ivsingle',
+
     # VAD modulse
     'g729'     : 'vadg729 mcr_basevad voutdir="{outroot}/g729" exec-path="{binroot}/g729/g729vad" ',
     'amr1'     : 'vadamr mcr_basevad voutdir="{outroot}/amr1" exec-path="{binroot}/amr/amr1" ',
@@ -63,8 +60,11 @@ MACROS = {
     'svmtest'  : 'dft_matlab engine=svm script=test',
 
     # Other modules
-    'cat'  : 'dft_cat',
-    'info' : 'dft_info',
+    'info'       : 'modinfo action=show',
+    'cat'        : 'modcat gt=yes source=yes',
+    'edit' :  'modedit attr="" value="{{attr}}" from_attr="" to_attr=""',
     'edit'      : 'dft_edit', 
-    'confusion' : 'dft_confusion',
+    'confusion' : 'modconfusion mcr_compare',
+    'agreement' : 'modagreement mcr_compare', 
+    'multivad'  : 'modmultivad out-labels-attr="vad_labels"'
 }

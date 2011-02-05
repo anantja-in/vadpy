@@ -61,44 +61,29 @@ class Labels(object):
         assert sections, 'At least one section should be supplied to create Labels object'
 
         self._sections = sections
-        self._frame_len = frame_len
-        self._count = sum(section.count for section in sections)
-
-        if frame_len:
-            self.merge()
-            self.adjust_sections_length()
-
+        self._count = sum(section.count for section in sections) 
+        self._labels = []
+        self._frame_len = 0
+        self.frame_len = frame_len # property
+            
     def __str__(self):
         return "Labels object. Sections count: {0}; Frame length: {1}".format(self._count, self._frame_len)
         
     def __len__(self):
-        return self._count
+        return self._labels and len(self._labels) or self._count
 
     def __iter__(self):
-        self._iter_time_pos = self._sections[0].start - self._frame_len
-        self._iter_frame_counter = 0            # --frame-len based loop counters
-        self._iter_section_id = 0               # sections in __iter__ loop counters
-        self._iter_section = self._sections[0]  # current iteration gt and vad sections
-        return self
+        return self._labels.__iter__()
 
     def next(self):
         return self.__next__()
 
-    def __next__(self):
-        if self._iter_frame_counter == self._iter_section.count: 
-            self._iter_frame_counter = 0
-            self._iter_section_id += 1
-            
-            if self._iter_section_id == len(self._sections):
-                raise StopIteration
-            else:
-                self._iter_section = self._sections[self._iter_section_id]      
+    def __next__(self):        
+        self._labels.next() # to be changed for Python3
 
-        self._iter_frame_counter
-        self._iter_frame_counter += 1
-        self._iter_time_pos += self._frame_len # calculate frame's time 'start' position
-
-        return self._iter_time_pos, self._iter_time_pos + self._frame_len, self._iter_section.voiced
+    def __getitem__(self, index):
+        assert self._frame_len, 'Cannot return item by index because frame-len has not been set'
+        return self._labels[index]
 
     def merge(self):
         """Sections merging by voiced value
@@ -134,9 +119,7 @@ class Labels(object):
                                                prev_section.end,
                                                prev_voiced,
                                                self._frame_len))
-
                 big_section_start = section.start
-
             prev_section = section
             prev_voiced = section.voiced
 
@@ -146,6 +129,7 @@ class Labels(object):
                                        prev_voiced,
                                        self._frame_len))
         self._sections = merged_sections
+
 
     def adjust_sections_length(self):
         """Frame dimension sections formatting according to frame_len option
@@ -213,9 +197,33 @@ class Labels(object):
                         ret_sections.append(new_section)
                 else:                       # just append this section to the list
                     ret_sections.append(section)
-
         self._sections = ret_sections
 
+    def create_labels(self):
+        sections = self._sections    # section object 'shortcut'
+        section = sections[0]        # current iteration gt and vad sections
+        start_time = section.start    
+        frame_counter = 0            # frame-len based loop counters
+        section_id = 0               # sections loop counters
+
+        while(True):
+            if frame_counter == section.count: 
+                frame_counter = 0
+                section_id += 1
+                try:
+                    section = sections[section_id]                    
+                except IndexError:
+                    break
+            
+            self._labels.append( (start_time, 
+                                  start_time + self._frame_len, 
+                                  section.voiced) )
+            frame_counter += 1
+            start_time += self._frame_len 
+        # add last section if necessary (could be required due to small frame-len)
+        if abs(start_time - sections[-1].end) <= self._frame_len:
+            self._labels.append((start_time, sections[-1].end, sections[-1].voiced))
+            
     @property
     def sections(self):
         return self._sections
@@ -226,9 +234,8 @@ class Labels(object):
 
     @frame_len.setter
     def frame_len(self, value):
-        assert value > 0, "Frame length must be a positive number"
-        self._frame_len = value        
-        if self._frame_len != value:
+        if value and self._frame_len != value:
+            self._frame_len = value
             self.merge()
             self.adjust_sections_length()
-
+            self.create_labels()

@@ -28,16 +28,16 @@ class ModConfusion(CompareModule):
         # the format of every tuple in dictionary is 
         # [True Positives, True Negatives, False Positives, False Negatives] tuple (list actually :)
         source_err = {} 
+        source_name = 'All'
         for element in self.vadpy.pipeline:
             if self.sep_sources:
                 source_name = element.source_name
-            else:
-                source_name = 'All'
             
             # Generate a list of decision (voiced/unvoiced) pairs for Labels objects
             # 
             labelsA = getattr(element, self.inputs[0])
-            labelsB = getattr(element, self.inputs[1])            
+            labelsB = getattr(element, self.inputs[1])
+
             if len(labelsA) != len(labelsB):
                 log.warning('Labels length mismatch: {0} / {1}'.format(len(labelsA), len(labelsB)))
 

@@ -41,7 +41,7 @@ class Module(object):
     version = ''
 
     def __init__(self, vadpy, options):
-        """\param options"""
+        """Put all options validation here"""
         self.vadpy = vadpy
         self.settings = vadpy.settings
         self.name = self.__class__.__name__.lower()
@@ -81,7 +81,7 @@ class DBModule(Module):
     source_name = Option('source-name', description = "Element's source name")
     source_dir = Option('source-dir', description = 'Source directory (relatively to root dir)')
     gt_dir = Option('gt-dir', description = 'Ground Truth directory (relatively to root dir)')    
-    dataset = Option(description = 'The dataset path format attribute (see source_dir and gt_dir)')
+    dataset = Option(description = 'The dataset path format attribute (see source_dir and gt_dir)')    
 
     def __init__(self, vadpy, options):
         super(DBModule, self).__init__(vadpy, options)
@@ -98,14 +98,14 @@ class DBModule(Module):
         assert source_name, 'Source name cannot be blank'
         elements = []
         source_files = common.listdir(source_dir, *regexps)
-        gt_files = set(common.listdir(gt_dir, *regexps))
+        gt_files = common.listdir(gt_dir, *regexps)
 
         for source_file in source_files:
             source_file_path = os.path.join(source_dir, source_file)
             gt_file_path = os.path.join(gt_dir, source_file)
             if os.path.isdir(source_file_path):
                 continue
-            if source_file in gt_files or not se:
+            if source_file in gt_files:
                 elements.append(
                     Element(source_name,
                             os.path.abspath(source_file_path), 
@@ -175,7 +175,6 @@ class VADModule(Module):
     outpath = Option(description = 'Output path template (using Element and Module format arguments)')
     overwrite = Option(parser = bool_parser, 
                        description = 'Indicates if the module must overwrite existing VAD output')
-                       
     # filename corresponds to source_path's filename (template)
     def __init__(self, vadpy, options):
         super(VADModule, self).__init__(vadpy, options)
@@ -237,7 +236,7 @@ class SimpleVADModuleBase(VADModule):
             lstrun.append(element.vout_path)
             lstrun.extend(options_after_args)
 
-            log.debug('Starting the VAD as {0}'.format(lstrun))
+            log.debug('Executing VAD: {0}'.format(lstrun))
 
             proc = subprocess.Popen(lstrun, 
                                     close_fds = True,
@@ -278,10 +277,8 @@ class MatlabVADModuleBase(VADModule):
         pipeline = self.vadpy.pipeline
 
         self._execlist = ['-r', '{__bracket__}'] + self._execlist + [' {__bracket__}']
-
-        
-        # set internal flags for matlab engine
-        
+    
+        # set internal flags for matlab engine        
         assert pipeline.monotonic, "Cannot process non-monotonic pipeline (elements' flags differ"
         
         for elements in pipeline.slice(self.filecount):  # slice generator is used(!)
@@ -316,7 +313,6 @@ class MatlabVADModuleBase(VADModule):
                                     )
             stdoutdata, stderrdata = proc.communicate()
             assert not stderrdata, stderrdata
-
 
 
 class CompareModule(Module):
