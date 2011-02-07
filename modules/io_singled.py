@@ -61,5 +61,4 @@ class IOSingleD(GenericIOModuleBase):
         super(IOSingleD, self).write(labels, path)
         with open(path, 'w') as f:
             for section in labels:
-                f.write('{0}\t{1}\t{2}\n'.format(section[0], section[1], int(section[2])) )                
-    
+                f.write('{0}\t{1}\t{2}\n'.format(section[0], section[1], int(section[2])) )

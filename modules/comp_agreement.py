@@ -20,11 +20,12 @@ class ModAgreement(CompareModule):
                 lo_list.append(getattr(element, attr))
             lo_count = float(len(lo_list))
                 
-            assert len(set( len(labels) for labels in lo_list)) == 1, \
-                   'Labels objects section count differs'
+            sections_count = [len(labels) for labels in lo_list]
+            assert len(set(sections_count)) == 1, \
+                   'Labels objects section count differs: {0}'.format(sections_count)
 
-            total_agreement_rate = 0.0
-            majority_agreement_rate = 0.0
+            agreement_rate = 0.0
+            majority_voiced_rate = 0.0
 
             frame_len = lo_list[0].frame_len
             sections_count = len(lo_list[0])
@@ -38,27 +39,27 @@ class ModAgreement(CompareModule):
                                    if value])
                 unvoiced_count = lo_count - voiced_count
                 
-                majority_agreement_rate += max(unvoiced_count, voiced_count) / lo_count
+                majority_voiced_rate += voiced_count / lo_count
                 if voiced_count == lo_count or unvoiced_count == lo_count:
-                    total_agreement_rate += 1
+                    agreement_rate += 1
 
 
-            majority_agreement_rate /= sections_count
-            total_agreement_rate /= sections_count
+            majority_voiced_rate /= sections_count
+            agreement_rate /= sections_count
 
             if self.sep_sources:
                 source_name = element.source_name
 
             try:
-                source_rates[source_name].append( (majority_agreement_rate, total_agreement_rate) )
+                source_rates[source_name].append( (majority_voiced_rate, agreement_rate) )
             except KeyError:
-                source_rates[source_name] = [(majority_agreement_rate, total_agreement_rate), ]
+                source_rates[source_name] = [(majority_voiced_rate, agreement_rate), ]
             
         for source_name, rates in source_rates.items():
-            majority_agreement_rate = sum(r[0] for r in rates) / len(rates)
-            total_agreement_rate = sum(r[1] for r in rates) / len(rates)
+            majority_voiced_rate = sum(r[0] for r in rates) / len(rates)
+            agreement_rate = sum(r[1] for r in rates) / len(rates)
             print(source_name)
-            print('Majority agreement rate: {0:.3}%'.format(100 * majority_agreement_rate))
-            print('Total agreement rate: {0:.3}%'.format(100 * total_agreement_rate))
+            print('Majority voiced rate: {0:.3}%'.format(100 * majority_voiced_rate))
+            print('Total agreement rate: {0:.3}%'.format(100 * agreement_rate))
 
 

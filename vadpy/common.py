@@ -13,7 +13,7 @@ def listdir(path, *exprs):
        return files 
 
    reos = [re.compile(rexp) for rexp in exprs  # regex objects (filenames filters)
-           if len(rexp)]
+           if rexp]
    files = [f for f in files if any(               
             [reo.match(f) for reo in reos])]      # filter filename 
 

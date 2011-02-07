@@ -1,4 +1,5 @@
 import os
+import getpass
 
 # modules PATH
 PATH = ['./modules',
@@ -9,14 +10,16 @@ ROOT = os.path.abspath('..')
 format_args = {
     'root' : ROOT, 
     'binroot' : ROOT + '/bin',
-    'outroot' : ROOT + '/output',
+    'outroot' : ROOT + '/output/' + getpass.getuser(),
     'dbroot' :  ROOT + '/databases',
-    'framelen' : 0.005,            
 }
 
 MACROS = {   
+    # configuration values
+    'conf_framelen'  : 'frame-len=0.005',
+
     # macros 
-    'mcr_io'         : 'path-attr="" frame-len={framelen}',
+    'mcr_io'         : 'conf_framelen path-attr=""',
     'mcr_basevad'    : 'voutdir="{outroot}/{{modname}}" outpath="{{voutdir}}/{{e_srcname}}/{{e_srcfile}}" overwrite=No',
     'mcr_labels_vad' : 'labels-attr="vad_labels" path-attr="vout_path"',
     'mcr_labels_gt'  : 'labels-attr=gt_labels path-attr=gt_path',
@@ -29,18 +32,19 @@ MACROS = {
     'dft_matlab'    : 'vadmatlab mcr_basevad voutdir="{outroot}/matlab/{{engine}}_{{script}}" ' \
                       'bin=matlab mopts="-nojvm, -nosplash" ' \
                       'scriptdir={binroot}/matlab fread=600 filecount=128 args=""',
-
     # DB modules
     'nist05' : 'dbnist05 source-name=NIST05 dataset="" ' \
                'source-dir="{dbroot}/NIST05/DATA" gt-dir="{dbroot}/NIST05/GT/ASR"',
     'nist08' : 'dbnist08 source-name=NIST08 dataset="" dataunits="" channels="" ' \
                ' source-dir="{dbroot}/NIST08/DATA/" gt-dir="{dbroot}/NIST05/GT/"',    
-
+    'aurora' : 'dbaurora source-name=Aurora2 dataset=TEST env="1" snr="C,20,15,10,5,0,-5" ' \
+               'source-dir="{dbroot}/AURORA2/{{dataset}}/CLEAN" gt-dir="{dbroot}/AURORA2/{{dataset}}/GT" ',
     #IO modules
     'inist'     : 'dft_iostamps re=(?P<ss>\d.+) split=" " action=read labels-attr=gt_labels path-attr=gt_path ',
     'isingle'   : 'dft_iosingled mcr_labels_gt action=read ', 
     'ivsingle'  : 'dft_iosingled mcr_labels_vad action=read', 
     'igapless'  : 'dft_iogapless action=read',
+    #'odummy'    : 'genericiomodulebase mcr_io mcr_labels_vad action=write',
     'osingle'   : 'dft_iosingled mcr_labels_gt action=write',
     'ogapless'  : 'dft_iogapless mcr_labels_gt action=write',
     'ostamps'   : 'dft_iostamps mcr_labels_gt action=write',
@@ -62,9 +66,8 @@ MACROS = {
     # Other modules
     'info'       : 'modinfo action=show',
     'cat'        : 'modcat gt=yes source=yes',
-    'edit' :  'modedit attr="" value="{{attr}}" from_attr="" to_attr=""',
-    'edit'      : 'dft_edit', 
-    'confusion' : 'modconfusion mcr_compare',
-    'agreement' : 'modagreement mcr_compare re=""', 
-    'multivad'  : 'modmultivad out-labels-attr="vad_labels"'
+    'edit'       : 'modedit attr="" value="{{attr}}" from_attr="" to_attr=""',
+    'confusion'  : 'modconfusion mcr_compare',
+    'agreement'  : 'modagreement mcr_compare re=""', 
+    'multivad'   : 'modmultivad out-labels-attr="vad_labels"'
 }

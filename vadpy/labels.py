@@ -17,7 +17,7 @@ class Section(object):
         self.start = start
         self.end = end
         self.voiced = voiced
-        self.count = int(round(self.duration / frame_len))
+        self.compress(frame_len) # sets self.count
 
     @property
     def duration(self):
@@ -25,6 +25,9 @@ class Section(object):
    
     def __str__(self):
         return '{0} - {1} :{2}]'.format(self.start, self.end, self.voiced)
+
+    def compress(self, frame_len):
+        self.count = int(round(self.duration / frame_len))        
 
 
 def extend_sections(element, sections, frame_len):
@@ -130,11 +133,10 @@ class Labels(object):
                                        self._frame_len))
         self._sections = merged_sections
 
+    def compress_sections(self):
+        """Frame dimension sections compressing according to frame_len option
 
-    def adjust_sections_length(self):
-        """Frame dimension sections formatting according to frame_len option
-
-        Returns: list of formatted Section objects
+        Returns: list of compressed Section objects
 
         The method is used to sum small sections with section.length < --frame-len
         and replace them with a single Section object
@@ -150,8 +152,9 @@ class Labels(object):
         small_sections_unvoiced = 0      # unvoiced frames counter
 
         for section in sections:
+            section.compress(self._frame_len)
             if section.duration < frame_len:    # this is a small section
-                if first_small_section:          # there was a small section before current
+                if first_small_section:         # there was a small section before current
                     # update counters
                     small_sections_total_length += section.duration
                     small_sections_voiced +=  section.voiced
@@ -199,7 +202,9 @@ class Labels(object):
                     ret_sections.append(section)
         self._sections = ret_sections
 
+
     def create_labels(self):
+        self._labels = []
         sections = self._sections    # section object 'shortcut'
         section = sections[0]        # current iteration gt and vad sections
         start_time = section.start    
@@ -223,7 +228,7 @@ class Labels(object):
         # add last section if necessary (could be required due to small frame-len)
         if abs(start_time - sections[-1].end) <= self._frame_len:
             self._labels.append((start_time, sections[-1].end, sections[-1].voiced))
-            
+
     @property
     def sections(self):
         return self._sections
@@ -234,8 +239,8 @@ class Labels(object):
 
     @frame_len.setter
     def frame_len(self, value):
-        if value and self._frame_len != value:
-            self._frame_len = value
+        if value and self._frame_len != value:            
+            self._frame_len = value 
             self.merge()
-            self.adjust_sections_length()
+            self.compress_sections()
             self.create_labels()

@@ -28,7 +28,7 @@ class Element(object):
             self.set_length()         # calculate and set length value
 
     def set_length(self):
-        self.length = os.path.getsize(self.source_path) / (self.fs * (self.bps / 8.0)) 
+        self.length = os.path.getsize(self.source_path) / (self.fs * (self.bps / 8.0))
 
     @property
     def bps(self):

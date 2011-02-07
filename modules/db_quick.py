@@ -3,7 +3,7 @@ import os
 
 from vadpy import element
 from vadpy.module import DBModule
-from vadpy.options import Option
+from vadpy.options import Option, split_parser
 
 log = logging.getLogger(__name__)
 
@@ -25,14 +25,14 @@ class DBQUICK(DBModule):
     8000hz  - Data framerate is 8000hz 
     16bps   - 16 bits per frame
     """
-    flags = Option(description = 'Flags describing data in the database. ')
+    flags = Option(parser = split_parser, description = 'Flags describing data in the database. ')
     re = Option(description = 'Reqular expression filter')
 
     def __init__(self, vadpy, options):
         super(DBQUICK, self).__init__(vadpy, options)
         flags = element.UNDEFINED
 
-        for flag in self.flags.split(','):
+        for flag in self.flags:
             try:
                 flags |= FLAGS[flag]
             except KeyError:

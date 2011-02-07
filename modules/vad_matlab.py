@@ -21,12 +21,6 @@ class VADMatlab(MatlabVADModuleBase):
         super(VADMatlab, self).__init__(vadpy, options)
         assert self.filecount > 0, 'Filecount must be > 0'
 
-    def _get_vout_path(self, element):
-        return super(VADMatlab, self)._get_vout_path(element, 
-                                                     engine = self.engine,
-                                                     script = self.script)
-    
-    def run(self):
         self._execargs['script'] = self.script
         self._execargs['fread_len'] = self.fread
         self._execargs['vad_args'] = self.args
@@ -37,9 +31,17 @@ class VADMatlab(MatlabVADModuleBase):
                           "'{endianness}'", 
                           "{fread_len}",
                           "'{in_paths}'",
+                          "'{gt_paths}'",
                           "'{out_paths}'",
                           ]
-                          
+
+    def _get_vout_path(self, element):
+        self.voutdir = self.voutdir.format(engine = self.engine,
+                                           script = self.script)
+        return super(VADMatlab, self)._get_vout_path(element)
+                                            
+    
+    def run(self):                                  
         super(VADMatlab, self).run()
         
 

@@ -41,3 +41,6 @@ def bool_parser(value):
     else:
         raise Error('What kind of boolean do you think "{0}" is?'.format(value))
 
+
+def split_parser(value):
+    return value.split(',')

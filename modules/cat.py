@@ -36,7 +36,7 @@ class ModCat(Module):
         previous_time_to =   0        
         shift = 0
 
-        outsource_path = self.format_path(self.outpath)
+        outsource_path = ''
         gt_labels = None
         
         if self.cat_gt: # concatenate gt
@@ -46,16 +46,17 @@ class ModCat(Module):
                     section.end += shift
                     sections.append(section)
                 shift += element.length
-            gt_labels = Labels(sections,
-                               self.vadpy.pipeline.flush(),
-                               self.vadpy.pipeline.add(new_elem))
+            gt_labels = Labels(sections)
 
         if self.cat_source: # concatenate source
+            outsource_path = self.format_path(self.outpath)
             out_io = io.FileIO(outsource_path, 'w')
             for element in pipeline:
                 source_io = io.FileIO(element.source_path)
                 out_io.write(source_io.read())
             source_io.close()            
-
-        new_elem = Element(self.source_name, outsource_path, '', flags)
+        
+        new_elem = Element(self.source_name, outsource_path, '', flags, self.cat_source)
         new_elem.gt_labels = gt_labels
+        self.vadpy.pipeline.flush()
+        self.vadpy.pipeline.add(new_elem)

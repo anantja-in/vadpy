@@ -4,7 +4,7 @@ import re
 
 from vadpy.module import DBModule
 from vadpy.element import Element, LITTLE_ENDIAN, FS_8000, BPS_16
-from vadpy.options import Option
+from vadpy.options import Option, split_parser
 from vadpy  import common
 
 log = logging.getLogger(__name__)

@@ -2,7 +2,7 @@ import io
 import os
 
 from vadpy.module import Module
-from vadpy.options import  Option, bool_parser
+from vadpy.options import  Option, bool_parser, split_parser
 from vadpy.labels import Section, Labels
 
 import logging 
@@ -13,12 +13,11 @@ class ModMultiVAD(Module):
     
     The combination rule is max out of all, that's why an odd number of VAD Labels objects are required
     """
-    labels_attr = Option('labels-attr', description = "VAD labels attributes separated by comma")
+    labels_attr = Option('labels-attr', split_parser, "VAD labels attributes separated by comma")
     vad_labels_attr = Option('out-labels-attr', description = 'Output labels attribute')
 
     def __init__(self, vadpy, options):
         super(ModMultiVAD, self).__init__(vadpy, options)
-        self.labels_attr = self.labels_attr.split(',')
         assert self.labels_attr >= 3 and len(self.labels_attr) % 2 == 1, \
               'Labels attributes number is even or is less than 3'
 

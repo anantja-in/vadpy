@@ -5,7 +5,7 @@ import subprocess
 from . import common
 from .element import Element, LITTLE_ENDIAN
 from .error import VADpyError, MissingArgumentError
-from .options import Option, bool_parser
+from .options import Option, bool_parser, split_parser
 from .labels import Labels, extend_sections
 
 log = logging.getLogger(__name__)
@@ -108,10 +108,10 @@ class DBModule(Module):
             if source_file in gt_files:
                 elements.append(
                     Element(source_name,
-                            os.path.abspath(source_file_path), 
-                            os.path.abspath(gt_file_path),
+                            source_file_path, 
+                            gt_file_path,
                             flags)
-                    )                            
+                    )
             else:
                 raise VADpyError('Cannot find a GT file for corresponding source file {0}'.format(source_file))
         return elements
@@ -135,9 +135,7 @@ class IOModule(Module):
         if self.action == 'write':
             for element in self.vadpy.pipeline:
                 labels = getattr(element, self.labels_attr)
-                if labels:
-                    setattr(labels, 'frame_len', self.frame_len) # settings frame-len is crucial!                
-                
+                setattr(labels, 'frame_len', self.frame_len) # settings frame-len is crucial!
     def read(self, path):
         log.debug(('Reading {0}').format(path))
 
@@ -161,6 +159,7 @@ class GenericIOModuleBase(IOModule):
                 path = getattr(element, self.path_attr)
                 labels = Labels(extend_sections(element, self.read(path), self.frame_len),
                                 self.frame_len)
+
                 setattr(element, self.labels_attr, labels)
         elif self.action == 'write':
             for element in self.vadpy.pipeline:
@@ -318,12 +317,14 @@ class MatlabVADModuleBase(VADModule):
 class CompareModule(Module):
     """Base module for comparing elements' labels (and printing the output to stdout)
     """
-    inputs = Option(description = 'Input labels\' attributes separated by ",". In most cases those are gt_labels,vad_labels')
+    inputs = Option(parser = split_parser, 
+                    description = 'Input labels\' attributes separated by ",". '\
+                                  'In most cases those are gt_labels,vad_labels')
     sep_sources = Option('sep-sources', bool_parser, 'Treat files from every source separately.')
 
     def __init__(self, vadpy, options):
         super(CompareModule, self).__init__(vadpy, options)
-        self.inputs = self.inputs.split(',')
+        assert all(self.inputs), 'Inputs are empty'
 
     def run(self):
         super(CompareModule, self).run()
