@@ -44,12 +44,13 @@ def extend_sections(element, sections, frame_len):
             else:                
                 sections.insert(0, Section(0, sec.end, sec.voiced, frame_len))        
 
+        elem_len = len(element)
         sec = sections[-1]
-        if sec.end != element.length:
-            if abs(sec.end - element.length) < frame_len:
-                sec.end = element.length
+        if sec.end != elem_len:
+            if abs(sec.end - elem_len) < frame_len:
+                sec.end = elem_len
             else:
-                sections.append(Section(sec.end, element.length, sec.voiced, frame_len))
+                sections.append(Section(sec.end, elem_len, sec.voiced, frame_len))
     return sections
 
         
@@ -85,8 +86,10 @@ class Labels(object):
         self._labels.next() # to be changed for Python3
 
     def __getitem__(self, index):
-        assert self._frame_len, 'Cannot return item by index because frame-len has not been set'
-        return self._labels[index]
+        try:
+            return self._labels[index]
+        except KeyError:
+            raise Exception('Cannot return item by index because frame-len has not been set')
 
     def merge(self):
         """Sections merging by voiced value

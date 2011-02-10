@@ -25,6 +25,7 @@ class IOGapless(GenericIOModuleBase):
         super(IOGapless, self).read(path)
 
         i = 0
+        sections = []
         with open(path) as f:
             for line in f:
                 if not line:
@@ -32,12 +33,12 @@ class IOGapless(GenericIOModuleBase):
 
                 for char in line: 
                     decision = int(char)                    
-                    section = Section(i * frame_len,
-                                      (i + 1) * frame_len,
+                    section = Section(i * self.frame_len,
+                                      (i + 1) * self.frame_len,
                                       decision, 
                                       self.frame_len)
                     sections.append(section)   # create new section (above) and append it to sections list
-
+                    i+= 1
         log.debug(('Parsed: {0}; Sections: {1}').format(path, len(sections)))
         return sections
 

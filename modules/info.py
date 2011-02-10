@@ -23,7 +23,7 @@ class ModInfo(Module):
             'GT labels:\t{gt_labels}\n' \
             'Vout path:\t{vout_path}\n' \
             'VAD labels:\t{vad_labels}\n' \
-            'Length:\t\t{length} s.\n'
+            'Length:\t\t{_length} s.\n'
         
         if self.action == 'show':            
             # todo

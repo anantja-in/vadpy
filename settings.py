@@ -38,12 +38,13 @@ MACROS = {
     'nist08' : 'dbnist08 source-name=NIST08 dataset="" dataunits="" channels="" ' \
                ' source-dir="{dbroot}/NIST08/DATA/" gt-dir="{dbroot}/NIST05/GT/"',    
     'aurora' : 'dbaurora source-name=Aurora2 dataset=TEST env="1" snr="C,20,15,10,5,0,-5" ' \
-               'source-dir="{dbroot}/AURORA2/{{dataset}}/CLEAN" gt-dir="{dbroot}/AURORA2/{{dataset}}/GT" ',
+               'source-dir="{dbroot}/AURORA2/{{dataset}}/DATA" gt-dir="{dbroot}/AURORA2/{{dataset}}/GT" ',
     #IO modules
     'inist'     : 'dft_iostamps re=(?P<ss>\d.+) split=" " action=read labels-attr=gt_labels path-attr=gt_path ',
     'isingle'   : 'dft_iosingled mcr_labels_gt action=read ', 
     'ivsingle'  : 'dft_iosingled mcr_labels_vad action=read', 
-    'igapless'  : 'dft_iogapless action=read',
+    'igapless'  : 'dft_iogapless mcr_labels_gt action=read',
+    'ivgapless'  : 'dft_iogapless mcr_labels_vad action=read',
     #'odummy'    : 'genericiomodulebase mcr_io mcr_labels_vad action=write',
     'osingle'   : 'dft_iosingled mcr_labels_gt action=write',
     'ogapless'  : 'dft_iogapless mcr_labels_gt action=write',

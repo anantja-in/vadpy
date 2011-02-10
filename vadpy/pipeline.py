@@ -17,7 +17,7 @@ class Pipeline(object):
         return self._elements[item]
 
     def __iter__(self):
-        assert self.ready, 'The pipeline is not ready to be processed'
+        assert self.is_ready(), 'The pipeline is not ready to be processed'
         return self._elements.__iter__()
 
     def __contains__(self, entity):
@@ -41,12 +41,10 @@ class Pipeline(object):
     def flush(self):
         self._elements = []
 
-    @property
-    def ready(self):
+    def is_ready(self):
         is_ready = all(elem.bps and elem.fs and elem.flags != UNDEFINED 
                        for elem in self._elements)
         return is_ready
     
-    @property
-    def monotonic(self):
+    def is_monotonic(self):
         return len(set(elem.flags for elem in self._elements)) <= 1

@@ -278,7 +278,7 @@ class MatlabVADModuleBase(VADModule):
         self._execlist = ['-r', '{__bracket__}'] + self._execlist + [' {__bracket__}']
     
         # set internal flags for matlab engine        
-        assert pipeline.monotonic, "Cannot process non-monotonic pipeline (elements' flags differ"
+        assert pipeline.is_monotonic(), "Cannot process non-monotonic pipeline (elements' flags differ"
         
         for elements in pipeline.slice(self.filecount):  # slice generator is used(!)
             elements = [elem for elem in elements

@@ -10,7 +10,7 @@ FS_8000 = 0x8
 BPS_16 = 0x10
 
 class Element(object):
-    def __init__(self, source_name, source_path, gt_path, flags = UNDEFINED, set_length = True):
+    def __init__(self, source_name, source_path, gt_path, flags = UNDEFINED):
         """
         
         length - length in seconds
@@ -23,12 +23,26 @@ class Element(object):
         self.gt_labels = None         # definet by IO module (reading GT)
         self.vout_path = ''           # defined by VAD module
         self.vad_labels = None        # defined by IO module (reading VAD output)
-        self.length = 0               # file length in seconds
-        if set_length:
-            self.set_length()         # calculate and set length value
+        self._length = 0              # data length in seconds
+        self.set_length()
 
     def set_length(self):
-        self.length = os.path.getsize(self.source_path) / (self.fs * (self.bps / 8.0))
+        try:
+            if self.source_path:
+                self._length = os.path.getsize(self.source_path) / (self.fs * (self.bps / 8.0))
+        except OSError: # No such file or directory
+            pass
+
+    def __len__(self):
+        if not self._length:
+            self.set_length()
+        if self._length:
+            return self._length
+        if self.gt_labels:
+            return self.gt_labels.frame_len * len(self.gt_labels)
+        if self.vad_labels:
+            return self.gt_lanels.frame_len * len(self.gt_labels)        
+        return 0
 
     @property
     def bps(self):

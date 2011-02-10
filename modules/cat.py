@@ -10,10 +10,12 @@ import logging
 log = logging.getLogger(__name__)
 
 class ModCat(Module):
-    """Concatenates all elements' source data and GT labels into one element"""
+    """Concatenates all elements' source data and GT labels into one element
 
-    outpath = Option(description = 'Optput directory, to which the concatenated data should be written. ' \
-                         'Module/Path formatting is available.')
+    Additional macros: 
+    {{srcname}} - source-name option's value
+    """
+    outpath = Option(description = 'Optput file\'s path, to which the concatenated data should be written. ')            
     source_name = Option('source-name', description = 'New element\'s source name (bool)' )
     cat_gt = Option('gt', bool_parser, 'Concatenate GT (bool)')
     cat_source = Option('source', bool_parser, 'Concatenate source data (bool)')
@@ -25,7 +27,7 @@ class ModCat(Module):
         super(ModCat, self).run()
         pipeline = self.vadpy.pipeline
         # make sure that there are similar-by-flags elements in the pipeline
-        assert pipeline.monotonic, 'Pipeline contains elements with different flags'
+        assert pipeline.is_monotonic(), 'Pipeline contains elements with different flags'
         
         if not len(pipeline): # no need to proceed, if there are no elements in pipeline
             return 
@@ -45,7 +47,7 @@ class ModCat(Module):
                     section.start += shift
                     section.end += shift
                     sections.append(section)
-                shift += element.length
+                shift += len(element)
             gt_labels = Labels(sections)
 
         if self.cat_source: # concatenate source
