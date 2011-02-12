@@ -9,7 +9,7 @@ def listdir(path, *exprs):
    """
    files = os.listdir(path)  # get files from dir
   
-   if not exprs:
+   if not any(exprs):
        return files 
 
    reos = [re.compile(rexp) for rexp in exprs  # regex objects (filenames filters)
@@ -18,3 +18,10 @@ def listdir(path, *exprs):
             [reo.match(f) for reo in reos])]      # filter filename 
 
    return files # return a list of filtered files
+
+
+def makedirs(path):
+    try:
+        os.makedirs(path)
+    except OSError:
+        pass

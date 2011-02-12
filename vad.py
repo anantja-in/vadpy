@@ -10,15 +10,16 @@ log = logging.getLogger(__name__)
 
 
 def main():
-    # try:
-    setup_logging()
-    vadpy = VADpy(settings)
-    vadpy.run()
-    # except Exception as e:
-    #     log.critical(str(e))
-    #     exc_type, exc_value, exc_traceback = sys.exc_info()
-    #     traceback.print_tb(exc_traceback, limit = None, file = sys.stdout)
-    #     print("\n{0}".format(str(e)))
+    try:
+        setup_logging()
+        vadpy = VADpy(settings)
+        vadpy.run()
+    except Exception as e:
+        log.critical(str(e))
+        exc_type, exc_value, exc_traceback = sys.exc_info()
+        traceback.print_tb(exc_traceback, limit = None, file = sys.stdout)        
+        exit(1)
+
 
 def setup_logging():
     console_format = '%(levelname)-8s: %(message)s'

@@ -10,12 +10,12 @@ FS_8000 = 0x8
 BPS_16 = 0x10
 
 class Element(object):
-    def __init__(self, source_name, source_path, gt_path, flags = UNDEFINED):
+    def __init__(self, source_name = '', source_path = '', gt_path = '', flags = UNDEFINED):
         """
         
         length - length in seconds
         """
-        # defined by DB element
+        # defined by DB module
         self.flags = flags
         self.source_name = source_name
         self.source_path = source_path
@@ -33,11 +33,16 @@ class Element(object):
         except OSError: # No such file or directory
             pass
 
-    def __len__(self):
-        if not self._length:
-            self.set_length()
+    @property
+    def length(self):
         if self._length:
             return self._length
+        else:
+            self.set_length()
+        # 2nd try
+        if self._length:
+            return self._length
+        # nope, couldn't read the file, get labels' lengths if possible
         if self.gt_labels:
             return self.gt_labels.frame_len * len(self.gt_labels)
         if self.vad_labels:

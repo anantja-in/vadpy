@@ -26,7 +26,6 @@ class DBQUICK(DBModule):
     16bps   - 16 bits per frame
     """
     flags = Option(parser = split_parser, description = 'Flags describing data in the database. ')
-    re = Option(description = 'Reqular expression filter')
 
     def __init__(self, vadpy, options):
         super(DBQUICK, self).__init__(vadpy, options)
@@ -44,6 +43,5 @@ class DBQUICK(DBModule):
         elements = self.elements_from_dirs(self.source_name, 
                                            self.source_dir, 
                                            self.gt_dir, 
-                                           self.flags, 
-                                           self.re)
+                                           self.flags)
         self.vadpy.pipeline.add(*elements)

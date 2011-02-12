@@ -22,6 +22,7 @@ class ModCat(Module):
 
     def __init__(self, vadpy, options):
         super(ModCat, self).__init__(vadpy, options)
+        assert self.cat_gt or self.cat_source, 'Either GT or Source data should be concatenated'
 
     def run(self):
         super(ModCat, self).run()
@@ -47,7 +48,7 @@ class ModCat(Module):
                     section.start += shift
                     section.end += shift
                     sections.append(section)
-                shift += len(element)
+                shift += element.length
             gt_labels = Labels(sections)
 
         if self.cat_source: # concatenate source
@@ -58,7 +59,7 @@ class ModCat(Module):
                 out_io.write(source_io.read())
             source_io.close()            
         
-        new_elem = Element(self.source_name, outsource_path, '', flags, self.cat_source)
+        new_elem = Element(self.source_name, outsource_path, '', flags)
         new_elem.gt_labels = gt_labels
         self.vadpy.pipeline.flush()
         self.vadpy.pipeline.add(new_elem)

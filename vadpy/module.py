@@ -82,6 +82,7 @@ class DBModule(Module):
     source_dir = Option('source-dir', description = 'Source directory (relatively to root dir)')
     gt_dir = Option('gt-dir', description = 'Ground Truth directory (relatively to root dir)')    
     dataset = Option(description = 'The dataset path format attribute (see source_dir and gt_dir)')    
+    re = Option(description = 'Reqular expression files filter')
 
     def __init__(self, vadpy, options):
         super(DBModule, self).__init__(vadpy, options)
@@ -97,8 +98,8 @@ class DBModule(Module):
         """
         assert source_name, 'Source name cannot be blank'
         elements = []
-        source_files = common.listdir(source_dir, *regexps)
-        gt_files = common.listdir(gt_dir, *regexps)
+        source_files = common.listdir(source_dir, self.re, *regexps)
+        gt_files = common.listdir(gt_dir, self.re, *regexps)
 
         for source_file in source_files:
             source_file_path = os.path.join(source_dir, source_file)
@@ -141,9 +142,7 @@ class IOModule(Module):
 
     def write(self, data, path):
         log.debug('Writing to {0}'.format(path))
-        dir_path = os.path.dirname(path)
-        if not os.path.exists(dir_path):
-            os.makedirs(dir_path)
+        common.makedirs( os.path.dirname(path) )
 
 
 class GenericIOModuleBase(IOModule):
@@ -181,11 +180,8 @@ class VADModule(Module):
     def run(self):
         super(VADModule, self).run()
         for element in self.vadpy.pipeline:                            
-            element.vout_path = self._get_vout_path(element)           # set every element's vout_path attribute          
-            vad_output_dir = os.path.dirname(element.vout_path)        # create output paths that don't exist
-
-            if not os.path.exists(vad_output_dir):
-                os.makedirs(vad_output_dir)
+            element.vout_path = self._get_vout_path(element)           
+            common.makedirs( os.path.dirname(element.vout_path) )      # create output paths' dirs
 
     def _get_vout_path(self, element, **kwargs):
         """The method returns an output path for current VAD executable (The path is based on VADpy's configuration)

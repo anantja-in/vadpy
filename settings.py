@@ -33,11 +33,11 @@ MACROS = {
                       'bin=matlab mopts="-nojvm, -nosplash" ' \
                       'scriptdir={binroot}/matlab fread=600 filecount=128 args=""',
     # DB modules
-    'nist05' : 'dbnist05 source-name=NIST05 dataset="" ' \
+    'nist05' : 'dbnist05 source-name=NIST05 dataset="" re="" ' \
                'source-dir="{dbroot}/NIST05/DATA" gt-dir="{dbroot}/NIST05/GT/ASR"',
-    'nist08' : 'dbnist08 source-name=NIST08 dataset="" dataunits="" channels="" ' \
+    'nist08' : 'dbnist08 source-name=NIST08 dataset="" dataunits="" channels="" re="" ' \
                ' source-dir="{dbroot}/NIST08/DATA/" gt-dir="{dbroot}/NIST05/GT/"',    
-    'aurora' : 'dbaurora source-name=Aurora2 dataset=TEST env="1" snr="C,20,15,10,5,0,-5" ' \
+    'aurora' : 'dbaurora source-name=Aurora2 dataset=TEST env="1" snr="C,20,15,10,5,0,-5" re="" ' \
                'source-dir="{dbroot}/AURORA2/{{dataset}}/DATA" gt-dir="{dbroot}/AURORA2/{{dataset}}/GT" ',
     #IO modules
     'inist'     : 'dft_iostamps re=(?P<ss>\d.+) split=" " action=read labels-attr=gt_labels path-attr=gt_path ',
@@ -65,8 +65,9 @@ MACROS = {
     'svmtest'  : 'dft_matlab engine=svm script=test',
 
     # Other modules
-    'info'       : 'modinfo action=show',
+    'info'       : 'modinfo mode=normal',
     'cat'        : 'modcat gt=yes source=yes',
+    'split'      : 'modsplit gt=yes source=yes outpath="{outroot}/split/{{e_srcname}}/{{e_srcfile}}.{{counter}}"', 
     'edit'       : 'modedit attr="" value="{{attr}}" from_attr="" to_attr=""',
     'confusion'  : 'modconfusion mcr_compare',
     'agreement'  : 'modagreement mcr_compare re=""', 

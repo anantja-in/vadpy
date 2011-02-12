@@ -44,13 +44,12 @@ def extend_sections(element, sections, frame_len):
             else:                
                 sections.insert(0, Section(0, sec.end, sec.voiced, frame_len))        
 
-        elem_len = len(element)
         sec = sections[-1]
-        if sec.end != elem_len:
-            if abs(sec.end - elem_len) < frame_len:
-                sec.end = elem_len
+        if sec.end != element.length:
+            if abs(sec.end - element.length) < frame_len:
+                sec.end = element.length
             else:
-                sections.append(Section(sec.end, elem_len, sec.voiced, frame_len))
+                sections.append(Section(sec.end, element.length, sec.voiced, frame_len))
     return sections
 
         
@@ -207,7 +206,7 @@ class Labels(object):
 
 
     def create_labels(self):
-        self._labels = []
+        labels = []
         sections = self._sections    # section object 'shortcut'
         section = sections[0]        # current iteration gt and vad sections
         start_time = section.start    
@@ -223,14 +222,16 @@ class Labels(object):
                 except IndexError:
                     break
             
-            self._labels.append( (start_time, 
-                                  start_time + self._frame_len, 
-                                  section.voiced) )
+            labels.append( (start_time, 
+                            start_time + self._frame_len, 
+                            section.voiced) )
             frame_counter += 1
             start_time += self._frame_len 
+
         # add last section if necessary (could be required due to small frame-len)
-        if abs(start_time - sections[-1].end) <= self._frame_len:
-            self._labels.append((start_time, sections[-1].end, sections[-1].voiced))
+        if abs(start_time - sections[-1].end) >= self._frame_len:
+            labels.append((start_time, sections[-1].end, sections[-1].voiced))
+        self._labels = labels
 
     @property
     def sections(self):

@@ -20,6 +20,5 @@ class DBNIST05(DBModule):
         elements = self.elements_from_dirs(self.source_name, 
                                            self.source_dir, 
                                            self.gt_dir, 
-                                           self.FLAGS, 
-                                           '^j.*')
+                                           self.FLAGS,)
         self.vadpy.pipeline.add(*elements)
