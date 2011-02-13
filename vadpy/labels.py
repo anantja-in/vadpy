@@ -16,7 +16,7 @@ class Frame(object):
             'Frame start: {0}; end: {1};'.format(start,end)
         self.start = start
         self.end = end
-        self.voiced = voiced
+        self.voiced = bool(voiced)
         self.compress(frame_len) # sets self.count
 
     @property
@@ -136,7 +136,7 @@ class Labels(object):
         self._frames = merged_frames
 
     def compress_frames(self):
-        """Frame dimension frames compressing according to frame_len option
+        """Frame dimension compressing according to frame_len option
 
         Returns: list of compressed Frame objects
 
@@ -164,9 +164,9 @@ class Labels(object):
                
                 if small_frames_total_length > frame_len: # let's create a Frame object
                     new_frame = Frame(first_small_frame.start,
-                                          frame.end,
-                                          small_frames_voiced > small_frames_unvoiced, 
-                                          self._frame_len)
+                                      frame.end,
+                                      small_frames_voiced > small_frames_unvoiced, 
+                                      self._frame_len)
                     # Reset counters
                     first_small_frame = None
                     small_frames_total_length = 0
@@ -210,15 +210,20 @@ class Labels(object):
         frames = self._frames    # frame object 'shortcut'
         frame = frames[0]        # current iteration gt and vad frames
         start_time = frame.start    
-        frame_counter = 0            # frame-len based loop counters
+        frame_counter = 0          # frame-len based loop counters
         frame_id = 0               # frames loop counters
 
-        while(True):
+        dbg = raw_input('Debug? (y)')        
+
+        while(True):            
             if frame_counter == frame.count: 
+                if dbg:
+                    print(str(frame), frame.count)
+                    raw_input()
                 frame_counter = 0
                 frame_id += 1
                 try:
-                    frame = frames[frame_id]                    
+                    frame = frames[frame_id]
                 except IndexError:
                     break
             
@@ -227,7 +232,8 @@ class Labels(object):
                             frame.voiced) )
             frame_counter += 1
             start_time += self._frame_len 
-
+        
+        print('here')        
         # add last frame if necessary (could be required due to small frame-len)
         if abs(start_time - frames[-1].end) >= self._frame_len:
             labels.append((start_time, frames[-1].end, frames[-1].voiced))
@@ -248,3 +254,4 @@ class Labels(object):
             self.merge()
             self.compress_frames()
             self.create_labels()
+

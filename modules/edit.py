@@ -37,7 +37,8 @@ class ModEdit(Module):
                 new_val = self.format_path(self.value, 
                                            attr = old_val, 
                                            fname = fname, 
-                                           fdir = fdir)
+                                           fdir = fdir, 
+                                           **element.format_args)
                 setattr(element, self.attr, new_val)        
         if self.from_attr:
             for element in self.vadpy.pipeline:

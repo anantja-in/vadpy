@@ -17,7 +17,7 @@ class ModCat(Module):
     """
     out_source_path = Option('out-source-path',
                              description = 'Optput source file\'s path, to which the concatenated data should be written')
-    out_gt_path = Option('out-gt-path'
+    out_gt_path = Option('out-gt-path',
                          description = 'Optput GT file\'s path')
     source_name = Option('source-name', description = 'New element\'s source name (bool)' )
     cat_gt = Option('gt', bool_parser, 'Concatenate GT (yes/no)')

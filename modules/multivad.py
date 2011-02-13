@@ -14,7 +14,7 @@ class ModMultiVAD(Module):
     The combination rule is max out of all, that's why an odd number of VAD Labels objects are required
     """
     labels_attr = Option('labels-attr', split_parser, "VAD labels attributes separated by comma")
-    vad_labels_attr = Option('out-labels-attr', description = 'Output labels attribute')
+    out_labels_attr = Option('out-labels-attr', description = 'Output labels attribute')
 
     def __init__(self, vadpy, options):
         super(ModMultiVAD, self).__init__(vadpy, options)
@@ -54,4 +54,5 @@ class ModMultiVAD(Module):
                                         frame_len))
             
             lo_combined = Labels(frames, frame_len)
-            setattr(element, self.vad_labels_attr, lo_combined)
+
+            setattr(element, self.out_labels_attr, lo_combined)
