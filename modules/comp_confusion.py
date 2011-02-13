@@ -47,7 +47,7 @@ class ModConfusion(CompareModule):
             # Calculate False alarm and Miss rate
             tp = 0; tn = 0; fp = 0; fn = 0;
             for valA, valB in voicedAB:
-                if valA:                # concluding, valA is a value 'Voiced' Ground Truth section
+                if valA:                # concluding, valA is a value 'Voiced' Ground Truth frame
                   if valB: tp += 1      # true positive
                   else:    fp += 1      # false positive, false alarm
                 else:                     

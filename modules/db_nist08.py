@@ -17,9 +17,9 @@ class DBNIST08(DBModule):
         r'^20070313_145145.*',]
                           
     dataunits = Option(description = 'The data units\' numbers to be processed. ' \
-                                     'Leave blank to process all units. Example: {option}=1,2,3', )                       
+                                     'Leave blank to process all units. Example: dataunist=1,2,3', )
     channels = Option(description = 'Audio channels\' numbers (files) to be processed. ' \
-                                    'Leave blank to process all channels. Example: {option}=2,9,12')
+                                    'Leave blank to process all channels. Example: channels=2,9,12')
                       
     def __init__(self, vadpy, options):
         super(DBNIST08, self).__init__(vadpy, options)

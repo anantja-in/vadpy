@@ -6,7 +6,7 @@ from . import common
 from .element import Element, LITTLE_ENDIAN
 from .error import VADpyError, MissingArgumentError
 from .options import Option, bool_parser, split_parser
-from .labels import Labels, extend_sections
+from .labels import Labels, extend_frames
 
 log = logging.getLogger(__name__)
 
@@ -142,7 +142,7 @@ class IOModule(Module):
 
     def write(self, data, path):
         log.debug('Writing to {0}'.format(path))
-        common.makedirs( os.path.dirname(path) )
+        common.makedirs(os.path.dirname(path))
 
 
 class GenericIOModuleBase(IOModule):
@@ -156,7 +156,7 @@ class GenericIOModuleBase(IOModule):
         if self.action == 'read':
             for element in self.vadpy.pipeline:                
                 path = getattr(element, self.path_attr)
-                labels = Labels(extend_sections(element, self.read(path), self.frame_len),
+                labels = Labels(extend_frames(element, self.read(path), self.frame_len),
                                 self.frame_len)
 
                 setattr(element, self.labels_attr, labels)
@@ -172,7 +172,7 @@ class VADModule(Module):
     voutdir = Option(description = 'VAD output directory')
     outpath = Option(description = 'Output path template (using Element and Module format arguments)')
     overwrite = Option(parser = bool_parser, 
-                       description = 'Indicates if the module must overwrite existing VAD output')
+                       description = 'Indicates if the module must overwrite existing VAD output (yes/no)')
     # filename corresponds to source_path's filename (template)
     def __init__(self, vadpy, options):
         super(VADModule, self).__init__(vadpy, options)
@@ -181,7 +181,7 @@ class VADModule(Module):
         super(VADModule, self).run()
         for element in self.vadpy.pipeline:                            
             element.vout_path = self._get_vout_path(element)           
-            common.makedirs( os.path.dirname(element.vout_path) )      # create output paths' dirs
+            common.makedirs(os.path.dirname(element.vout_path))      # create output paths' dirs
 
     def _get_vout_path(self, element, **kwargs):
         """The method returns an output path for current VAD executable (The path is based on VADpy's configuration)
@@ -218,7 +218,7 @@ class SimpleVADModuleBase(VADModule):
         super(SimpleVADModuleBase, self).run() 
 
         for element in self.vadpy.pipeline:
-            if not self.overwrite and os.path.exists(element.vout_path):
+            if os.path.exists(element.vout_path) and not self.overwrite:
                 log.debug('File already exists: {0}'.format(element.vout_path))
                 continue
 
@@ -316,7 +316,7 @@ class CompareModule(Module):
     inputs = Option(parser = split_parser, 
                     description = 'Input labels\' attributes separated by ",". '\
                                   'In most cases those are gt_labels,vad_labels')
-    sep_sources = Option('sep-sources', bool_parser, 'Treat files from every source separately.')
+    sep_sources = Option('sep-sources', bool_parser, 'Treat files from every source separately (yes/no)')
 
     def __init__(self, vadpy, options):
         super(CompareModule, self).__init__(vadpy, options)

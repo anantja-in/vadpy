@@ -2,7 +2,7 @@ import logging
 import re
 from datetime import timedelta
 
-from vadpy.labels import Section
+from vadpy.labels import Frame
 from vadpy.module import Option, GenericIOModuleBase
 
 log = logging.getLogger(__name__)
@@ -11,7 +11,7 @@ class IOStamps(GenericIOModuleBase):
     """Parse GT/VAD files with positive decisions-only strings
 
     The format is: 
-    # voiced section: 
+    # voiced frame: 
     <time_from (datetime stamp regex)><splitter><time_to (datetime stamp regex)>
     
     Where stamp regular expression may look like:
@@ -40,7 +40,7 @@ class IOStamps(GenericIOModuleBase):
                
     def read(self, path):
         super(IOStamps, self).read(path)
-        sections = []
+        frames = []
 
         previous_time_from = 0
         previous_time_to =   0
@@ -56,47 +56,47 @@ class IOStamps(GenericIOModuleBase):
                 time_from = self._get_seconds(stamp_from)
                 time_to = self._get_seconds(stamp_to)
 
-                if previous_time_to >= time_from: # overlapping sections:
+                if previous_time_to >= time_from: # overlapping frames:
                     time_from = previous_time_to
                 else:
-                    # create unvoiced sections
+                    # create unvoiced frames
                     if previous_time_to != time_from:
-                        usection = Section(previous_time_to, time_from, False, self.frame_len)
-                        sections.append(usection)
+                        uframe = Frame(previous_time_to, time_from, False, self.frame_len)
+                        frames.append(uframe)
 
-                # create voiced section
+                # create voiced frame
                 if time_from != time_to:
-                    vsection = Section(time_from, time_to, True, self.frame_len)
-                    sections.append(vsection)
+                    vframe = Frame(time_from, time_to, True, self.frame_len)
+                    frames.append(vframe)
 
                 previous_time_from = time_from
                 previous_time_to = time_to
 
-        log.debug(('Parsed: {0}; Sections: {1}').format(path, len(sections)))
-        return sections
+        log.debug(('Parsed: {0}; Frames: {1}').format(path, len(frames)))
+        return frames
 
 
     def write(self, labels, path):
         super(IOStamps, self).write(labels, path)
         with open(path, 'w') as f:
-            begin_section = None
-            previos_section = None # (i-1_th section)
+            begin_frame = None
+            previos_frame = None # (i-1_th frame)
 
             try:
-                # although it's expected that labels.sections contain
-                # consequtevely changing sections (voiced/unvoiced/voiced/unvoiced/...)
-                # we can still insure ourselves against several consequtive voiced or unvoiced sections.
-                segment_start = labels.sections[0]
+                # although it's expected that labels.frames contain
+                # consequtevely changing frames (voiced/unvoiced/voiced/unvoiced/...)
+                # we can still insure ourselves against several consequtive voiced or unvoiced frames.
+                segment_start = labels.frames[0]
                 
-                for section in labels.sections:
-                    if segment_start.voiced != section.voiced: # sections differ
-                        if not section.voiced:                 # segment_start....previous_section segment is voiced
-                            f.write('{0} {1}\n'.format(segment_start.start, previos_section.end))
-                        segment_start = section
-                    previos_section = section
+                for frame in labels.frames:
+                    if segment_start.voiced != frame.voiced: # frames differ
+                        if not frame.voiced:                 # segment_start....previous_frame segment is voiced
+                            f.write('{0} {1}\n'.format(segment_start.start, previos_frame.end))
+                        segment_start = frame
+                    previos_frame = frame
 
                 if segment_start.voiced: # finalize
-                    f.write('{0} {1}\n'.format(segment_start.start, previos_section.end))
+                    f.write('{0} {1}\n'.format(segment_start.start, previos_frame.end))
                     
             except IndexError:
                 pass

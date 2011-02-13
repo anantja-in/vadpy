@@ -1,7 +1,7 @@
 import logging 
 import re
 
-from vadpy.labels import Section
+from vadpy.labels import Frame
 from vadpy.module import GenericIOModuleBase
 from vadpy.options import  Option
 
@@ -25,7 +25,7 @@ class IOGapless(GenericIOModuleBase):
         super(IOGapless, self).read(path)
 
         i = 0
-        sections = []
+        frames = []
         with open(path) as f:
             for line in f:
                 if not line:
@@ -33,19 +33,19 @@ class IOGapless(GenericIOModuleBase):
 
                 for char in line: 
                     decision = int(char)                    
-                    section = Section(i * self.frame_len,
+                    frame = Frame(i * self.frame_len,
                                       (i + 1) * self.frame_len,
                                       decision, 
                                       self.frame_len)
-                    sections.append(section)   # create new section (above) and append it to sections list
+                    frames.append(frame)   # create new frame (above) and append it to frames list
                     i+= 1
-        log.debug(('Parsed: {0}; Sections: {1}').format(path, len(sections)))
-        return sections
+        log.debug(('Parsed: {0}; Frames: {1}').format(path, len(frames)))
+        return frames
 
 
     def write(self, labels, path):
         super(IOGapless, self).write(labels, path)
         with open(path, 'w') as f:
-            sout = ''.join(str(int(section[2])) for section in labels)
+            sout = ''.join(str(int(frame[2])) for frame in labels)
             f.write(sout)
     

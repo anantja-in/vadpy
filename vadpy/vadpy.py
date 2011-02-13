@@ -47,8 +47,7 @@ class VADpy(object):
         for module, options in modules:
             self._modules.append(
                 manager.enable(module, options))
-        
-            
+                    
     def run(self):
         for module in self._modules:
             module.run()

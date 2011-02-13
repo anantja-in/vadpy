@@ -32,7 +32,7 @@ class DBAURORA(DBModule):
                     gt_file_path = os.path.join(self.gt_dir, 'N{0}'.format(env))
 
                 elements.append(
-                    Element(self.source_name,
+                    Element('{0}/{1}'.format(self.source_name, self.dataset),
                             source_file_path, 
                             gt_file_path,
                             self.FLAGS)

@@ -20,22 +20,22 @@ class ModAgreement(CompareModule):
                 lo_list.append(getattr(element, attr))
             lo_count = float(len(lo_list))
                 
-            sections_count = [len(labels) for labels in lo_list]
-            assert len(set(sections_count)) == 1, \
-                   'Labels objects section count differs: {0}'.format(sections_count)
+            frames_count = [len(labels) for labels in lo_list]
+            assert len(set(frames_count)) == 1, \
+                   'Labels objects frame count differs: {0}'.format(frames_count)
 
             agreement_rate = 0.0
             majority_voiced_rate = 0.0
 
             frame_len = lo_list[0].frame_len
-            sections_count = len(lo_list[0])
+            frames_count = len(lo_list[0])
 
-            for i in range(0, sections_count):
-                combined_section = []
+            for i in range(0, frames_count):
+                combined_frame = []
                 for lo in lo_list:
-                    combined_section.append(lo[i][2]) # i-th section, (start, end, --> voiced <-- ) tuple
+                    combined_frame.append(lo[i][2]) # i-th frame, (start, end, --> voiced <-- ) tuple
 
-                voiced_count = len([value for value in combined_section 
+                voiced_count = len([value for value in combined_frame 
                                    if value])
                 unvoiced_count = lo_count - voiced_count
                 
@@ -44,8 +44,8 @@ class ModAgreement(CompareModule):
                     agreement_rate += 1
 
 
-            majority_voiced_rate /= sections_count
-            agreement_rate /= sections_count
+            majority_voiced_rate /= frames_count
+            agreement_rate /= frames_count
 
             if self.sep_sources:
                 source_name = element.source_name

@@ -2,6 +2,16 @@
 
 vadpy=$1/vad.py
 
+
+function ftest_nist08_default {
+    $vadpy ! nist08
+}
+
+function ftest_nist05_default {
+    $vadpy ! nist05
+}
+
+
 function ftest_aurora_default {
     $vadpy ! aurora 
 }
@@ -41,7 +51,24 @@ function ftest
     fi
 }
 
+function ftest_nist08
+{
+    ftest "ftest_nist08_default"
+}
+
+function ftest_nist05
+{
+    ftest "ftest_nist05_default"
+}
+
+function ftest_aurora 
+{
+    ftest "ftest_aurora_default"
+}
+
 ftest "ftest_run_noparam"
 ftest "ftest_run_param_q" 
 ftest "ftest_run_param_h"
-ftest "ftest_aurora_default" 1
+ftest "ftest_aurora"
+ftest "ftest_nist08"
+ftest "ftest_nist05"

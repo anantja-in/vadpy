@@ -2,7 +2,7 @@ import logging
 import re
 from datetime import timedelta
 
-from vadpy.labels import Section
+from vadpy.labels import Frame
 from vadpy.module import GenericIOModuleBase
 from vadpy.options import  Option
 
@@ -27,7 +27,7 @@ class IOSingleD(GenericIOModuleBase):
     def read(self, path):
         super(IOSingleD, self).read(path)
 
-        sections = []
+        frames = []
 
         previous_time_from = 0
         previous_time_to =   0
@@ -46,19 +46,19 @@ class IOSingleD(GenericIOModuleBase):
                     end = float(match.group(2))
                     decision = bool(int(match.group(3)))
 
-                    section = Section(start * self.k_factor,
+                    frame = Frame(start * self.k_factor,
                                       end * self.k_factor,
                                       decision, 
                                       self.frame_len)
 
-                    sections.append(section)   # create new section (above) and append it to sections list
+                    frames.append(frame)   # create new frame (above) and append it to frames list
 
-        log.debug(('Parsed: {0}; Sections: {1}').format(path, len(sections)))
-        return sections
+        log.debug(('Parsed: {0}; Frames: {1}').format(path, len(frames)))
+        return frames
 
 
     def write(self, labels, path):
         super(IOSingleD, self).write(labels, path)
         with open(path, 'w') as f:
-            for section in labels:
-                f.write('{0}\t{1}\t{2}\n'.format(section[0], section[1], int(section[2])) )
+            for frame in labels:
+                f.write('{0}\t{1}\t{2}\n'.format(frame[0], frame[1], int(frame[2])) )

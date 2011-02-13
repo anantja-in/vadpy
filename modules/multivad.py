@@ -3,7 +3,7 @@ import os
 
 from vadpy.module import Module
 from vadpy.options import  Option, bool_parser, split_parser
-from vadpy.labels import Section, Labels
+from vadpy.labels import Frame, Labels
 
 import logging 
 log = logging.getLogger(__name__)
@@ -30,28 +30,28 @@ class ModMultiVAD(Module):
                 lo_list.append(getattr(element, attr))
             lo_count = len(lo_list)                
             assert len(set( len(labels) for labels in lo_list)) == 1, \
-                   'Labels objects section count differs'
+                   'Labels objects frame count differs'
             assert len(set( labels.frame_len for labels in lo_list)) ==1, \
                    'Labels objects frame length differs'
 
-            sections = []        
+            frames = []        
             frame_len = lo_list[0].frame_len
-            sections_count = len(lo_list[0])
+            frames_count = len(lo_list[0])
 
-            for i in range(0, sections_count):
-                combined_section = []
+            for i in range(0, frames_count):
+                combined_frame = []
                 for lo in lo_list:
-                    combined_section.append(lo[i][2]) # i-th section, (start, end, --> voiced <-- ) tuple
+                    combined_frame.append(lo[i][2]) # i-th frame, (start, end, --> voiced <-- ) tuple
 
-                voiced_count = len([value for value in combined_section 
+                voiced_count = len([value for value in combined_frame 
                                    if value])
                 unvoiced_count = lo_count - voiced_count                
 
                 decision = voiced_count > unvoiced_count and True or False
-                sections.append(Section(i * frame_len, 
+                frames.append(Frame(i * frame_len, 
                                         (i + 1) * frame_len,                                  
                                         decision, 
                                         frame_len))
             
-            lo_combined = Labels(sections, frame_len)
+            lo_combined = Labels(frames, frame_len)
             setattr(element, self.vad_labels_attr, lo_combined)

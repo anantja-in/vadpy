@@ -1,19 +1,19 @@
 import math
 
-class Section(object):
+class Frame(object):
     def __init__(self, start, end, voiced, frame_len):
-        """Initialize Section object
+        """Initialize Frame object
         
         core     -- EvalCore object
-        start    -- Section's start (in seconds)
-        end      -- Section's end  (in seconds)
-        voiced   -- Boolean VAD decision for the section (True / False)
+        start    -- Frame's start (in seconds)
+        end      -- Frame's end  (in seconds)
+        voiced   -- Boolean VAD decision for the frame (True / False)
         score    -- Soft VAD score
         """
-        assert end - start >= 0, 'Error creating Section object: ' \
-            'Section\'s start stamp is in ' \
+        assert end - start >= 0, 'Error creating Frame object: ' \
+            'Frame\'s start stamp is in ' \
             'future relatively to end stamp.\n' \
-            'Section start: {0}; end: {1};'.format(start,end)
+            'Frame start: {0}; end: {1};'.format(start,end)
         self.start = start
         self.end = end
         self.voiced = voiced
@@ -30,47 +30,47 @@ class Section(object):
         self.count = int(round(self.duration / frame_len))        
 
 
-def extend_sections(element, sections, frame_len):
-    """Extend sections list by two additional (first, last) sections if required
+def extend_frames(element, frames, frame_len):
+    """Extend frames list by two additional (first, last) frames if required
 
-    The function adds two sections (at most) to the list, so that sections timestamps cover 
+    The function adds two frames (at most) to the list, so that frames timestamps cover 
     0 .. file length competely
     """
-    if sections:
-        sec = sections[0]
+    if frames:
+        sec = frames[0]
         if sec.start != 0:
-            if sec.start < frame_len: # just a small glitch, no need to insert a new section
+            if sec.start < frame_len: # just a small glitch, no need to insert a new frame
                 sec.start = 0
             else:                
-                sections.insert(0, Section(0, sec.end, sec.voiced, frame_len))        
+                frames.insert(0, Frame(0, sec.end, sec.voiced, frame_len))        
 
-        sec = sections[-1]
+        sec = frames[-1]
         if sec.end != element.length:
             if abs(sec.end - element.length) < frame_len:
                 sec.end = element.length
             else:
-                sections.append(Section(sec.end, element.length, sec.voiced, frame_len))
-    return sections
+                frames.append(Frame(sec.end, element.length, sec.voiced, frame_len))
+    return frames
 
         
 class Labels(object):
     """Labels store for GT or VAD labels"""
-    def __init__(self, sections, frame_len = None):
+    def __init__(self, frames, frame_len = None):
         """Initialize Generic Labels object 
         
-        sections  -- list of Section objects with GT/VAD labels
+        frames  -- list of Frame objects with GT/VAD labels
         frame_len -- length of every labels frame in seconds
         """
-        assert sections, 'At least one section should be supplied to create Labels object'
+        assert frames, 'At least one frame should be supplied to create Labels object'
 
-        self._sections = sections
-        self._count = sum(section.count for section in sections) 
+        self._frames = frames
+        self._count = sum(frame.count for frame in frames) 
         self._labels = []
         self._frame_len = 0
         self.frame_len = frame_len # property
             
     def __str__(self):
-        return "Labels object. Sections count: {0}; Frame length: {1}".format(self._count, self._frame_len)
+        return "Labels object. Frames count: {0}; Frame length: {1}".format(self._count, self._frame_len)
         
     def __len__(self):
         return self._labels and len(self._labels) or self._count
@@ -91,151 +91,151 @@ class Labels(object):
             raise Exception('Cannot return item by index because frame-len has not been set')
 
     def merge(self):
-        """Sections merging by voiced value
+        """Frames merging by voiced value
 
-        The method merges Sections objects if 
-        two consecutive Section objects have same voiced values
+        The method merges Frames objects if 
+        two consecutive Frame objects have same voiced values
         """
-        sections = self._sections
-        # first check, do we actually need to merge sections?
+        frames = self._frames
+        # first check, do we actually need to merge frames?
         merge_required = False
-        prev_voiced = sections[0].voiced
+        prev_voiced = frames[0].voiced
 
-        for section in sections[1:]:
-            if section.voiced == prev_voiced: # yeap, merge is required
+        for frame in frames[1:]:
+            if frame.voiced == prev_voiced: # yeap, merge is required
                 merge_required = True 
                 break;
             else:
-                prev_voiced = section.voiced   # no, continue
+                prev_voiced = frame.voiced   # no, continue
 
         # Now merge.. 
         if not merge_required:
-            return sections
+            return frames
 
-        merged_sections = []
-        prev_section = sections[0]
-        prev_voiced = prev_section.voiced
+        merged_frames = []
+        prev_frame = frames[0]
+        prev_voiced = prev_frame.voiced
 
-        big_section_start = prev_section.start
+        big_frame_start = prev_frame.start
 
-        for section in sections[1:]:
-            if section.voiced != prev_voiced:
-                merged_sections.append(Section(big_section_start, 
-                                               prev_section.end,
+        for frame in frames[1:]:
+            if frame.voiced != prev_voiced:
+                merged_frames.append(Frame(big_frame_start, 
+                                               prev_frame.end,
                                                prev_voiced,
                                                self._frame_len))
-                big_section_start = section.start
-            prev_section = section
-            prev_voiced = section.voiced
+                big_frame_start = frame.start
+            prev_frame = frame
+            prev_voiced = frame.voiced
 
-        # last section
-        merged_sections.append(Section(big_section_start, 
-                                       prev_section.end,
+        # last frame
+        merged_frames.append(Frame(big_frame_start, 
+                                       prev_frame.end,
                                        prev_voiced,
                                        self._frame_len))
-        self._sections = merged_sections
+        self._frames = merged_frames
 
-    def compress_sections(self):
-        """Frame dimension sections compressing according to frame_len option
+    def compress_frames(self):
+        """Frame dimension frames compressing according to frame_len option
 
-        Returns: list of compressed Section objects
+        Returns: list of compressed Frame objects
 
-        The method is used to sum small sections with section.length < --frame-len
-        and replace them with a single Section object
+        The method is used to sum small frames with frame.length < --frame-len
+        and replace them with a single Frame object
         """
-        sections = self._sections
-        # 'small' section - section which's len < frame_len
+        frames = self._frames
+        # 'small' frame - frame which's len < frame_len
         frame_len = self._frame_len
-        ret_sections = []  # list of sections that will be returned
+        ret_frames = []  # list of frames that will be returned
         
-        first_small_section = None
-        small_sections_total_length = 0  # length is seconds
-        small_sections_voiced = 0        # voiced frames counter
-        small_sections_unvoiced = 0      # unvoiced frames counter
+        first_small_frame = None
+        small_frames_total_length = 0  # length is seconds
+        small_frames_voiced = 0        # voiced frames counter
+        small_frames_unvoiced = 0      # unvoiced frames counter
 
-        for section in sections:
-            section.compress(self._frame_len)
-            if section.duration < frame_len:    # this is a small section
-                if first_small_section:         # there was a small section before current
+        for frame in frames:
+            frame.compress(self._frame_len)
+            if frame.duration < frame_len:    # this is a small frame
+                if first_small_frame:         # there was a small frame before current
                     # update counters
-                    small_sections_total_length += section.duration
-                    small_sections_voiced +=  section.voiced
-                    small_sections_unvoiced += (not section.voiced)
+                    small_frames_total_length += frame.duration
+                    small_frames_voiced +=  frame.voiced
+                    small_frames_unvoiced += (not frame.voiced)
                
-                if small_sections_total_length > frame_len: # let's create a Section object
-                    new_section = Section(first_small_section.start,
-                                          section.end,
-                                          small_sections_voiced > small_sections_unvoiced, 
+                if small_frames_total_length > frame_len: # let's create a Frame object
+                    new_frame = Frame(first_small_frame.start,
+                                          frame.end,
+                                          small_frames_voiced > small_frames_unvoiced, 
                                           self._frame_len)
                     # Reset counters
-                    first_small_section = None
-                    small_sections_total_length = 0
-                    small_sections_voiced = 0
-                    small_sections_unvoiced = 0
+                    first_small_frame = None
+                    small_frames_total_length = 0
+                    small_frames_voiced = 0
+                    small_frames_unvoiced = 0
 
-                    ret_sections.append(new_section)
-                else:                       # this is the FIRST small section in current position
-                    first_small_section = section
+                    ret_frames.append(new_frame)
+                else:                       # this is the FIRST small frame in current position
+                    first_small_frame = frame
 
                 # update counters
-                small_sections_total_length += section.duration
-                small_sections_voiced +=  section.voiced
-                small_sections_unvoiced += (not section.voiced)
-            else:                          # this is not a small section but..
-                if first_small_section:     # ..there was a small section before
-                    # update counters (!) - multiply current voiced to section.count
-                    small_sections_total_length += section.duration
-                    small_sections_voiced +=  section.voiced * section.count
-                    small_sections_unvoiced += (not section.voiced) * section.count
+                small_frames_total_length += frame.duration
+                small_frames_voiced +=  frame.voiced
+                small_frames_unvoiced += (not frame.voiced)
+            else:                          # this is not a small frame but..
+                if first_small_frame:     # ..there was a small frame before
+                    # update counters (!) - multiply current voiced to frame.count
+                    small_frames_total_length += frame.duration
+                    small_frames_voiced +=  frame.voiced * frame.count
+                    small_frames_unvoiced += (not frame.voiced) * frame.count
                     
-                    if small_sections_total_length > frame_len: # make a single Section
-                        new_section = Section(first_small_section.start,
-                                              section.end,
-                                              small_sections_voiced > small_sections_unvoiced, 
+                    if small_frames_total_length > frame_len: # make a single Frame
+                        new_frame = Frame(first_small_frame.start,
+                                              frame.end,
+                                              small_frames_voiced > small_frames_unvoiced, 
                                               self._frame_len)
                         # Reset counters
-                        first_small_section = None
-                        small_sections_total_length = 0
-                        small_sections_voiced = 0
-                        small_sections_unvoiced = 0
+                        first_small_frame = None
+                        small_frames_total_length = 0
+                        small_frames_voiced = 0
+                        small_frames_unvoiced = 0
 
-                        ret_sections.append(new_section)
-                else:                       # just append this section to the list
-                    ret_sections.append(section)
-        self._sections = ret_sections
+                        ret_frames.append(new_frame)
+                else:                       # just append this frame to the list
+                    ret_frames.append(frame)
+        self._frames = ret_frames
 
 
     def create_labels(self):
         labels = []
-        sections = self._sections    # section object 'shortcut'
-        section = sections[0]        # current iteration gt and vad sections
-        start_time = section.start    
+        frames = self._frames    # frame object 'shortcut'
+        frame = frames[0]        # current iteration gt and vad frames
+        start_time = frame.start    
         frame_counter = 0            # frame-len based loop counters
-        section_id = 0               # sections loop counters
+        frame_id = 0               # frames loop counters
 
         while(True):
-            if frame_counter == section.count: 
+            if frame_counter == frame.count: 
                 frame_counter = 0
-                section_id += 1
+                frame_id += 1
                 try:
-                    section = sections[section_id]                    
+                    frame = frames[frame_id]                    
                 except IndexError:
                     break
             
             labels.append( (start_time, 
                             start_time + self._frame_len, 
-                            section.voiced) )
+                            frame.voiced) )
             frame_counter += 1
             start_time += self._frame_len 
 
-        # add last section if necessary (could be required due to small frame-len)
-        if abs(start_time - sections[-1].end) >= self._frame_len:
-            labels.append((start_time, sections[-1].end, sections[-1].voiced))
+        # add last frame if necessary (could be required due to small frame-len)
+        if abs(start_time - frames[-1].end) >= self._frame_len:
+            labels.append((start_time, frames[-1].end, frames[-1].voiced))
         self._labels = labels
 
     @property
-    def sections(self):
-        return self._sections
+    def frames(self):
+        return self._frames
       
     @property 
     def frame_len(self):
@@ -246,5 +246,5 @@ class Labels(object):
         if value and self._frame_len != value:            
             self._frame_len = value 
             self.merge()
-            self.compress_sections()
+            self.compress_frames()
             self.create_labels()

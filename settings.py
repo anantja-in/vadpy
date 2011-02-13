@@ -36,7 +36,7 @@ MACROS = {
     'nist05' : 'dbnist05 source-name=NIST05 dataset="" re="" ' \
                'source-dir="{dbroot}/NIST05/DATA" gt-dir="{dbroot}/NIST05/GT/ASR"',
     'nist08' : 'dbnist08 source-name=NIST08 dataset="" dataunits="" channels="" re="" ' \
-               ' source-dir="{dbroot}/NIST08/DATA/" gt-dir="{dbroot}/NIST05/GT/"',    
+               ' source-dir="{dbroot}/NIST08/DATA/" gt-dir="{dbroot}/NIST08/GT/"',    
     'aurora' : 'dbaurora source-name=Aurora2 dataset=TEST env="1" snr="C,20,15,10,5,0,-5" re="" ' \
                'source-dir="{dbroot}/AURORA2/{{dataset}}/DATA" gt-dir="{dbroot}/AURORA2/{{dataset}}/GT" ',
     #IO modules
@@ -67,7 +67,9 @@ MACROS = {
     # Other modules
     'info'       : 'modinfo mode=normal',
     'cat'        : 'modcat gt=yes source=yes',
-    'split'      : 'modsplit gt=yes source=yes outpath="{outroot}/split/{{e_srcname}}/{{e_srcfile}}.{{counter}}"', 
+    'split'      : 'modsplit gt=yes source=yes length=60 overwrite=No ' \
+                   'out-source-path="{outroot}/split/{{e_srcname}}/{{e_srcfile}}.{{counter}}" ' \
+                   'out-gt-path="{outroot}/split/{{e_srcname}}/GT/{{e_srcfile}}.{{counter}}"', 
     'edit'       : 'modedit attr="" value="{{attr}}" from_attr="" to_attr=""',
     'confusion'  : 'modconfusion mcr_compare',
     'agreement'  : 'modagreement mcr_compare re=""', 
