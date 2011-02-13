@@ -26,9 +26,9 @@ class DBAURORA(DBModule):
                 source_file_name = 'N{0}_SNR{1}'.format(env, snr)
                 source_file_path = os.path.join(self.source_dir, source_file_name)
 
-                if self.dataset == 'TRAIN' :
+                if self.dataset.startswith('TRAIN'):
                     gt_file_path = os.path.join(self.gt_dir, source_file_name)
-                elif self.dataset == 'TEST':
+                elif self.dataset.startswith('TEST'):
                     gt_file_path = os.path.join(self.gt_dir, 'N{0}'.format(env))
 
                 elements.append(

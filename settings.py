@@ -16,7 +16,7 @@ format_args = {
 
 MACROS = {   
     # configuration values
-    'conf_framelen'  : 'frame-len=0.005',
+    'conf_framelen'  : 'frame-len=0.01',
 
     # macros 
     'mcr_io'         : 'conf_framelen path-attr=""',
