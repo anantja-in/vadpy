@@ -274,12 +274,13 @@ class MatlabVADModuleBase(VADModule):
         self._execlist = ['-r', '{__bracket__}'] + self._execlist + [' {__bracket__}']
     
         # set internal flags for matlab engine        
-        assert pipeline.is_monotonic(), "Cannot process non-monotonic pipeline (elements' flags differ"
+        assert pipeline.is_monotonic(), "Cannot process non-monotonic pipeline (elements' flags differ)"
         
         for elements in pipeline.slice(self.filecount):  # slice generator is used(!)
             elements = [elem for elem in elements
                         if self.overwrite or not os.path.exists(elem.vout_path)]
             if not elements:
+                log.debug("All output files already exist")
                 return 
 
             self._execargs['endianness'] = elements[0].flags & LITTLE_ENDIAN and 'l' or 'b'
@@ -292,7 +293,7 @@ class MatlabVADModuleBase(VADModule):
             self._execargs['in_paths'] = in_paths
             self._execargs['gt_paths'] = gt_paths
             self._execargs['out_paths'] = out_paths
-            
+
             sexec = ' '.join(self._execlist)
             sexec = sexec.format(**self._execargs)
             lstrun = [self.bin, self.mopts, sexec]

@@ -7,28 +7,25 @@ from vadpy.options import Option
 log = logging.getLogger(__name__)
 
 
-class VADMatlab(MatlabVADModuleBase):
+class VADMatlabSVM(MatlabVADModuleBase):
     """Matlab-based VADs helper module
 
     Path formatting:
     {script} - uses "script" option's value in path, e.g. ... voutdir="{outroot}/matlab/{{script}}"
     """
     script = Option(description = 'VAD function name')
-    fread = Option(description = 'Length of a signal in each fread iteration (in seconds)')
-    args = Option(description = 'Additional arguments to be passed to matlab script')
+    frame_len = Option('frame-len', description = 'Labels frame length')
 
     def __init__(self, vadpy, options):
-        super(VADMatlab, self).__init__(vadpy, options)
-        assert self.filecount > 0, 'Filecount must be > 0'
+        super(VADMatlabSVM, self).__init__(vadpy, options)
 
         self._execargs['script'] = self.script
-        self._execargs['vad_args'] = self.args
+        self._execargs['frame_len'] = self.frame_len
 
         self._execlist = ['{engine}', 
                           "'{script}'",
-                          "'{vad_args}'",
                           "'{endianness}'", 
-                          "{fread_len}",
+                          "'{frame_len}'",
                           "'{in_paths}'",
                           "'{gt_paths}'",
                           "'{out_paths}'",
@@ -37,10 +34,10 @@ class VADMatlab(MatlabVADModuleBase):
     def _get_vout_path(self, element):
         self.voutdir = self.voutdir.format(engine = self.engine,
                                            script = self.script)
-        return super(VADMatlab, self)._get_vout_path(element)
+        return super(VADMatlabSVM, self)._get_vout_path(element)
                                             
     
     def run(self):                                  
-        super(VADMatlab, self).run()
+        super(VADMatlabSVM, self).run()
         
 

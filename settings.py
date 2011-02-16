@@ -24,14 +24,15 @@ MACROS = {
     'mcr_labels_vad' : 'labels-attr="vad_labels" path-attr="vout_path"',
     'mcr_labels_gt'  : 'labels-attr=gt_labels path-attr=gt_path',
     'mcr_compare'    : 'sep-sources=Yes inputs=gt_labels,vad_labels',
+    'mcr_matlab'    : 'mcr_basevad voutdir="{outroot}/matlab/{{engine}}_{{script}}" ' \
+                      'bin=matlab mopts="-nojvm, -nosplash" ' \
+                      'scriptdir={binroot}/matlab fread=600 filecount=128 args=""',
 
     # Default modules' configurations
     'dft_iosingled' : 'iosingled mcr_io k=1',
     'dft_iostamps'  : 'iostamps mcr_io re="" split=""',
     'dft_iogapless' : 'iogapless mcr_io',
-    'dft_matlab'    : 'vadmatlab mcr_basevad voutdir="{outroot}/matlab/{{engine}}_{{script}}" ' \
-                      'bin=matlab mopts="-nojvm, -nosplash" ' \
-                      'scriptdir={binroot}/matlab fread=600 filecount=128 args=""',
+    'dft_matlab'    : 'vadmatlab mcr_matlab fread=600 filecount=128 args=""',
     # DB modules
     'nist05' : 'dbnist05 source-name=NIST05 dataset="" re="" ' \
                'source-dir="{dbroot}/NIST05/DATA" gt-dir="{dbroot}/NIST05/GT/ASR"',
@@ -62,8 +63,10 @@ MACROS = {
     'amr1'     : 'vadamr mcr_basevad voutdir="{outroot}/amr1" exec-path="{binroot}/amr/amr1" ',
     'amr2'     : 'vadamr mcr_basevad voutdir="{outroot}/amr2" exec-path="{binroot}/amr/amr2" ',
     'matlab'   : 'dft_matlab engine=vad',
-    'svmtrain' : 'dft_matlab engine=svm script=train',
-    'svmtest'  : 'dft_matlab engine=svm script=test',
+    'svmtrain' : 'vadmatlabsvm mcr_matlab conf_framelen engine=svm script=train ' \
+                 'outpath="{{voutdir}}/{{e_srcname}}/{{e_srcfile}}.mat"',
+    'svmtest'  : 'vadmatlabsvm mcr_matlab conf_framelen engine=svm script=test ' \
+                 'outpath="{{voutdir}}/{{e_srcname}}/{{e_srcfile}}"',
 
     # Other modules
     'info'       : 'modinfo mode=normal',

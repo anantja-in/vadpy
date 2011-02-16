@@ -46,7 +46,7 @@ class Element(object):
         if self.gt_labels:
             return self.gt_labels.frame_len * len(self.gt_labels)
         if self.vad_labels:
-            return self.gt_lanels.frame_len * len(self.gt_labels)        
+            return self.gt_labels.frame_len * len(self.gt_labels)        
         return 0
 
     @property

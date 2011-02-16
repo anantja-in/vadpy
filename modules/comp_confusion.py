@@ -82,8 +82,10 @@ class ModConfusion(CompareModule):
             fn *= 100
             # print the stuff to stdout
             print(source_name)
-            print('FRR: {0:.3}%'.format(fp))
-            print('FAR: {0:.3}%'.format(fn))
+            print('{0:<25}{1:.3}%'.format('False Rejection Rate:',
+                                            fp))
+            print('{0:<25}{1:.3}%'.format('False Alarm Rate:',
+                                            fn))
             print('')
 
     
