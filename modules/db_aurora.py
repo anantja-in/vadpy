@@ -9,7 +9,7 @@ from vadpy.options import Option, split_parser
 log = logging.getLogger(__name__)
 
 class DBAURORA(DBModule):
-    """AURORA2z corpus module"""    
+    """AURORA2 corpus module"""
     env = Option(parser = split_parser, description = 'Environment numbers separated by ","')
     snr = Option(parser = split_parser, description = 'SNR rates separated by ","')
 

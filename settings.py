@@ -16,7 +16,7 @@ format_args = {
 
 MACROS = {   
     # configuration values
-    'conf_framelen'  : 'frame-len=0.01',
+    'conf_framelen'  : 'frame-len=0.008',
 
     # macros 
     'mcr_io'         : 'conf_framelen path-attr=""',
@@ -39,7 +39,8 @@ MACROS = {
     'nist08' : 'dbnist08 source-name=NIST08 dataset="" dataunits="" channels="" re="" ' \
                ' source-dir="{dbroot}/NIST08/DATA/" gt-dir="{dbroot}/NIST08/GT/"',    
     'aurora' : 'dbaurora source-name=Aurora2 dataset=TEST env="1" snr="C,20,15,10,5,0,-5" re="" ' \
-               'source-dir="{dbroot}/AURORA2/{{dataset}}/DATA" gt-dir="{dbroot}/AURORA2/{{dataset}}/GT" ',
+               'source-dir="{dbroot}/AURORA2/{{dataset}}/DATA" ' \
+               'gt-dir="{dbroot}/AURORA2/{{dataset}}/GT" ',
     #IO modules
     'inist'     : 'dft_iostamps re=(?P<ss>\d.+) split=" " action=read labels-attr=gt_labels path-attr=gt_path ',
     'isingle'   : 'dft_iosingled mcr_labels_gt action=read ', 
@@ -69,7 +70,7 @@ MACROS = {
                  'outpath="{{voutdir}}/{{e_srcname}}/{{e_srcfile}}"',
 
     # Other modules
-    'info'       : 'modinfo mode=normal',
+    'info'       : 'modinfo attr="__info__"',
     'cat'        : 'modcat gt=yes source=yes',
     'split'      : 'modsplit gt=yes source=yes length=60 overwrite=No ' \
                    'out-source-path="{outroot}/split/{{e_srcname}}/{{e_srcfile}}.{{counter}}" ' \
@@ -77,5 +78,6 @@ MACROS = {
     'edit'       : 'modedit attr="" value="{{attr}}" from_attr="" to_attr=""',
     'confusion'  : 'modconfusion mcr_compare',
     'agreement'  : 'modagreement mcr_compare re=""', 
-    'multivad'   : 'modmultivad out-labels-attr="vad_labels"'
+    'multivad'   : 'modmultivad out-labels-attr="vad_labels"',
+    'vurate'     : 'modvurate labels-attr=gt_labels'
 }

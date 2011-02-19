@@ -15,6 +15,8 @@ class Element(object):
         
         length - length in seconds
         """
+        # defined by pipeline
+        self.id = 0 
         # defined by DB module
         self.flags = flags
         self.source_name = source_name

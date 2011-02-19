@@ -27,13 +27,14 @@ class ModEdit(Module):
         super(ModEdit, self).run()                
         if self.attr:
             for element in self.vadpy.pipeline:
-                old_val = getattr(element, self.attr)
+                try:
+                    old_val = getattr(element, self.attr)
+                except AttributeError:
+                    old_val = ''
+
                 fdir = ''
                 fname = ''
-                try :
-                    fdir, fname = os.path.split(old_val)
-                except:
-                    pass
+                fdir, fname = os.path.split(old_val)
                 new_val = self.format_path(self.value, 
                                            attr = old_val, 
                                            fname = fname, 

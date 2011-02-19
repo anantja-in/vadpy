@@ -8,8 +8,13 @@ log = logging.getLogger(__name__)
 class Pipeline(object):
     def __init__(self, vadpy):
         self._elements = []
+        self._counter = 0
 
     def add(self, *elements):
+        for element in elements:
+            element.id = self._counter
+            self._counter += 1
+
         self._elements.extend(elements)
         log.debug('{0} elements have been added to the pipeline'.format(len(elements)))
 
@@ -40,6 +45,7 @@ class Pipeline(object):
 
     def flush(self):
         self._elements = []
+        self._counter = 0
 
     def is_ready(self):
         is_ready = all(elem.bps and elem.fs and elem.flags != UNDEFINED 

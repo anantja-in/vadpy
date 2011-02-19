@@ -29,6 +29,7 @@ class ModConfusion(CompareModule):
         # [True Positives, True Negatives, False Positives, False Negatives] tuple (list actually :)
         source_err = {} 
         source_name = 'All'
+
         for element in self.vadpy.pipeline:
             if self.sep_sources:
                 source_name = element.source_name
@@ -82,10 +83,8 @@ class ModConfusion(CompareModule):
             fn *= 100
             # print the stuff to stdout
             print(source_name)
-            print('{0:<25}{1:.3}%'.format('False Rejection Rate:',
+            print('{0:<25}{1:.3}%'.format('Miss rate:',
                                             fp))
             print('{0:<25}{1:.3}%'.format('False Alarm Rate:',
                                             fn))
             print('')
-
-    

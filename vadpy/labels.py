@@ -13,6 +13,7 @@ class Frame(object):
         assert end - start >= 0, 'Error creating Frame object: ' \
             'Frame\'s start stamp is in ' \
             'future relatively to end stamp.\n' \
+            'A possible reason is incorrect labels\' frame length\n' \
             'Frame start: {0}; end: {1};'.format(start,end)
         self.start = start
         self.end = end

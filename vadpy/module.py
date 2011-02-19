@@ -13,10 +13,10 @@ log = logging.getLogger(__name__)
 
 class ModuleMeta(type):
     def __new__(meta, classname, bases, class_dict):
-        for item in class_dict:                    
+        for item in class_dict:
             attr = class_dict[item]
             if isinstance(attr, Option):
-                attr.module = classname.lower() # add module's name to option                
+                attr.module = classname.lower() # add module's name to option
                 if not attr.name:
                     attr.name = item
         return type.__new__(meta, classname, bases, class_dict)
@@ -312,8 +312,7 @@ class MatlabVADModuleBase(VADModule):
 
 
 class CompareModule(Module):
-    """Base module for comparing elements' labels (and printing the output to stdout)
-    """
+    """Base module for comparing elements' labels (and printing the output to stdout)"""
     inputs = Option(parser = split_parser, 
                     description = 'Input labels\' attributes separated by ",". '\
                                   'In most cases those are gt_labels,vad_labels')
@@ -326,3 +325,12 @@ class CompareModule(Module):
     def run(self):
         super(CompareModule, self).run()
     
+
+class InfoModule(Module):
+    """Base module for adding information to elements in pipeline"""
+
+    def __init__(self, vadpy, options):
+        super(InfoModule, self).__init__(vadpy, options)
+
+    def __run__(self):
+        super(InfoModule, self).run()

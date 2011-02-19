@@ -5,7 +5,26 @@ import logging
 log = logging.getLogger(__name__)
 
 class ModAgreement(CompareModule):
-    """Tests elements' labels for 'agreement'"""
+    """Tests elements' labels for 'agreement'
+
+    This module is made for testing the percentage of 'agreement' rates between N labels' objects
+    E.g. O1, O2, O3 are input objects with equal frames count
+
+    O1 O2 O3    M   T   MR    TR
+    0  1  0     2   0   2/3   0
+    1  0  0     2   0   2/3   0
+    1  1  0     2   0   2/3   0
+    1  1  1     3   3    1    1
+    1  1  1     3   3    1    1
+    0  0  0     3   3    1    1
+    0  0  1     2   0   2/3   0
+
+    Here, 'M' determines 'majority agreement', 'T' - total agreement. 
+    Thus, 'MR' is majority agreement rate, 'TR' - total agreement rate. 
+    By summing the rates, and diving them to the total amount of frames, 
+    we can see that majority agreement rate is ~ 80%
+    and total agreement rate is ~ 42%
+    """    
     def __init__(self, vadpy, options):
         super(ModAgreement, self).__init__(vadpy, options)
 
@@ -35,8 +54,8 @@ class ModAgreement(CompareModule):
                 for lo in lo_list:
                     combined_frame.append(lo[i][2]) # i-th frame, (start, end, --> voiced <-- ) tuple
 
-                voiced_count = len([value for value in combined_frame 
-                                   if value])
+                voiced_count = sum(1 for value in combined_frame 
+                                   if value)
                 unvoiced_count = lo_count - voiced_count
                 
                 majority_voiced_rate += voiced_count / lo_count

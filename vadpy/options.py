@@ -43,4 +43,6 @@ def bool_parser(value):
 
 
 def split_parser(value):
+    if not value:
+        return []
     return value.split(',')
