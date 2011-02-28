@@ -106,7 +106,6 @@ class Labels(object):
         # first check, do we actually need to merge frames?
         merge_required = False
         prev_voiced = frames[0].voiced
-
         for frame in frames[1:]:
             if frame.voiced == prev_voiced: # yeap, merge is required
                 merge_required = True 
@@ -141,10 +140,10 @@ class Labels(object):
                                        self._frame_len))
         self._frames = merged_frames
 
-    def concatenate(self):
-        """Frame dimension concatenating according to frame_len option
+    def scale(self):
+        """Frame dimension scaling according to frame_len option
 
-        Returns: list of concatenated Frame objects
+        Returns: list of scaled Frame objects
 
         The method is used to sum small frames with frame.duration < --frame-len
         and replace them with a single Frame object
@@ -156,18 +155,20 @@ class Labels(object):
         
         first_small_frame = None
         small_frames_total_length = 0  # length is seconds
-        small_frames_voiced = 0        # voiced frames counter
-        small_frames_unvoiced = 0      # unvoiced frames counter
+        small_frames_voiced = 0        # voiced frames length
+        small_frames_unvoiced = 0      # unvoiced frames length
 
         for frame in frames:
+            duration = frame.duration
             frame.compute_count(self._frame_len)
-            if frame.duration < frame_len:    # this is a small frame
-                if first_small_frame:         # there was a small frame before current
-                    # update counters
-                    small_frames_total_length += frame.duration
-                    small_frames_voiced +=  frame.voiced
-                    small_frames_unvoiced += (not frame.voiced)
-               
+            if duration < frame_len:    # this is a small frame               
+                # update counters
+                small_frames_total_length += duration
+                if frame.voiced:
+                    small_frames_voiced +=  duration
+                else:
+                    small_frames_unvoiced += duration
+                
                 if small_frames_total_length > frame_len: # let's create a Frame object
                     new_frame = Frame(first_small_frame.start,
                                       frame.end,
@@ -180,32 +181,28 @@ class Labels(object):
                     small_frames_unvoiced = 0
 
                     ret_frames.append(new_frame)
-                else:                       # this is the FIRST small frame in current position
+                elif not first_small_frame:      # this is the FIRST small frame in current section
                     first_small_frame = frame
 
-                # update counters
-                small_frames_total_length += frame.duration
-                small_frames_voiced +=  frame.voiced and frame.duration or 0
-                small_frames_unvoiced += (not frame.voiced and frame.duration or 0)
             else:                         # this is not a small frame but..
                 if first_small_frame:     # ..there was a small frame before
-                    # update counters (!) - multiply current voiced to frame.count
-                    small_frames_total_length += frame.duration
-                    small_frames_voiced +=  frame.voiced * frame.count
-                    small_frames_unvoiced += (not frame.voiced) * frame.count
-                    
-                    if small_frames_total_length > frame_len: # make a single Frame
-                        new_frame = Frame(first_small_frame.start,
-                                              frame.end,
-                                              small_frames_voiced > small_frames_unvoiced, 
-                                              self._frame_len)
-                        # Reset counters
-                        first_small_frame = None
-                        small_frames_total_length = 0
-                        small_frames_voiced = 0
-                        small_frames_unvoiced = 0
+                    small_frames_total_length += duration
+                    if frame.voiced:
+                        small_frames_voiced +=  duration
+                    else:
+                        small_frames_unvoiced += duration
+                                    
+                    new_frame = Frame(first_small_frame.start,
+                                          frame.end,
+                                          small_frames_voiced > small_frames_unvoiced, 
+                                          self._frame_len)
+                    # Reset counters
+                    first_small_frame = None
+                    small_frames_total_length = 0
+                    small_frames_voiced = 0
+                    small_frames_unvoiced = 0
 
-                        ret_frames.append(new_frame)
+                    ret_frames.append(new_frame)                
                 else:                       # just append this frame to the list
                     ret_frames.append(frame)
         self._compute_count()
@@ -216,9 +213,9 @@ class Labels(object):
         labels = []
         frame_id = 0
         frame = self.frames[0]
-        for i in range(1, len(self)):         
-            t_point = i*frame_len
 
+        for i in range(1, len(self)):         
+            t_point = i*frame_len            
             while(True):                
                 if frame.start <= t_point <= frame.end or abs(frame.start - t_point) < frame_len :
                     labels.append( (t_point, t_point + frame_len, frame.voiced))
@@ -241,9 +238,9 @@ class Labels(object):
 
     @frame_len.setter
     def frame_len(self, value):
-        if value and self._frame_len != value:        
+        if value and self._frame_len != value:
             self._labels = []
             self._frame_len = value
             self.merge()
-            self.concatenate()
+            self.scale()
             self.create_labels()
