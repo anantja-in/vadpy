@@ -38,9 +38,12 @@ class ModConfusion(CompareModule):
             # 
             labelsA = getattr(element, self.inputs[0])
             labelsB = getattr(element, self.inputs[1])
-
+            
             if len(labelsA) != len(labelsB):
-                log.warning('Labels length mismatch: {0} / {1}'.format(len(labelsA), len(labelsB)))
+                log.warning('Labels length mismatch: {0} / {1}, auto-adjusting frame lengths.'.format(len(labelsA), len(labelsB)))
+                min_flen = min(labelsA.frame_len, labelsB.frame_len)
+                labelsA.frame_len = min_flen
+                labelsB.frame_len = min_flen
 
             voicedAB = zip((voiced for start, stop, voiced in labelsA), # zip will concatenate up to min. length of the objects
                            (voiced for start, stop, voiced in labelsB))
@@ -83,7 +86,7 @@ class ModConfusion(CompareModule):
             fn *= 100
             # print the stuff to stdout
             print(source_name)
-            print('{0:<25}{1:.3}%'.format('Miss rate:',
+            print('{0:<25}{1:.3}%'.format('Miss Rate:',
                                             fp))
             print('{0:<25}{1:.3}%'.format('False Alarm Rate:',
                                             fn))

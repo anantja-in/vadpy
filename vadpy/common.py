@@ -7,17 +7,16 @@ def listdir(path, *exprs):
    path  - directory path
    exprs - a string or a list of strings with regular expression(s) (None for listdir behaviour)
    """
-   files = os.listdir(path)  # get files from dir
-  
+   files = sorted(os.listdir(path))
    if not any(exprs):
-       return files 
+       return files
 
-   reos = [re.compile(rexp) for rexp in exprs  # regex objects (filenames filters)
+   reos = [re.compile(rexp) for rexp in exprs  
            if rexp]
-   files = [f for f in files if any(               
-            [reo.match(f) for reo in reos])]      # filter filename 
+   files = [f for f in files 
+            if any((reo.match(f) for reo in reos))]
 
-   return files # return a list of filtered files
+   return files
 
 
 def makedirs(path):

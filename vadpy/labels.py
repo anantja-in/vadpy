@@ -211,7 +211,6 @@ class Labels(object):
         self._compute_count()
         self._frames = ret_frames
 
-
     def create_labels(self):
         frame_len = self._frame_len
         labels = []
@@ -230,7 +229,7 @@ class Labels(object):
                         frame = self.frames[frame_id]
                     except IndexError:
                         break
-        self._labels = labels
+        self._labels = labels        
 
     @property
     def frames(self):
@@ -248,4 +247,3 @@ class Labels(object):
             self.merge()
             self.concatenate()
             self.create_labels()
-
