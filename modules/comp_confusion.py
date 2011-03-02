@@ -16,6 +16,7 @@ class ModConfusion(CompareModule):
     |                           | False positive     | True negative      |
     |---------------------------|--------------------|--------------------|
     """
+    fscore_b = Option('fscore-b', float, "F-measurment's Beta parameter's value")
 
     def __init__(self, vadpy, options):
         super(ModConfusion, self).__init__(vadpy, options)
@@ -70,19 +71,25 @@ class ModConfusion(CompareModule):
 
         # convert results to percent domain
         for source_name, err in source_err.items():            
-            tp = err[0]
-            tn = err[1]
+            tp = float(err[0])
+            tn = float(err[1])
             fp = float(err[2])
             fn = float(err[3])
             tp_fp = tp + fp
             tn_fn = tn + fn
 
-            #tp /= tp_fp
-            #tn /= tn_fn
+            tp /= tp_fp
+            tn /= tn_fn
             fp /= tp_fp
             fn /= tn_fn
 
-            fp *= 100 # to percents
+            B2 = self.fscore_b**2
+            fscore = (1 + B2) * tp / \
+                ((1 + B2) * tp + B2 * fn + fp)
+
+            tp *= 100 # to percents
+            tn *= 100 
+            fp *= 100 
             fn *= 100
             # print the stuff to stdout
             print(source_name)
@@ -90,4 +97,11 @@ class ModConfusion(CompareModule):
                                             fp))
             print('{0:<25}{1:.3}%'.format('False Alarm Rate:',
                                             fn))
+            print('{0:<25}{1:.3}'.format('F-Score:',
+                                          fscore))
+            # print('{0:<25}{1:.3}%'.format('True positives rate:',
+            #                               tp))
+            # print('{0:<25}{1:.3}%'.format('True negatives rate:',
+            #                               fp))
+            
             print('')

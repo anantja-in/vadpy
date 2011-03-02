@@ -1,6 +1,7 @@
 import os
 import logging 
 import subprocess
+import copy
 
 from . import common
 from .element import Element, LITTLE_ENDIAN
@@ -137,6 +138,7 @@ class IOModule(Module):
             for element in self.vadpy.pipeline:
                 labels = getattr(element, self.labels_attr)
                 setattr(labels, 'frame_len', self.frame_len) # settings frame-len is crucial!
+
     def read(self, path):
         log.debug(('Reading {0}').format(path))
 
@@ -153,11 +155,18 @@ class GenericIOModuleBase(IOModule):
     def run(self):
         super(GenericIOModuleBase, self).run()
         
+        labels_objects = {} # path : labels object, so we don't read the same thing twice..
+
         if self.action == 'read':
             for element in self.vadpy.pipeline:                
                 path = getattr(element, self.path_attr)
-                labels = Labels(extend_frames(element, self.read(path), self.frame_len),
-                                self.frame_len)
+                if path not in labels_objects:
+                    labels = Labels(extend_frames(element, self.read(path), self.frame_len),
+                                    self.frame_len)
+                    labels_objects[path] = labels
+                else:
+                    log.debug('Copying: ' + str(labels))
+                    labels = copy.deepcopy(labels_objects[path])
 
                 setattr(element, self.labels_attr, labels)
         elif self.action == 'write':
