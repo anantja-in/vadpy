@@ -16,7 +16,7 @@ format_args = {
 
 MACROS = {   
     # configuration values
-    'conf_framelen'  : 'frame-len=0.008',
+    'conf_framelen'  : 'frame-len=0.01',
 
     # macros 
     'mcr_io'         : 'conf_framelen path-attr=""',
@@ -39,7 +39,7 @@ MACROS = {
     'nist08' : 'dbnist08 source-name=NIST08 dataset="" dataunits="" channels="" re="" ' \
                ' source-dir="{dbroot}/NIST08/DATA/" gt-dir="{dbroot}/NIST08/GT/"',    
     'aurora' : 'dbaurora source-name=Aurora2 dataset=TEST env="1" snr="C,20,15,10,5,0,-5" re="" ' \
-               'source-dir="{dbroot}/AURORA2/{{dataset}}/DATA" ' \
+               'source-dir="{dbroot}/AURORA2/{{dataset}}/CLEAN" ' \
                'gt-dir="{dbroot}/AURORA2/{{dataset}}/GT" ',
     #IO modules
     'inist'     : 'dft_iostamps re=(?P<ss>\d.+) split=" " action=read labels-attr=gt_labels path-attr=gt_path ',
@@ -56,13 +56,15 @@ MACROS = {
     'ovsingle'  : 'dft_iosingled mcr_labels_vad action=write',
     'ovgapless' : 'dft_iogapless mcr_labels_vad action=write',
     # VAD->IO shortcuts
-    'iamr'      : 'ivsingle',
-    'ig729'     : 'ivsingle',
+    'ig729'     : 'ivsingle frame-len=0.01',
+    'iamr'      : 'ivsingle frame-len=0.02',
+    'isilk'     : 'igapless frame-len=0.02',
 
     # VAD modulse
     'g729'     : 'vadg729 mcr_basevad voutdir="{outroot}/g729" exec-path="{binroot}/g729/g729vad" ',
     'amr1'     : 'vadamr mcr_basevad voutdir="{outroot}/amr1" exec-path="{binroot}/amr/amr1" ',
     'amr2'     : 'vadamr mcr_basevad voutdir="{outroot}/amr2" exec-path="{binroot}/amr/amr2" ',
+    'silk'     : 'vadsilk mcr_basevad voutdir="{outroot}/silk" exec-path="{binroot}/silk/silkvad" ', 
     'matlab'   : 'dft_matlab engine=vad',
     'svmtrain' : 'vadmatlabsvm mcr_matlab conf_framelen engine=svm script=train ' \
                  'outpath="{{voutdir}}/{{e_srcname}}/{{e_srcfile}}.mat"',
@@ -78,6 +80,6 @@ MACROS = {
     'edit'       : 'modedit attr="" value="{{attr}}" from_attr="" to_attr=""',
     'confusion'  : 'modconfusion mcr_compare',
     'agreement'  : 'modagreement mcr_compare re=""', 
-    'multivad'   : 'modmultivad out-labels-attr="vad_labels"',
+    'multivad'   : 'modmultivad out-labels-attr="vad_labels" max-diff-rate=0.5',
     'vurate'     : 'modvurate labels-attr=gt_labels'
 }

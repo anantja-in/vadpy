@@ -15,6 +15,8 @@ class ModMultiVAD(Module):
     """
     labels_attr = Option('labels-attr', split_parser, "VAD labels attributes separated by comma")
     out_labels_attr = Option('out-labels-attr', description = 'Output labels attribute')
+    max_diff_rate = Option('max-diff-rate', float, 'Maximum difference rate of labels frame count.\n' \
+                                                    'Recommented value: 0.005 (0.5%)')
 
     def __init__(self, vadpy, options):
         super(ModMultiVAD, self).__init__(vadpy, options)
@@ -27,16 +29,22 @@ class ModMultiVAD(Module):
         for element in self.vadpy.pipeline:    
             lo_list = [] # labels object
             for attr in self.labels_attr:
-                lo_list.append(getattr(element, attr))
-            lo_count = len(lo_list)                
-            assert len(set( len(labels) for labels in lo_list)) == 1, \
-                   'Labels objects frame count differs'
-            assert len(set( labels.frame_len for labels in lo_list)) ==1, \
-                   'Labels objects frame length differs'
-
+                lo_list.append(getattr(element, attr))                
+            lo_count = len(lo_list)            
+            min_flen = min(lo.frame_len for lo in lo_list)
+            for lo in lo_list:
+                lo.frame_len = min_flen
+                
+            min_len = min(len(lo) for lo in lo_list)
+            max_len = max(len(lo) for lo in lo_list)
+            if (max_len - min_len < min_len * self.max_diff_rate):
+                raise Exception("Labels objects' difference ({0}) is greater than max-diff-rate ({1})".format(
+                        max_len - min_len, 
+                        min_len * self.max_diff_rate))
+            
             frames = []        
             frame_len = lo_list[0].frame_len
-            frames_count = len(lo_list[0])
+            frames_count = min_len
 
             for i in range(0, frames_count):
                 combined_frame = []
@@ -44,7 +52,7 @@ class ModMultiVAD(Module):
                     combined_frame.append(lo[i][2]) # i-th frame, (start, end, --> voiced <-- ) tuple
 
                 voiced_count = len([value for value in combined_frame 
-                                   if value])
+                                    if value])
                 unvoiced_count = lo_count - voiced_count                
 
                 decision = voiced_count > unvoiced_count and True or False

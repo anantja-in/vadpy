@@ -6,7 +6,7 @@ from vadpy.element import BIG_ENDIAN
 log = logging.getLogger(__name__)
 
 
-class VADG729(SimpleVADModuleBase):
-    """G729 Annex B VAD module"""
+class VADSILK(SimpleVADModuleBase):
+    """Skype SILK codec's VAD module"""
     def _get_exec_options(self, element):
         return element.flags & BIG_ENDIAN and ([], ['-b']) or ([], [])
