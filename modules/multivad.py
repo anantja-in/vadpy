@@ -37,7 +37,7 @@ class ModMultiVAD(Module):
                 
             min_len = min(len(lo) for lo in lo_list)
             max_len = max(len(lo) for lo in lo_list)
-            if (max_len - min_len < min_len * self.max_diff_rate):
+            if (max_len - min_len > min_len * self.max_diff_rate):
                 raise Exception("Labels objects' difference ({0}) is greater than max-diff-rate ({1})".format(
                         max_len - min_len, 
                         min_len * self.max_diff_rate))

@@ -6,14 +6,18 @@ log = logging.getLogger(__name__)
 UNDEFINED = 0
 LITTLE_ENDIAN = 0x2
 BIG_ENDIAN = 0x4
-FS_8000 = 0x8
-BPS_16 = 0x10
+FS_4000 = 0x10
+FS_8000 = 0x20
+BPS_16 = 0x100
 
 class Element(object):
+    """The class represents VADpy pipeline's element object"""
     def __init__(self, source_name = '', source_path = '', gt_path = '', flags = UNDEFINED):
-        """
-        
-        length - length in seconds
+        """        
+        source_name - Name of the element's source
+        source_path - Path to the data file 
+        gt_path     - Path to the GT file
+        flags       - Logical combination of flags describing the element
         """
         # defined by pipeline
         self.id = 0 
@@ -30,8 +34,7 @@ class Element(object):
 
     def set_length(self):
         try:
-            if self.source_path:
-                self._length = os.path.getsize(self.source_path) / (self.fs * (self.bps / 8.0))
+            self._length = os.path.getsize(self.source_path) / (self.fs * (self.bps / 8.0))
         except OSError: # No such file or directory
             pass
 
@@ -41,9 +44,8 @@ class Element(object):
             return self._length
         else:
             self.set_length()
-        # 2nd try
-        if self._length:
-            return self._length
+            if self._length:          # 2nd try
+                return self._length
         # nope, couldn't read the file, get labels' lengths if possible
         if self.gt_labels:
             return self.gt_labels.frame_len * len(self.gt_labels)
@@ -61,6 +63,9 @@ class Element(object):
     def fs(self):
         if self._flags & FS_8000:
             return 8000
+        elif self._flags & FS_4000:
+            return 4000
+        
         raise Exception('Invalid FS flag')
     
     @property

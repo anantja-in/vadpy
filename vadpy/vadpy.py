@@ -16,7 +16,7 @@ class VADpy(object):
         self._modules = []
         self._parse_arguments()
 
-    def _parse_arguments(self):        
+    def _parse_arguments(self):
         # 
         # this parsing should be rewritten into a normal module
         # I believe, it's worth of a Python project :)

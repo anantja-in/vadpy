@@ -18,7 +18,6 @@ class VADAMR(SimpleVADModuleBase):
         elif element.flags & LITTLE_ENDIAN:
             opt_after_args = ['l', ]
 
-        assert opt_after_args, 'Non-compatible endianness'
         return opt_before_args, opt_after_args
 
 

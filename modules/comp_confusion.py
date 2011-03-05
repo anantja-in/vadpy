@@ -75,33 +75,19 @@ class ModConfusion(CompareModule):
             tn = float(err[1])
             fp = float(err[2])
             fn = float(err[3])
-            tp_fp = tp + fp
-            tn_fn = tn + fn
-
-            tp /= tp_fp
-            tn /= tn_fn
-            fp /= tp_fp
-            fn /= tn_fn
-
+                        
             B2 = self.fscore_b**2
             fscore = (1 + B2) * tp / \
                 ((1 + B2) * tp + B2 * fn + fp)
 
-            tp *= 100 # to percents
-            tn *= 100 
-            fp *= 100 
-            fn *= 100
+            mr = 100 * fn / (tn + fn) 
+            far = 100 * fp / (tp + fp)
             # print the stuff to stdout
             print(source_name)
-            print('{0:<25}{1:.3}%'.format('Miss Rate:',
-                                            fp))
-            print('{0:<25}{1:.3}%'.format('False Alarm Rate:',
-                                            fn))
+            print('{0:<25}{1:.3}'.format('Miss Rate:',
+                                            mr))
+            print('{0:<25}{1:.3}'.format('False Alarm Rate:',
+                                            far))
             print('{0:<25}{1:.3}'.format('F-Score:',
-                                          fscore))
-            # print('{0:<25}{1:.3}%'.format('True positives rate:',
-            #                               tp))
-            # print('{0:<25}{1:.3}%'.format('True negatives rate:',
-            #                               fp))
-            
+                                          fscore))            
             print('')

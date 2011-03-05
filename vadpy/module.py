@@ -73,7 +73,7 @@ class Module(object):
         """
         format_args = {'modname' : self.__class__.__name__, 
                        }
-        format_args.update(self.vadpy.settings.format_args)
+        format_args.update(self.settings.format_args)
         format_args.update(kwargs)             
         return os.path.abspath( path.format(**format_args) )
 
@@ -166,7 +166,7 @@ class GenericIOModuleBase(IOModule):
                     labels_objects[path] = labels
                 else:
                     log.debug('Copying: ' + str(labels))
-                    labels = copy.deepcopy(labels_objects[path])
+                    labels = copy.copy(labels_objects[path])
 
                 setattr(element, self.labels_attr, labels)
         elif self.action == 'write':
