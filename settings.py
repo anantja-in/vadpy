@@ -16,7 +16,7 @@ format_args = {
 
 MACROS = {   
     # configuration values
-    'conf_framelen'  : 'frame-len=0.01',
+    'conf_framelen'  : 'frame-len=0.015',
 
     # macros 
     'mcr_io'         : 'conf_framelen path-attr=""',
@@ -34,13 +34,15 @@ MACROS = {
     'dft_iogapless' : 'iogapless mcr_io',
     'dft_matlab'    : 'vadmatlab mcr_matlab fread=600 filecount=128 args=""',
     # DB modules
-    'nist05' : 'dbnist05 source-name=NIST05 dataset="" re="" ' \
-               'source-dir="{dbroot}/NIST05/DATA" gt-dir="{dbroot}/NIST05/GT/ASR"',
-    'nist08' : 'dbnist08 source-name=NIST08 dataset="" dataunits="" channels="" re="" ' \
-               ' source-dir="{dbroot}/NIST08/DATA/" gt-dir="{dbroot}/NIST08/GT/"',    
+    'nist05' : 'dbnist05 source-name=NIST05 re="" ' \
+               'source-dir="{dbroot}/NIST05/{{dataset}}/DATA" dataset=TEST ' \
+               'gt-dir="{dbroot}/NIST05/{{dataset}}/GT"',
     'aurora' : 'dbaurora source-name=Aurora2 dataset=TEST env=1,2,3,4 snr=C,20,15,10,5,0,-5 re="" ' \
                'source-dir="{dbroot}/AURORA2/{{dataset}}/DATA" ' \
                'gt-dir="{dbroot}/AURORA2/{{dataset}}/GT" ',
+    # 'nist08' : 'dbnist08 source-name=NIST08 dataset="" dataunits="" channels="" re="" ' \
+    #            ' source-dir="{dbroot}/NIST08/DATA/" gt-dir="{dbroot}/NIST08/GT/"',
+
     #IO modules
     'isingle'   : 'dft_iosingled mcr_labels_gt action=read ', 
     'ivsingle'  : 'dft_iosingled mcr_labels_vad action=read', 
@@ -58,6 +60,8 @@ MACROS = {
     'inist'     : 'dft_iostamps re=(?P<ss>\d.+) split=" " action=read labels-attr=gt_labels path-attr=gt_path ',
     'ibusstop'  : 'dft_iostamps re=(?P<mm>\d+):(?P<ss>\d+) split=" " action=read labels-attr=gt_labels path-attr=gt_path ',
     'ilabra'    : 'dft_iostamps re=(?P<hh>\d+):(?P<mm>\d+):(?P<ss>\d+) split=" " ' \
+                  'action=read labels-attr=gt_labels path-attr=gt_path ',
+    'ibusstop'  : 'dft_iostamps re=(?P<mm>\d+):(?P<ss>\d+) split=" " ' \
                   'action=read labels-attr=gt_labels path-attr=gt_path ',
 
     # VAD->IO aliases

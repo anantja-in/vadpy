@@ -13,7 +13,7 @@ class DBAURORA(DBModule):
     env = Option(parser = split_parser, description = 'Environment numbers separated by ","')
     snr = Option(parser = split_parser, description = 'SNR rates separated by ","')
 
-    FLAGS       = BIG_ENDIAN | FS_8000 | BPS_16
+    FLAGS = BIG_ENDIAN | FS_8000 | BPS_16
     
     def __init__(self, vadpy, options):
         super(DBAURORA, self).__init__(vadpy, options)

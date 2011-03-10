@@ -79,8 +79,9 @@ class ModConfusion(CompareModule):
             B2 = self.fscore_b**2
             fscore = (1 + B2) * tp / \
                 ((1 + B2) * tp + B2 * fn + fp)
+            length = tp + tn + fp + fn;
 
-            mr = 100 * fn / (tn + fn) 
+            mr  = 100 * fn / (tn + fn)
             far = 100 * fp / (tp + fp)
             # print the stuff to stdout
             print(source_name)

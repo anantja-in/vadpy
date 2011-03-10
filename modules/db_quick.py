@@ -12,6 +12,7 @@ FLAGS = {'undefined' : element.UNDEFINED,
          'le' : element.LITTLE_ENDIAN,
          'be' : element.BIG_ENDIAN,
          '8000hz' : element.FS_8000,
+         '4000hz' : element.FS_4000,
          '16bps' : element.BPS_16,
          }
 
@@ -35,7 +36,7 @@ class DBQUICK(DBModule):
             try:
                 flags |= FLAGS[flag]
             except KeyError:
-                raise Exception('Flag {0} cannot be found'.format(val))
+                raise Exception('Flag {0} cannot be found'.format(flag))
         self.flags = flags
 
     def run(self):

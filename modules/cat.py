@@ -13,7 +13,7 @@ class ModCat(Module):
     """Concatenates all elements' source data and GT labels into one element
 
     Additional macros: 
-    {{srcname}} - source-name option's value
+    {srcname} - source-name option's value
     """
     out_source_path = Option('out-source-path',
                              description = 'Optput source file\'s path, to which the concatenated data should be written')
