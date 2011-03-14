@@ -14,7 +14,10 @@ class VADAFE(SimpleVADModuleBase):
 #        raise Exception('Not implemented')
 
     def _get_exec_options(self, element):
+
         if element.flags & BIG_ENDIAN:
             opt_before_args = ['-swap']
+        else:
+            opt_before_args = []
 
         return opt_before_args, []

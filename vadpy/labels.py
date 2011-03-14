@@ -53,6 +53,9 @@ def extend_frames(element, frames, frame_len):
                     sec.end = element.length
                 else:
                     frames.append(Frame(sec.end, element.length, sec.voiced, frame_len))
+    else: # No frames, we assume that element is completely unvoiced
+        frames = [ Frame(0, element.length, False, frame_len) ]
+
     return frames
 
         
@@ -244,3 +247,11 @@ class Labels(object):
             self.merge()
             self.scale()
             self.create_labels()
+
+
+def equalize_framelen(*lo_list):
+    """Align labels objects by using minimal frame length and size"""
+    if len(set(len(labels) for labels in lo_list)) != 1:
+        min_frame_len = min(labels.frame_len for labels in lo_list)
+        for labels in lo_list:
+            labels.frame_len = min_frame_len

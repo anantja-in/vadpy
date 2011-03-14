@@ -56,6 +56,10 @@ class IOStamps(GenericIOModuleBase):
                 time_from = self._get_seconds(stamp_from)
                 time_to = self._get_seconds(stamp_to)
 
+                if previous_time_to >= time_to:
+                    log.warning('Skipping frame: {0}-{1}'.format(time_from, time_to))
+                    continue
+
                 if previous_time_to >= time_from: # overlapping frames:
                     time_from = previous_time_to
                 else:

@@ -1,5 +1,6 @@
 from vadpy.module import CompareModule
 from vadpy.options import  Option
+from vadpy.labels import equalize_framelen
 
 import logging 
 log = logging.getLogger(__name__)
@@ -38,16 +39,13 @@ class ModAgreement(CompareModule):
             for attr in self.inputs:
                 lo_list.append(getattr(element, attr))
             lo_count = float(len(lo_list))
-                
-            frames_count = [len(labels) for labels in lo_list]
-            assert len(set(frames_count)) == 1, \
-                   'Labels objects frame count differs: {0}'.format(frames_count)
+
+            equalize_framelen(*lo_list)
+            frame_len = lo_list[0].frame_len
+            frames_count = min(len(labels) for labels in lo_list)
 
             agreement_rate = 0.0
             majority_voiced_rate = 0.0
-
-            frame_len = lo_list[0].frame_len
-            frames_count = len(lo_list[0])
 
             for i in range(0, frames_count):
                 combined_frame = []
