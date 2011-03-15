@@ -66,8 +66,8 @@ MACROS = {
     'ibusstop'  : 'igapless frame-len=1',
 
     # VAD->IO aliases
-    'ig729'     : 'ivsingle frame-len=0.01',
-    'iamr'      : 'ivsingle frame-len=0.02',
+    'ig729'     : 'ivgapless frame-len=0.01',
+    'iamr'      : 'ivgapless frame-len=0.02',
     'isilk'     : 'ivgapless frame-len=0.02',
     'iafe'      : 'ivgapless frame-len=0.01',
 
