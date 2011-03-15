@@ -26,7 +26,7 @@ class ModConfusion(CompareModule):
     |  0  |  1  | Fp  | Fp rate = Fp / (Tn + Fp)
     |-----------------|
     """
-    fscore_b = Option('fscore-b', float, "F-measurment's Beta parameter's value")
+    # fscore_b = Option('fscore-b', float, "F-measurment's Beta parameter's value")
     cmp_size=Option('cmp-size', int, 'Amount of 2nd labels object frames to be treated as a single frame')
 
     def __init__(self, vadpy, options):
@@ -48,15 +48,18 @@ class ModConfusion(CompareModule):
             
             # Generate a list of decision (voiced/unvoiced) pairs for Labels objects
             # 
-            labelsA = getattr(element, self.inputs[0])
-            labelsB = getattr(element, self.inputs[1])
+            gt_labels = getattr(element, self.inputs[0])
+            vad_labels = getattr(element, self.inputs[1])
             
-            if len(labelsA) != len(labelsB):
-                log.warning('Labels length mismatch: {0} / {1}, equlizing frame lengths.'.format(len(labelsA), len(labelsB)))
-                equalize_framelen(labelsA, labelsB)
+            if len(gt_labels) != len(vad_labels):
+                log.warning('Labels length mismatch: {0} / {1}, equlizing frame lengths.'.format(
+                        len(gt_labels), len(vad_labels)))
 
-            voicedAB = zip((voiced for start, stop, voiced in labelsA), # zip will concatenate up to min. length of the objects
-                           (voiced for start, stop, voiced in labelsB))
+                equalize_framelen(gt_labels, vad_labels)
+
+            # zip will concatenate up to min. length of the objects
+            voicedAB = zip((voiced for start, stop, voiced in gt_labels), 
+                           (voiced for start, stop, voiced in vad_labels))
 
             # Calculate False alarm and Miss rate
             tp = 0; tn = 0; fp = 0; fn = 0;
@@ -80,7 +83,7 @@ class ModConfusion(CompareModule):
                 else:                     
                   if valB: fp += 1      # false positive, false alarm
                   else:    tn += 1      # true negative
-
+            
             # Store error values to sources'  "errors summary"
             try:
                 err = source_err[source_name]
@@ -98,27 +101,22 @@ class ModConfusion(CompareModule):
             fp = float(err[2])
             fn = float(err[3])
                         
-            B2 = self.fscore_b**2
-            fscore = (1 + B2) * tp / \
-                ((1 + B2) * tp + B2 * fn + fp)
+            # B2 = self.fscore_b**2
+            # fscore = (1 + B2) * tp / \
+            #     ((1 + B2) * tp + B2 * fn + fp)
             length = tp + tn + fp + fn;
+            gt_voiced = fn + tp
+            gt_unvoiced = fp + tn
 
             mr  = 100 * fn / (tp + fn)
             far = 100 * fp / (tn + fp)
-            total_len = tn + fn + tp + fp
-            total_err = 100 * (fn + fp) / total_len
-
-            # print the stuff to stdout
+            vur = gt_voiced / gt_unvoiced
+            #total_len = tn + fn + tp + fp
+            
             print(source_name)
-            print('{0:<25}{1:.3}'.format('Miss Rate:',
-                                            mr))
-            print('{0:<25}{1:.3}'.format('False Alarm Rate:',
-                                            far))
-            print('{0:<25}{1:.3}'.format('Total error:',
-                                          total_err))
-            print('{0:<25}{1:.3}'.format('F-score:',
-                                          fscore))
-            print((fp + tp) / (fn + tn))
+            print('{0:<25}{1:.3}'.format('Miss rate:', mr))
+            print('{0:<25}{1:.3}'.format('False alarm rate:', far))
+            print('{0:<25}{1:.3}'.format('Speech/Nonspeech rate:', vur))
             print('')
 
 

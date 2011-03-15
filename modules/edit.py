@@ -17,8 +17,8 @@ class ModEdit(Module):
     """
     attr = Option(description = 'Attribute to be edited')
     value = Option(description = "New value to be set (see module's description")
-    from_attr = Option(description = 'Attribute from which a value should be copied')
-    to_attr = Option(description = 'Attribute to which a value should be copied')
+    from_attr = Option('from-attr', description = 'Attribute from which a value could be copied')
+    to_attr = Option('to-attr', description = 'Attribute to which a value should be copied')
 
     def __init__(self, vadpy, options):
         super(ModEdit, self).__init__(vadpy, options)

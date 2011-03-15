@@ -89,7 +89,7 @@ MACROS = {
     'split'      : 'modsplit gt=yes source=yes length=60 overwrite=No ' \
                    'out-source-path="{outroot}/split/{{e_srcname}}/{{e_srcfile}}.{{counter}}" ' \
                    'out-gt-path="{outroot}/split/{{e_srcname}}/GT/{{e_srcfile}}.{{counter}}"', 
-    'edit'       : 'modedit attr="" value="{{attr}}" from_attr="" to_attr=""',
+    'edit'       : 'modedit attr="" value="{{attr}}" from-attr="" to-attr=""',
     'confusion'  : 'modconfusion mcr_compare fscore-b=1 cmp-size=1',
     'agreement'  : 'modagreement mcr_compare re=""', 
     'multivad'   : 'modmultivad out-labels-attr="vad_labels" max-diff-rate=0.005',
