@@ -23,20 +23,19 @@ class VADMatlab(MatlabVADModuleBase):
 
         self._execargs['script'] = self.script
         self._execargs['vad_args'] = self.args
-
+        
         self._execlist = ['{engine}', 
                           "'{script}'",
                           "'{vad_args}'",
-                          "'{endianness}'", 
-                          "{fread_len}",
+                          "'{endianness}'",        
                           "'{in_paths}'",
-                          "'{gt_paths}'",
                           "'{out_paths}'",
                           ]
 
     def _get_vout_path(self, element):
         self.voutdir = self.voutdir.format(engine = self.engine,
-                                           script = self.script)
+                                           script = self.script,
+                                           args = self.args)
         return super(VADMatlab, self)._get_vout_path(element)
                                             
     
