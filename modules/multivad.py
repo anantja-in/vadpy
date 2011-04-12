@@ -2,7 +2,7 @@ import io
 import os
 
 from vadpy.module import Module
-from vadpy.options import  Option, bool_parser, split_parser
+from vadpy.options import  Option, split_parser, odd_parser
 from vadpy.labels import Frame, Labels
 
 import logging 
@@ -17,6 +17,7 @@ class ModMultiVAD(Module):
     out_labels_attr = Option('out-labels-attr', description = 'Output labels attribute')
     max_diff_rate = Option('max-diff-rate', float, 'Maximum difference rate of labels frame count.\n' \
                                                     'Recommented value: 0.005 (0.5%)')
+    fframes_count = Option('fframes-count', odd_parser, 'Odd amount of fusion frames to be calculated at one iteration')
 
     def __init__(self, vadpy, options):
         super(ModMultiVAD, self).__init__(vadpy, options)
@@ -48,13 +49,15 @@ class ModMultiVAD(Module):
 
             for i in range(0, frames_count):
                 combined_frame = []
-                for lo in lo_list:
-                    combined_frame.append(lo[i][2]) # i-th frame, (start, end, --> voiced <-- ) tuple
+                print 'i=', i
+                for j in range(max(0, i - self.fframes_count), min(i + self.fframes_count - 1, frames_count - 1)):
+                    print 'j=', j
+                    for lo in lo_list:
+                        combined_frame.append(lo[j][2]) # j-th frame, (start, end, --> voiced <-- ) tuple
 
                 voiced_count = len([value for value in combined_frame 
                                     if value])
                 unvoiced_count = lo_count - voiced_count                
-
                 decision = voiced_count > unvoiced_count and True or False
                 frames.append(Frame(i * frame_len, 
                                         (i + 1) * frame_len,                                  
@@ -62,5 +65,4 @@ class ModMultiVAD(Module):
                                         frame_len))
             
             lo_combined = Labels(frames, frame_len)
-
             setattr(element, self.out_labels_attr, lo_combined)

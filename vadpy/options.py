@@ -39,10 +39,17 @@ def bool_parser(value):
     elif value in ['true', 'yes']:
         return True
     else:
-        raise Error('What kind of boolean do you think "{0}" is?'.format(value))
+        raise Exception('What kind of boolean do you think "{0}" is?'.format(value))
 
 
 def split_parser(value):
     if not value:
         return []
     return value.split(',')
+
+
+def odd_parser(value):
+    value = int(value)
+    print value
+    assert value % 2 != 0, '{0} is not an odd number'.format(value)
+    return value
