@@ -105,6 +105,6 @@ MACROS = {
     'edit'       : 'modedit attr="" value="{{attr}}" from-attr="" to-attr=""',
     'confusion'  : 'modconfusion mcr_compare fscore-b=1 cmp-size=1',
     'agreement'  : 'modagreement mcr_compare re=""', 
-    'multivad'   : 'modmultivad out-labels-attr="vad_labels" max-diff-rate=0.005 fframes-count=1',
+    'multivad'   : 'modmultivad output="vad_labels" max-diff-rate=0.005 fframes-count=1',
     'vurate'     : 'modvurate labels-attr=gt_labels'
 }

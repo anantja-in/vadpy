@@ -13,15 +13,15 @@ class ModMultiVAD(Module):
     
     The combination rule is max out of all, that's why an odd number of VAD Labels objects are required
     """
-    labels_attr = Option('labels-attr', split_parser, "VAD labels attributes separated by comma")
-    out_labels_attr = Option('out-labels-attr', description = 'Output labels attribute')
+    inputs = Option('inputs', split_parser, "VAD labels attributes separated by comma")
+    output = Option('output', description = 'Output labels attribute')
     max_diff_rate = Option('max-diff-rate', float, 'Maximum difference rate of labels frame count.\n' \
                                                     'Recommented value: 0.005 (0.5%)')
     fframes_count = Option('fframes-count', odd_parser, 'Odd amount of fusion frames to be calculated at one iteration')
 
     def __init__(self, vadpy, options):
         super(ModMultiVAD, self).__init__(vadpy, options)
-        assert self.labels_attr >= 3 and len(self.labels_attr) % 2 == 1, \
+        assert self.inputs >= 3 and len(self.inputs) % 2 == 1, \
               'Labels attributes number is even or is less than 3'
 
     def run(self):
@@ -29,7 +29,7 @@ class ModMultiVAD(Module):
         
         for element in self.vadpy.pipeline:    
             lo_list = [] # labels object
-            for attr in self.labels_attr:
+            for attr in self.inputs:
                 lo_list.append(getattr(element, attr))                
             lo_count = len(lo_list)            
             min_flen = min(lo.frame_len for lo in lo_list)
@@ -49,9 +49,7 @@ class ModMultiVAD(Module):
 
             for i in range(0, frames_count):
                 combined_frame = []
-                print 'i=', i
                 for j in range(max(0, i - self.fframes_count), min(i + self.fframes_count - 1, frames_count - 1)):
-                    print 'j=', j
                     for lo in lo_list:
                         combined_frame.append(lo[j][2]) # j-th frame, (start, end, --> voiced <-- ) tuple
 
@@ -65,4 +63,4 @@ class ModMultiVAD(Module):
                                         frame_len))
             
             lo_combined = Labels(frames, frame_len)
-            setattr(element, self.out_labels_attr, lo_combined)
+            setattr(element, self.output, lo_combined)
