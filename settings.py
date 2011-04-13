@@ -46,6 +46,8 @@ MACROS = {
                'gt-dir="{dbroot}/TESTDB/GT" source-dir="{dbroot}/TESTDB/DATA" ',
     # 'nist08' : 'dbnist08 source-name=NIST08 dataset="" dataunits="" channels="" re="" ' \
     #            ' source-dir="{dbroot}/NIST08/DATA/" gt-dir="{dbroot}/NIST08/GT/"',
+    'labra'  :  'dbquick source-name=labra dataset="" flags=8000hz,le,16bps re="" ' \
+                'gt-dir={dbroot}/LABRA/GT source-dir={dbroot}/LABRA/DATA/ ',
 
     #IO modules
     'isingle'   : 'dft_iosingled mcr_labels_gt action=read', 
@@ -62,7 +64,7 @@ MACROS = {
     'ovgapless' : 'dft_iogapless mcr_labels_vad action=write',
     # DB->IO aliases
     'iaurora'   : 'igapless frame-len=0.01',
-    'inist'     : 'dft_iostamps re=(?P<ss>\d.+) split=" " action=read labels-attr=gt_labels path-attr=gt_path ',
+    'inist'     : 'igapless frame-len=0.01',
     'ibusstop'  : 'dft_iostamps re=(?P<mm>\d+):(?P<ss>\d+) split=" " action=read labels-attr=gt_labels path-attr=gt_path ',
     'ilabra'    : 'dft_iostamps re=(?P<hh>\d+):(?P<mm>\d+):(?P<ss>\d+) split=" " ' \
                   'action=read labels-attr=gt_labels path-attr=gt_path frame-len=1',
