@@ -1,5 +1,4 @@
 import io
-import os
 
 from vadpy.labels import Frame, Labels
 from vadpy.module import Module

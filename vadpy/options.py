@@ -50,6 +50,5 @@ def split_parser(value):
 
 def odd_parser(value):
     value = int(value)
-    print value
     assert value % 2 != 0, '{0} is not an odd number'.format(value)
     return value
