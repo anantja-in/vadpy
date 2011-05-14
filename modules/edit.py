@@ -10,15 +10,15 @@ log = logging.getLogger(__name__)
 class ModEdit(Module):
     """The ModEdit module allows editing elements' attributes.
     
-    Additional formatting arguments for value option:
-    {attr}    - element's attribute original value (attr option)
+    Additional formatting macros for 'value' option:
+    {attrval} - element's attribute original value (attr option)
     {fname}   - file name (if value is a path)
     {fdir}    - file's directory (if value is a path)    
     """
     attr = Option(description = 'Attribute to be edited')
     value = Option(description = "New value to be set (see module's description")
-    from_attr = Option('from-attr', description = 'Attribute from which a value could be copied')
-    to_attr = Option('to-attr', description = 'Attribute to which a value should be copied')
+    copy_from = Option('copy-from', description = 'Attribute from which a value is copied')
+    copy_to = Option('copy-to', description = 'Attribute to which a value should be copied')
 
     def __init__(self, vadpy, options):
         super(ModEdit, self).__init__(vadpy, options)
@@ -36,12 +36,12 @@ class ModEdit(Module):
                 fname = ''
                 fdir, fname = os.path.split(old_val)
                 new_val = self.format_path(self.value, 
-                                           attr = old_val, 
+                                           attrval = old_val, 
                                            fname = fname, 
                                            fdir = fdir, 
                                            **element.format_args)
-                setattr(element, self.attr, new_val)        
-        if self.from_attr:
+                setattr(element, self.attr, new_val)
+        if self.copy_from:
             for element in self.vadpy.pipeline:
-                val = getattr(element, self.from_attr)
-                setattr(element, self.to_attr, val)
+                val = getattr(element, self.copy_from)
+                setattr(element, self.copy_to, val)

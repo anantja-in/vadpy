@@ -9,7 +9,6 @@ log = logging.getLogger(__name__)
 
 class VADAMR(SimpleVADModuleBase):
     """Adaptive Multi-Rate audio codec (AMR) VADpy module"""
-
     def _get_exec_options(self, element):
         opt_before_args = ['MR122', ] # see allmodes.txt in AMR source directory
         opt_after_args = []

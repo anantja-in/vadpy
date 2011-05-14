@@ -248,7 +248,6 @@ class Labels(object):
             self.scale()
             self.create_labels()
 
-
 def equalize_framelen(*lo_list):
     """Align labels objects by using minimal frame length and size"""
     if len(set(len(labels) for labels in lo_list)) != 1:

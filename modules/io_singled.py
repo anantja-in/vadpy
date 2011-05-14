@@ -12,7 +12,7 @@ class IOSingleD(GenericIOModuleBase):
     """Parse GT/VAD output Label files with decisions-only strings
 
     The format is: 
-    <time_from (in seconds)> <time_to (in seconds)> <decision (0|1) [<score>])
+    <time_from (in seconds)> <time_to (in seconds)> <decision (0|1)>
     """   
     k_factor = Option('k', parser = int)
 

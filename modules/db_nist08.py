@@ -11,7 +11,7 @@ log = logging.getLogger(__name__)
 
 class DBNIST08(DBModule):
     """NIST 2008 corpus module"""
-    FLAGS        = LITTLE_ENDIAN | FS_8000 | BPS_16     # database flags
+    FLAGS        = LITTLE_ENDIAN | FS_8000 | BPS_16
     CHANNELS     = [1, 2, 3, 5, 7, 8, 9, 12, 13]
     DATAUNITS_RE = [
         r'^20070313_145145.*',]

@@ -1,6 +1,7 @@
 import collections
 
 class Option(object):
+    """VADpy module's option class"""
     def __init__(self, 
                  name = None,
                  parser = str,
@@ -30,6 +31,28 @@ class Option(object):
         if value:
             self.description = self.description.format(option = value)
         self._name = value
+
+
+class StrictOption(Option):
+    """VADpy module's strict option class
+
+    An assertion error is rased if option's value is not in 'values' list
+    """
+    def __init__(self, 
+                 name = None, 
+                 parser = str,
+                 values = [],
+                 description = '', ):
+        """
+        values      - a list of possible values
+        """
+        self._values = values
+        super(StrictOption, self).__init__(name, parser, description)
+
+    def parse(self, value):
+        parsed_value = self.parser(value)
+        assert parsed_value in self._values, "Incorrect option's value: {0}".format(parsed_value)
+        return parsed_value
 
 
 def bool_parser(value):

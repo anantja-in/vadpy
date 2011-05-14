@@ -9,7 +9,7 @@ class ModVURate(InfoModule):
 
     Processes single input at a time
     """    
-    labels_attr = Option('labels-attr', description = 'Labels attribute')
+    labels_attr = Option('labels-attr', description = 'Labels attribute to be used')
 
     def __init__(self, vadpy, options):
         super(ModVURate, self).__init__(vadpy, options)

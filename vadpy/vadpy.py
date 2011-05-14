@@ -6,6 +6,7 @@ log = logging.getLogger(__name__)
 from .pipeline import Pipeline
 from .manager import ModuleManager
 from .parser import SeqOptions
+from .module import DBModule
 
 class VADpy(object):
     def __init__(self, settings):
@@ -50,4 +51,6 @@ class VADpy(object):
                     
     def run(self):
         for module in self._modules:
+            if not len(self.pipeline) and not issubclass(module.__class__, DBModule):
+                return
             module.run()

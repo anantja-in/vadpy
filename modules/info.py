@@ -63,4 +63,3 @@ class ModInfo(Module):
             for element in pipeline:
                 for attr in self.attributes:
                     print('{0:<20}{1}'.format(attr, getattr(element, attr)))
-                print('\n')

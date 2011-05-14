@@ -51,7 +51,7 @@ class Module(object):
         # get all options defined in class
         for attr in dir(self.__class__): # because we must iterate through all child classes
             objattr = getattr(self.__class__, attr)
-            if type(objattr) == Option: # option found
+            if isinstance(objattr, Option): # option found
                 option = objattr
                 name = option.name or attr
                 if name in options:
@@ -77,6 +77,12 @@ class Module(object):
         format_args.update(kwargs)             
         return os.path.abspath( path.format(**format_args) )
 
+
+class MonotonicPipelineModule(Module):
+    def __init__(self, vadpy, options):    
+        assert vadpy.pipeline.is_monotonic(), 'Pipeline contains elements with different flags'
+        super(MonotonicPipelineModule, self).__init__(vadpy, options)
+        
             
 class DBModule(Module):
     source_name = Option('source-name', description = "Element's source name")
@@ -343,3 +349,4 @@ class InfoModule(Module):
 
     def __run__(self):
         super(InfoModule, self).run()
+

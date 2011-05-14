@@ -46,7 +46,7 @@ class ModConfusion(CompareModule):
             if self.sep_sources:
                 source_name = element.source_name
             
-            # Generate a list of decision (voiced/unvoiced) pairs for Labels objects
+            # Generate a list of decision (speech/noise) pairs for Labels objects
             # 
             gt_labels = getattr(element, self.inputs[0])
             vad_labels = getattr(element, self.inputs[1])
@@ -58,8 +58,8 @@ class ModConfusion(CompareModule):
                 equalize_framelen(gt_labels, vad_labels)
 
             # zip will concatenate up to min. length of the objects
-            voicedAB = zip((voiced for start, stop, voiced in gt_labels), 
-                           (voiced for start, stop, voiced in vad_labels))
+            speechAB = zip((speech for start, stop, speech in gt_labels), 
+                           (speech for start, stop, speech in vad_labels))
 
             # Calculate False alarm and Miss rate
             tp = 0; tn = 0; fp = 0; fn = 0;
@@ -67,17 +67,17 @@ class ModConfusion(CompareModule):
             half_cmp_size = int(self.cmp_size / 2)
 
 
-            for i in range(0, len(voicedAB)):
-                valA = voicedAB[i][0]
+            for i in range(0, len(speechAB)):
+                valA = speechAB[i][0]
                 
                 if (half_cmp_size > 0 and 
-                    half_cmp_size < i < len(voicedAB) - half_cmp_size):
-                    valB = bool(round(sum(vAB[1] for vAB in voicedAB[i - half_cmp_size : i + half_cmp_size]) 
+                    half_cmp_size < i < len(speechAB) - half_cmp_size):
+                    valB = bool(round(sum(vAB[1] for vAB in speechAB[i - half_cmp_size : i + half_cmp_size]) 
                                  / float(self.cmp_size)))
                 else:
-                    valB = voicedAB[i][1]
+                    valB = speechAB[i][1]
 
-                if valA:                # concluding, valA is a value 'Voiced' Ground Truth frame
+                if valA:                # concluding, valA is a value 'Speech' Ground Truth frame
                   if valB: tp += 1      # true positive
                   else:    fn += 1      # false negative, miss 
                 else:                     
@@ -105,18 +105,18 @@ class ModConfusion(CompareModule):
             # fscore = (1 + B2) * tp / \
             #     ((1 + B2) * tp + B2 * fn + fp)
             length = tp + tn + fp + fn;
-            gt_voiced = fn + tp
-            gt_unvoiced = fp + tn
+            gt_speech = fn + tp
+            gt_noise = fp + tn
 
             mr  = 100 * fn / (tp + fn)
             far = 100 * fp / (tn + fp)
-            vur = gt_voiced / gt_unvoiced
+            vur = gt_speech / gt_noise
             #total_len = tn + fn + tp + fp
             
             print(source_name)
             print('{0:<25}{1:.3}'.format('Miss rate:', mr))
             print('{0:<25}{1:.3}'.format('False alarm rate:', far))
-            print('{0:<25}{1:.3}'.format('Speech/Nonspeech rate:', vur))
+            print('{0:<25}{1:.3}; ({2:.3}% speech)'.format('Speech/Non-speech rate:', vur, vur / (1 + vur)))
             print('')
 
 

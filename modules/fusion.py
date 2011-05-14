@@ -8,8 +8,8 @@ from vadpy.labels import Frame, Labels
 import logging 
 log = logging.getLogger(__name__)
 
-class ModMultiVAD(Module):
-    """The MultiVAD module accepts odd number of VAD Labels objects and outputs combined labels
+class ModFusion(Module):
+    """The Fusion module accepts odd number of VAD Labels objects and outputs combined labels
     
     The combination rule is max out of all, that's why an odd number of VAD Labels objects are required
     """
@@ -20,12 +20,12 @@ class ModMultiVAD(Module):
     fframes_count = Option('fframes-count', odd_parser, 'Odd amount of fusion frames to be calculated at one iteration')
 
     def __init__(self, vadpy, options):
-        super(ModMultiVAD, self).__init__(vadpy, options)
+        super(ModFusion, self).__init__(vadpy, options)
         assert self.inputs >= 3 and len(self.inputs) % 2 == 1, \
               'Labels attributes number is even or is less than 3'
 
     def run(self):
-        super(ModMultiVAD, self).run()        
+        super(ModFusion, self).run()
         
         for element in self.vadpy.pipeline:    
             lo_list = [] # labels object
@@ -51,12 +51,12 @@ class ModMultiVAD(Module):
                 combined_frame = []
                 for j in range(max(0, i - self.fframes_count), min(i + self.fframes_count - 1, frames_count - 1)):
                     for lo in lo_list:
-                        combined_frame.append(lo[j][2]) # j-th frame, (start, end, --> voiced <-- ) tuple
+                        combined_frame.append(lo[j][2]) # j-th frame, (start, end, --> speech <-- ) tuple
 
-                voiced_count = len([value for value in combined_frame 
+                speech_count = len([value for value in combined_frame 
                                     if value])
-                unvoiced_count = lo_count - voiced_count                
-                decision = voiced_count > unvoiced_count and True or False
+                noise_count = lo_count - speech_count                
+                decision = speech_count > noise_count and True or False
                 frames.append(Frame(i * frame_len, 
                                         (i + 1) * frame_len,                                  
                                         decision, 

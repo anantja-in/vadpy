@@ -14,9 +14,9 @@ log = logging.getLogger(__name__)
 class ModSplit(Module):
     """Split elements' data and GT labels into one or more elements
     
-    Additional formatting arguments:
-    {{counter}} - 1,2...length counter for splitted files 
-                  Counter should be used, as long as you don't want to overwrite the same file.'
+    Additional formatting macros:
+    {counter} - 1,2...length counter for splitted files 
+                Counter should be used, as long as you don't want to overwrite the same file.'
     """
 
     out_source_path = Option('out-source-path', 
@@ -35,9 +35,6 @@ class ModSplit(Module):
         super(ModSplit, self).run()
         pipeline = self.vadpy.pipeline
         
-        if not len(pipeline): # no need to proceed, if there are no elements in pipeline
-            return 
-
         new_elements = []
         for element in pipeline:
             slices_count = self._get_slices_count(element)
