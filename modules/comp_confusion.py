@@ -116,7 +116,7 @@ class ModConfusion(CompareModule):
             print(source_name)
             print('{0:<25}{1:.3}'.format('Miss rate:', mr))
             print('{0:<25}{1:.3}'.format('False alarm rate:', far))
-            print('{0:<25}{1:.3}; ({2:.3}% speech)'.format('Speech/Non-speech rate:', vur, vur / (1 + vur)))
+            print('{0:<25}{1:.3}; ({2:.3}% speech)'.format('Speech/Non-speech rate:', vur, 100 * vur / (1 + vur)))
             print('')
 
 

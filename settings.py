@@ -36,7 +36,7 @@ MACROS = {
     'dft_iogapless' : 'iogapless mcr_io',
     'dft_matlab'    : 'vadmatlab mcr_matlab fread=600 filecount=128 args=""',
     # DB modules
-    'dnist05' : 'dbnist05 source-name=NIST05 re="" ' \
+    'nist05'  : 'dbnist05 source-name=NIST05 re="" ' \
                 'source-dir="{dbroot}/NIST05/{{dataset}}/DATA" dataset=TEST ' \
                 'gt-dir="{dbroot}/NIST05/{{dataset}}/GT"',
     'aurora'  : 'dbaurora source-name=Aurora2 dataset=TEST env=1,2,3,4 snr=C,20,15,10,5,0,-5 re="" ' \
@@ -78,7 +78,9 @@ MACROS = {
     'iamr'      : 'ivgapless frame-len=0.02',
     'isilk'     : 'ivgapless frame-len=0.02',
     'iafe'      : 'ivgapless frame-len=0.01',
-    'ienergy'   : 'ivgapless frame-len=0.01',
+    'imatlab'   : 'ivgapless frame-len=0.01',
+    'ienergy'   : 'imatlab',
+    'ientropy'  : 'imatlab',
     'isvm'      : 'ivgapless', 
 
     # VAD modulse
@@ -92,6 +94,7 @@ MACROS = {
     'svmtest'  : 'vadmatlabsvm mcr_matlab conf_framelen engine=svm script=test ' \
                  'outpath="{{voutdir}}/{{e_srcname}}/{{e_srcfile}}"',
     'energy.m' : 'dft_matlab engine=vad script=energy',
+    'entropy.m' : 'dft_matlab engine=vad script=entropy',
     'stat.m'   : 'dft_matlab engine=vad script=logmmse_SPU2 args="1" ' \
                  'voutdir="{outroot}/matlab/{{engine}}_stat{{args}}"',
     'stat1.m'  : 'stat.m args="1"',
@@ -106,7 +109,7 @@ MACROS = {
                    'out-source-path="{outroot}/split/{{e_srcname}}/{{e_srcfile}}.{{counter}}" ' \
                    'out-gt-path="{outroot}/split/{{e_srcname}}/GT/{{e_srcfile}}.{{counter}}"', 
     'edit'       : 'modedit attr="" value="{{attr}}" from-attr="" to-attr=""',
-    'extract'    : 'modextract mode=speech',
+    'extract'    : 'modextract mode=speech out-path="{outroot}/fusion/{{e_srcfile}}"',
     'confusion'  : 'modconfusion mcr_compare inputs=gt_labels,vad_labels fscore-b=1 cmp-size=1',
     'histogram'  : 'modfusionhistogram mcr_compare re=""', 
     'fusion'     : 'modfusion output="vad_labels" max-diff-rate=0.005 fframes-count=1',
