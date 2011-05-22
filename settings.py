@@ -45,7 +45,7 @@ MACROS = {
     'busstop' : 'dbquick source-name=busstop dataset="" flags=8000hz,le,16bps re="" ' \
                 'gt-dir="{dbroot}/busstop/GT" source-dir="{dbroot}/busstop/DATA" ',
     'test'    : 'dbquick source-name=testdb dataset="" flags=8000hz,le,16bps re="" ' \
-                'gt-dir="{dbroot}/TESTDB/GT" source-dir="{dbroot}/TESTDB/DATA" ',
+                'gt-dir="{dbroot}/TESTDB/GT" source-dir="{dbroot}/TESTDB/DATA/{{dataset}}" ',
     # 'nist08' : 'dbnist08 source-name=NIST08 dataset="" dataunits="" channels="" re="" ' \
     #            ' source-dir="{dbroot}/NIST08/DATA/" gt-dir="{dbroot}/NIST08/GT/"',
     'labra'  :  'dbquick source-name=labra dataset="" flags=8000hz,le,16bps re="" ' \
