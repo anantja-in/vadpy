@@ -24,3 +24,6 @@ def makedirs(path):
         os.makedirs(path)
     except OSError:
         pass    
+
+class Object(object):
+    pass

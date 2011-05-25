@@ -1,11 +1,11 @@
-from vadpy.module import CompareModule
+from vadpy.module import ComputeModule
 from vadpy.options import  Option
 from vadpy.labels import equalize_framelen
 
 import logging 
 log = logging.getLogger(__name__)
 
-class ModConfusion(CompareModule):
+class ModConfusion(ComputeModule):
     """Tests elements' labels for TypeI and TypeII errors
     -----------------------------------------------------------------------
     |                           | H0 is True         | H1 is True         |
@@ -39,13 +39,13 @@ class ModConfusion(CompareModule):
         # false positives/false negatives per source
         # the format of every tuple in dictionary is 
         # [True Positives, True Negatives, False Positives, False Negatives] tuple (list actually :)
-        source_err = {} 
-        source_name = 'All'
 
-        for element in self.vadpy.pipeline:
-            if self.sep_sources:
-                source_name = element.source_name
-            
+        tp_total = 0.0
+        tn_total = 0.0
+        fp_total = 0.0
+        fn_total = 0.0
+
+        for element in self.vadpy.pipeline:            
             # Generate a list of decision (speech/noise) pairs for Labels objects
             # 
             gt_labels = getattr(element, self.inputs[0])
@@ -83,37 +83,34 @@ class ModConfusion(CompareModule):
                 else:                     
                   if valB: fp += 1      # false positive, false alarm
                   else:    tn += 1      # true negative
-            
-            # Store error values to sources'  "errors summary"
-            try:
-                err = source_err[source_name]
-                err[0] += tp
-                err[1] += tn
-                err[2] += fp
-                err[3] += fn
-            except KeyError:
-                source_err[source_name] = [tp, tn, fp, fn]
-
-        # convert results to percent domain
-        for source_name, err in source_err.items():            
-            tp = float(err[0])
-            tn = float(err[1])
-            fp = float(err[2])
-            fn = float(err[3])
                         
-            # B2 = self.fscore_b**2
-            # fscore = (1 + B2) * tp / \
-            #     ((1 + B2) * tp + B2 * fn + fp)
-            length = tp + tn + fp + fn;
-            gt_speech = fn + tp
-            gt_noise = fp + tn
+            tp_total += tp
+            tn_total += tn
+            fp_total += fp
+            fn_total += fn
 
-            mr  = 100 * fn / (tp + fn)
-            far = 100 * fp / (tn + fp)
-            vur = gt_speech / gt_noise
-            #total_len = tn + fn + tp + fp
-            
-            print(source_name)
+        tp = tp_total 
+        tn = tn_total
+        fp = fp_total
+        fn = fn_total
+
+        # B2 = self.fscore_b**2
+        # fscore = (1 + B2) * tp / \
+        #     ((1 + B2) * tp + B2 * fn + fp)
+        length = tp + tn + fp + fn;
+        gt_speech = fn + tp
+        gt_noise = fp + tn
+
+        mr  = fn / (tp + fn)
+        far = fp / (tn + fp)
+        vur = gt_speech / gt_noise
+        #total_len = tn + fn + tp + fp
+
+        self.add_result('mr', mr)
+        self.add_result('far', far)
+        self.add_result('vur', vur)
+        
+        if self.print_flag:
             print('{0:<25}{1:.3}'.format('Miss rate:', mr))
             print('{0:<25}{1:.3}'.format('False alarm rate:', far))
             print('{0:<25}{1:.3}; ({2:.3}% speech)'.format('Speech/Non-speech rate:', vur, 100 * vur / (1 + vur)))

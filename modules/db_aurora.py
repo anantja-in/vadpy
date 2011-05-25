@@ -1,17 +1,20 @@
-import logging 
 import os
 
 from vadpy import common
 from vadpy.module import DBModule
 from vadpy.element import Element, BIG_ENDIAN, FS_8000, BPS_16
-from vadpy.options import Option, split_parser
+from vadpy.options import StrictOption, split_parser
 
+import logging 
 log = logging.getLogger(__name__)
 
 class DBAURORA(DBModule):
     """AURORA2 corpus module"""
-    env = Option(parser = split_parser, description = 'Environment numbers separated by ","')
-    snr = Option(parser = split_parser, description = 'SNR rates separated by ","')
+    env = StrictOption(parser = split_parser, description = 'Environment numbers separated by ","', 
+                       values = ['1','2','3','4'])
+
+    snr = StrictOption(parser = split_parser, description = 'SNR rates separated by ","', 
+                       values = ['C','20','15','10', '5', '0', '-5'])
 
     FLAGS = BIG_ENDIAN | FS_8000 | BPS_16
     

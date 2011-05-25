@@ -1,4 +1,4 @@
-from vadpy.module import CompareModule
+from vadpy.module import ComputeModule
 from vadpy.options import  Option
 from vadpy.labels import equalize_framelen
 
@@ -6,7 +6,7 @@ from itertools import product
 import logging 
 log = logging.getLogger(__name__)
 
-class ModFusionHistogram(CompareModule):
+class ModFusionHistogram(ComputeModule):
     """Fusion histogram calculator"""
     def __init__(self, vadpy, options):
         super(ModFusionHistogram, self).__init__(vadpy, options)
@@ -59,17 +59,22 @@ class ModFusionHistogram(CompareModule):
                 lr_histogram[key] = 1.0
             else:
                 lr_histogram[key] = speech_val / noise_val
-            
+        
+        # update pipeline with histogram data
+        self.add_result('speech', speech_histogram)
+        self.add_result('noise', noise_histogram)
+        self.add_result('lr', lr_histogram)
 
-        print('Speech histogram:')
-        for key in sorted(speech_histogram.keys()):
-            print('{0:<25}{1:.3}'.format(key, speech_histogram[key]))
+        if self.print_flag:
+            print('Speech histogram:')
+            for key in sorted(speech_histogram.keys()):
+                print('{0:<25}{1:.3}'.format(key, speech_histogram[key]))
 
-        print('\nNoise histogram:')
-        for key in sorted(noise_histogram.keys()):
-            print('{0:<25}{1:.3}'.format(key, noise_histogram[key]))
+            print('\nNoise histogram:')
+            for key in sorted(noise_histogram.keys()):
+                print('{0:<25}{1:.3}'.format(key, noise_histogram[key]))
 
-        print('\nLikelihood ratio histogram:')
-        for key in sorted(lr_histogram.keys()):
-            print('{0:<25}{1:.3}'.format(key, lr_histogram[key]))
+            print('\nLikelihood ratio histogram:')
+            for key in sorted(lr_histogram.keys()):
+                print('{0:<25}{1:.3}'.format(key, lr_histogram[key]))
 

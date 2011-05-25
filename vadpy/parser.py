@@ -69,6 +69,7 @@ class SeqOptions(object):
                                     name, val = buf.split('=')
                                     module_args[name] = val
                                     buf = ''
+
             if module:
                 modules.append( (module, deepcopy(module_args)) )
         return modules

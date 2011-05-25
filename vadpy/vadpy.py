@@ -12,8 +12,7 @@ class VADpy(object):
     def __init__(self, settings):
         self.settings = settings
         self.pipeline = Pipeline(self)
-        self.options = SeqOptions(self)
-
+        self.options = SeqOptions(self)        
         self._modules = []
         self._parse_arguments()
 
@@ -24,7 +23,7 @@ class VADpy(object):
         # 
         modules = self.options.parse()
         manager = ModuleManager(self)
-
+        
         if self.options.help_required:
             # print module help
             if modules: # "modules" is a simple string variable here

@@ -51,7 +51,12 @@ class StrictOption(Option):
 
     def parse(self, value):
         parsed_value = self.parser(value)
-        assert parsed_value in self._values, "Incorrect option's value: {0}".format(parsed_value)
+        if isinstance(parsed_value, collections.Iterable):
+            if len(set(parsed_value) - set(self._values)) != 0:
+                raise OptionValueError(parsed_value)
+        else:
+            if parsed_value not in self._values:
+                raise OptionValueError(parsed_value)
         return parsed_value
 
 
@@ -75,3 +80,7 @@ def odd_parser(value):
     value = int(value)
     assert value % 2 != 0, '{0} is not an odd number'.format(value)
     return value
+
+class OptionValueError(Exception):
+    def __init__(self, value):
+        super(OptionValueError, self).__init__("Incorrect option's value: {0}".format(value))

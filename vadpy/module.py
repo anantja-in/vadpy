@@ -45,7 +45,7 @@ class Module(object):
         """Put all options validation here"""
         self.vadpy = vadpy
         self.settings = vadpy.settings
-        self.name = self.__class__.__name__.lower()
+        self.name = self.__class__.__name__
 
         # == setup options == # 
         # get all options defined in class
@@ -63,7 +63,7 @@ class Module(object):
         pass
     
     def run(self):
-        log.info('Running {0}'.format(self.__class__.__name__))
+        log.info('Running {0}'.format(self.name))
 
     def format_path(self, path, **kwargs):
         """Formats path via static and dynamic format arguments
@@ -71,7 +71,7 @@ class Module(object):
         The static arguments are built from settings.format_args
         The dynamic arguments are built from module's arguments
         """
-        format_args = {'modname' : self.__class__.__name__, 
+        format_args = {'modname' : self.name, 
                        }
         format_args.update(self.settings.format_args)
         format_args.update(kwargs)             
@@ -326,20 +326,30 @@ class MatlabVADModuleBase(VADModule):
             assert not stderrdata, stderrdata
 
 
-class CompareModule(Module):
-    """Base module for comparing elements' labels (and printing the output to stdout)"""
+class ComputeModule(Module):
+    """Base module for computing data based on elements' labels"""
     inputs = Option(parser = split_parser, 
                     description = 'Input labels\' attributes separated by ",". '\
                                   'In most cases those are gt_labels,vad_labels')
-    sep_sources = Option('sep-sources', bool_parser, 'Treat files from every source separately (yes/no)')
+    print_flag = Option('print', bool_parser, 'Print the computed data to stdout (yes/no)')
 
     def __init__(self, vadpy, options):
-        super(CompareModule, self).__init__(vadpy, options)
+        super(ComputeModule, self).__init__(vadpy, options)
         assert all(self.inputs), 'Inputs are empty'
 
     def run(self):
-        super(CompareModule, self).run()
-    
+        super(ComputeModule, self).run()
+
+    def add_result(self, name, value):
+        """Add computation result to corresponding pipeline object"""
+        pipeline = self.vadpy.pipeline
+        try:
+            comp_res_object = getattr(pipeline, self.name.lower())
+        except AttributeError:
+            comp_res_object = common.Object()
+            setattr(pipeline, self.name.lower(), comp_res_object)
+
+        setattr(comp_res_object, name, value)
 
 class InfoModule(Module):
     """Base module for adding information to elements in pipeline"""

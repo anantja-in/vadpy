@@ -25,7 +25,7 @@ MACROS = {
                        'outpath="{{voutdir}}/{{e_srcname}}/{{e_srcfile}}" overwrite=No',
     'mcr_labels_vad' : 'labels-attr="vad_labels" path-attr="vout_path"',
     'mcr_labels_gt'  : 'labels-attr=gt_labels path-attr=gt_path',
-    'mcr_compare'    : 'sep-sources=Yes',
+    'mcr_compute'    : 'print=Yes',
     'mcr_matlab'     : 'mcr_basevad voutdir="{outroot}/matlab/{{engine}}_{{script}}" ' \
                        'bin=matlab mopts="-nojvm, -nosplash" ' \
                        'scriptdir={binroot}/matlab fread=600 filecount=128 args=""',
@@ -108,10 +108,10 @@ MACROS = {
     'split'      : 'modsplit gt=yes source=yes length=60 overwrite=No ' \
                    'out-source-path="{outroot}/split/{{e_srcname}}/{{e_srcfile}}.{{counter}}" ' \
                    'out-gt-path="{outroot}/split/{{e_srcname}}/GT/{{e_srcfile}}.{{counter}}"', 
-    'edit'       : 'modedit attr="" value="{{attr}}" from-attr="" to-attr=""',
+    'edit'       : 'modedit attr="" value="{{attr}}" copy-from="" copy-to=""',
     'extract'    : 'modextract mode=speech out-path="{outroot}/fusion/{{e_srcfile}}"',
-    'confusion'  : 'modconfusion mcr_compare inputs=gt_labels,vad_labels fscore-b=1 cmp-size=1',
-    'histogram'  : 'modfusionhistogram mcr_compare re=""', 
-    'fusion'     : 'modfusion output="vad_labels" max-diff-rate=0.005 fframes-count=1',
+    'confusion'  : 'modconfusion mcr_compute inputs=gt_labels,vad_labels fscore-b=1 cmp-size=1',
+    'histogram'  : 'modfusionhistogram mcr_compute re=""', 
+    'fusion'     : 'modfusion output="vad_labels" max-diff-rate=0.005 margs=1 method=majority ',
     'vurate'     : 'modvurate labels-attr=gt_labels'
 }
