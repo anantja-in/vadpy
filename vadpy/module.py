@@ -17,7 +17,6 @@ class ModuleMeta(type):
         for item in class_dict:
             attr = class_dict[item]
             if isinstance(attr, Option):
-                attr.module = classname.lower() # add module's name to option
                 if not attr.name:
                     attr.name = item
         return type.__new__(meta, classname, bases, class_dict)
@@ -57,7 +56,7 @@ class Module(object):
                 if name in options:
                     setattr(self, attr, option.parse(options[name])) # replace Option object with value
                 else:
-                    raise MissingArgumentError(option.module, name)
+                    raise MissingArgumentError(self.name, name)
 
     def __del__(self):
         pass
@@ -340,11 +339,14 @@ class ComputeModule(Module):
     def run(self):
         super(ComputeModule, self).run()
 
-    def add_result(self, name, value):
+    def add_result(self, name, value, modalias = ''):
         """Add computation result to corresponding pipeline object"""
         pipeline = self.vadpy.pipeline
+        if not modalias:
+            modalias = self.name.lower()
+
         try:
-            comp_res_object = getattr(pipeline, self.name.lower())
+            comp_res_object = getattr(pipeline, modalias)
         except AttributeError:
             comp_res_object = common.Object()
             setattr(pipeline, self.name.lower(), comp_res_object)
@@ -359,4 +361,3 @@ class InfoModule(Module):
 
     def __run__(self):
         super(InfoModule, self).run()
-

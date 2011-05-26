@@ -24,7 +24,7 @@ def main():
 
 def setup_logging():
     console_format = '%(levelname)-8s %(message)s'
-    loglevel = logging.DEBUG
+    loglevel = logging.CRITICAL
 
     if  '-dt' in sys.argv:
         loglevel = logging.DEBUG
@@ -33,10 +33,11 @@ def setup_logging():
         loglevel = logging.DEBUG
         # add module name and message time in debug mode
         console_format = "%(asctime)-10s" + console_format + ' (%(name)s)' 
+    elif'-i' in sys.argv or '--info' in sys.argv:
+        loglevel = logging.INFO    
     elif  '-q' in sys.argv or '--quiet' in sys.argv:
         loglevel = logging.CRITICAL
-    else: #'-i' in sys.argv or '--info' in sys.argv:
-        loglevel = logging.INFO    
+
 
     # Logging to terminal
     logging.basicConfig(level = loglevel, 

@@ -29,9 +29,8 @@ class VADpy(object):
             if modules: # "modules" is a simple string variable here
                 if modules in self.settings.MACROS:
                     print('VADpy macro: {0} '.format(self.settings.MACROS[modules]))
-                else:
+                else:                    
                     module = manager[modules]
-                    print(module)
             else:
                 exec_name = sys.argv[0]
                 # print general program help

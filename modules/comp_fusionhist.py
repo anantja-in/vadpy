@@ -3,8 +3,11 @@ from vadpy.options import  Option
 from vadpy.labels import equalize_framelen
 
 from itertools import product
+import math
+
 import logging 
 log = logging.getLogger(__name__)
+
 
 class ModFusionHistogram(ComputeModule):
     """Fusion histogram calculator"""
@@ -58,7 +61,7 @@ class ModFusionHistogram(ComputeModule):
             elif noise_val == 0:
                 lr_histogram[key] = 1.0
             else:
-                lr_histogram[key] = speech_val / noise_val
+                lr_histogram[key] = math.log(speech_val / noise_val)
         
         # update pipeline with histogram data
         self.add_result('speech', speech_histogram)
@@ -77,4 +80,3 @@ class ModFusionHistogram(ComputeModule):
             print('\nLikelihood ratio histogram:')
             for key in sorted(lr_histogram.keys()):
                 print('{0:<25}{1:.3}'.format(key, lr_histogram[key]))
-
