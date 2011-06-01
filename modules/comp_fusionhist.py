@@ -77,6 +77,6 @@ class ModFusionHistogram(ComputeModule):
             for key in sorted(noise_histogram.keys()):
                 print('{0:<25}{1:.3}'.format(key, noise_histogram[key]))
 
-            print('\nLikelihood ratio histogram:')
+            print('\Log likelihood ratio histogram:')
             for key in sorted(lr_histogram.keys()):
                 print('{0:<25}{1:.3}'.format(key, lr_histogram[key]))
