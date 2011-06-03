@@ -1,5 +1,9 @@
 import os 
 import re
+import functools
+
+class Object(object):
+    pass
 
 def listdir(path, *exprs):
    """Return a list of files from a directory filtered by regular expression
@@ -23,7 +27,11 @@ def makedirs(path):
     try:
         os.makedirs(path)
     except OSError:
-        pass    
+        pass
 
-class Object(object):
-    pass
+def runoverridden(f):
+    @functools.wraps(f)
+    def wrapper(self, *args, **kw):
+        if getattr(self, f.__name__).im_func != wrapper:
+            return f(self, *args, **kw)
+    return wrapper

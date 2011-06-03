@@ -27,7 +27,8 @@ class ModConfusion(ComputeModule):
     |-----------------|
     """
     # fscore_b = Option('fscore-b', float, "F-measurment's Beta parameter's value")
-    cmp_size=Option('cmp-size', int, 'Amount of 2nd labels object frames to be treated as a single frame')
+    ctx_size =Option('ctx-size', int, 
+                     'Temporal context size of 2nd labels object frames iterator (using majority voting)')
 
     def __init__(self, vadpy, options):
         super(ModConfusion, self).__init__(vadpy, options)
@@ -58,22 +59,18 @@ class ModConfusion(ComputeModule):
                 equalize_framelen(gt_labels, vad_labels)
 
             # zip will concatenate up to min. length of the objects
-            speechAB = zip((speech for start, stop, speech in gt_labels), 
-                           (speech for start, stop, speech in vad_labels))
+            speechAB = zip((int(speech) for start, stop, speech in gt_labels), 
+                           (int(speech) for start, stop, speech in vad_labels))
 
             # Calculate False alarm and Miss rate
             tp = 0; tn = 0; fp = 0; fn = 0;
 
-            half_cmp_size = int(self.cmp_size / 2)
-
-
             for i in range(0, len(speechAB)):
                 valA = speechAB[i][0]
                 
-                if (half_cmp_size > 0 and 
-                    half_cmp_size < i < len(speechAB) - half_cmp_size):
-                    valB = bool(round(sum(vAB[1] for vAB in speechAB[i - half_cmp_size : i + half_cmp_size]) 
-                                 / float(self.cmp_size)))
+                if (self.ctx_size < i < len(speechAB) - self.ctx_size):
+                    valB = int(round(sum(vAB[1] for vAB in speechAB[i - self.ctx_size : i + self.ctx_size + 1]) 
+                                     / float(self.ctx_size * 2 + 1)))
                 else:
                     valB = speechAB[i][1]
 
@@ -109,12 +106,14 @@ class ModConfusion(ComputeModule):
         self.add_result('mr', mr)
         self.add_result('far', far)
         self.add_result('vur', vur)
-        
-        if self.print_flag:
-            print('{0:<25}{1:.3}'.format('Miss rate:', mr))
-            print('{0:<25}{1:.3}'.format('False alarm rate:', far))
-            print('{0:<25}{1:.3}; ({2:.3}% speech)'.format('Speech/Non-speech rate:', vur, 100 * vur / (1 + vur)))
-            print('')
 
+    def _format_results(self):
+        res = self.vadpy.pipeline.modconfusion
+        mr = res.mr
+        far = res.far
+        vur = res.vur
 
-
+        return ('{0:<25}{1:.3}\n'.format('Miss rate:', mr) + 
+                '{0:<25}{1:.3}\n'.format('False alarm rate:', far) + 
+                '{0:<25}{1:.3}; ({2:.3}% speech)\n'.format('Speech/Non-speech rate:', vur, 100 * vur / (1 + vur))
+                )

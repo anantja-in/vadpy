@@ -8,7 +8,6 @@ import math
 import logging 
 log = logging.getLogger(__name__)
 
-
 class ModFusionHistogram(ComputeModule):
     """Fusion histogram calculator"""
     def __init__(self, vadpy, options):
@@ -68,15 +67,18 @@ class ModFusionHistogram(ComputeModule):
         self.add_result('noise', noise_histogram)
         self.add_result('lr', lr_histogram)
 
-        if self.print_flag:
-            print('Speech histogram:')
-            for key in sorted(speech_histogram.keys()):
-                print('{0:<25}{1:.3}'.format(key, speech_histogram[key]))
+    def _format_results(self):
+        res = self.vadpy.pipeline.histogram
+        s = 'Speech histogram:\n'
+        for key in sorted(speech_histogram.keys()):
+            s += '{0:<25}{1:.3}\n'.format(key, speech_histogram[key])
+            
+        s += '\nNoise histogram:\n'
+        for key in sorted(noise_histogram.keys()):
+            s += '{0:<25}{1:.3}'.format(key, noise_histogram[key])
 
-            print('\nNoise histogram:')
-            for key in sorted(noise_histogram.keys()):
-                print('{0:<25}{1:.3}'.format(key, noise_histogram[key]))
-
-            print('\Log likelihood ratio histogram:')
-            for key in sorted(lr_histogram.keys()):
-                print('{0:<25}{1:.3}'.format(key, lr_histogram[key]))
+        s += '\Log likelihood ratio histogram:\n'
+        for key in sorted(lr_histogram.keys()):
+            s += '{0:<25}{1:.3}'.format(key, lr_histogram[key])
+            
+        return s

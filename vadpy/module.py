@@ -60,9 +60,18 @@ class Module(object):
 
     def __del__(self):
         pass
-    
+
+    @common.runoverridden
+    def pre_run(self):
+        log.info('Pre-running {0}'.format(self.name))     
+
+    @common.runoverridden    
     def run(self):
-        log.info('Running {0}'.format(self.name))
+        log.info('Running {0}'.format(self.name))     
+
+    @common.runoverridden
+    def post_run(self):
+        log.info('Post-running {0}'.format(self.name))     
 
     def format_path(self, path, **kwargs):
         """Formats path via static and dynamic format arguments
@@ -339,6 +348,11 @@ class ComputeModule(Module):
     def run(self):
         super(ComputeModule, self).run()
 
+    def post_run(self):
+        super(ComputeModule, self).post_run()
+        if self.print_flag:
+            print(self._format_results())            
+
     def add_result(self, name, value, modalias = ''):
         """Add computation result to corresponding pipeline object"""
         pipeline = self.vadpy.pipeline
@@ -350,8 +364,11 @@ class ComputeModule(Module):
         except AttributeError:
             comp_res_object = common.Object()
             setattr(pipeline, self.name.lower(), comp_res_object)
-
         setattr(comp_res_object, name, value)
+
+    def _format_results(self):
+        """Called after results are calculated if pring_flag is set"""
+        return ''
 
 class InfoModule(Module):
     """Base module for adding information to elements in pipeline"""
