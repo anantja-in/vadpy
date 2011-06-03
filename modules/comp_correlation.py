@@ -7,8 +7,8 @@ import math
 import logging 
 log = logging.getLogger(__name__)
 
-class ModQstatistics(ComputeModule):
-    """Compute q-statistics correlation between inputs
+class ModCorrelation(ComputeModule):
+    """Compute correlation between inputs
     -----------------------------------------------------------------------
     |                           | VAD_1 is correct   | VAD_1 is wrong     |
     |---------------------------|--------------------|--------------------|
@@ -18,15 +18,15 @@ class ModQstatistics(ComputeModule):
     | VAD_1 is wrong            |         c          |         d          |
     |                           |                    |                    |
     |---------------------------|--------------------|--------------------|
-
-    p = a * b - b * c / sqrt((a + b) * (c + d) * (a + c) * (b + d))
+    Q = (a*d - b*c) / (a*d + b*c)
+    p = a*b - b*c / sqrt((a + b) * (c + d) * (a + c) * (b + d))
     """
 
     def __init__(self, vadpy, options):
-        super(ModQstatistics, self).__init__(vadpy, options)
+        super(ModCorrelation, self).__init__(vadpy, options)
 
     def run(self):
-        super(ModQstatistics, self).run()
+        super(ModCorrelation, self).run()
         assert len(set(self.inputs)) == 3, 'Q-statistics module requires three different inputs (GT, VAD1, VAD2)'
 
         # false positives/false negatives per source
@@ -45,7 +45,7 @@ class ModQstatistics(ComputeModule):
             
             if len(set([len(gt_labels), len(vad1_labels), len(vad2_labels)])) != 1:
                 log.warning('Labels length mismatch: {0} / {1} / {2}, equlizing frame lengths.'.format(
-                        len(gt_labels), len(vad1_labels), len(vad1_labels) ))
+                        len(gt_labels), len(vad1_labels), len(vad2_labels) ))
                 equalize_framelen(gt_labels, vad1_labels, vad2_labels)
 
             speechData = zip((int(speech) for start, stop, speech in gt_labels), 
@@ -79,11 +79,16 @@ class ModQstatistics(ComputeModule):
         c = c_total / length
         d = d_total / length
 
-        qscr = (a*d - b*c) / math.sqrt((a + b)*(c + d)*(a + c)*(b + d))
+        corrQ = (a*d - b*c) / (a*d + b*c)
+        corrp = (a*d - b*c) / math.sqrt((a + b)*(c + d)*(a + c)*(b + d))
 
-        self.add_result('qscr', qscr)
+        self.add_result('corrQ', corrQ)
+        self.add_result('corrp', corrp)
 
 
     def _format_results(self):
-        qscr = self.vadpy.pipeline.modqstatistics.qscr
-        return '{0:<25}{1:.3}'.format('Q-Statistics corr. rate:', qscr)
+        corrQ = self.vadpy.pipeline.modcorrelation.corrQ
+        corrp = self.vadpy.pipeline.modcorrelation.corrp
+        return ('{0:<25}{1:.3}\n'.format('Q-Statistics (Q):', corrQ) + 
+                '{0:<25}{1:.3}'.format('Correlation (p):', corrp)
+                )

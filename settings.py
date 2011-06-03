@@ -111,7 +111,7 @@ MACROS = {
     'edit'       : 'modedit attr="" value="{{attr}}" copy-from="" copy-to=""',
     'extract'    : 'modextract mode=speech out-path="{outroot}/fusion/{{e_srcfile}}"',
     'confusion'  : 'modconfusion mcr_compute inputs=gt_labels,vad_labels fscore-b=1 ctx-size=0',
-    'qstatistics': 'modqstatistics mcr_compute',
+    'correlation': 'modcorrelation mcr_compute',
     'histogram'  : 'modfusionhistogram mcr_compute re=""', 
     'fusion'     : 'modfusion output=vad_labels max-diff-rate=0.005 margs=1 method=majority',
     'vurate'     : 'modvurate labels-attr=gt_labels',
