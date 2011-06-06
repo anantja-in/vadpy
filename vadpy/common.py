@@ -29,7 +29,7 @@ def makedirs(path):
     except OSError:
         pass
 
-def runoverridden(f):
+def calloverridden(f):
     @functools.wraps(f)
     def wrapper(self, *args, **kw):
         if getattr(self, f.__name__).im_func != wrapper:

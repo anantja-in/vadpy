@@ -87,8 +87,9 @@ class ModCorrelation(ComputeModule):
 
 
     def _format_results(self):
-        corrQ = self.vadpy.pipeline.modcorrelation.corrQ
-        corrp = self.vadpy.pipeline.modcorrelation.corrp
+        res = self._get_results()
+        corrQ = res.corrQ
+        corrp = res.corrp
         return ('{0:<25}{1:.3}\n'.format('Q-Statistics (Q):', corrQ) + 
                 '{0:<25}{1:.3}'.format('Correlation (p):', corrp)
                 )

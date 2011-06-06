@@ -61,15 +61,15 @@ class Module(object):
     def __del__(self):
         pass
 
-    @common.runoverridden
+    @common.calloverridden
     def pre_run(self):
         log.info('Pre-running {0}'.format(self.name))     
 
-    @common.runoverridden    
+    @common.calloverridden    
     def run(self):
         log.info('Running {0}'.format(self.name))     
 
-    @common.runoverridden
+    @common.calloverridden
     def post_run(self):
         log.info('Post-running {0}'.format(self.name))     
 
@@ -358,7 +358,7 @@ class ComputeModule(Module):
         pipeline = self.vadpy.pipeline
         if not modalias:
             modalias = self.name.lower()
-
+        
         try:
             comp_res_object = getattr(pipeline, modalias)
         except AttributeError:
@@ -369,6 +369,16 @@ class ComputeModule(Module):
     def _format_results(self):
         """Called after results are calculated if pring_flag is set"""
         return ''
+
+    def _get_results(self, modalias = ''):
+        pipeline = self.vadpy.pipeline
+        if not modalias:
+            modalias = self.name.lower()
+
+        try:
+            return getattr(pipeline, modalias)
+        except:
+            return None
 
 class InfoModule(Module):
     """Base module for adding information to elements in pipeline"""

@@ -3,7 +3,8 @@
 % model_path = '/home/zaur/Documents/Study/vadpy2/output/zaur/matlab/svm_train/AN1_60.mat';
 % out_path = '/home/zaur/Documents/Study/vadpy2/output/zaur/split/Aurora2/TRAIN/GT/N1_SNRC.0.out';
 
-sound_path = '/home/zaur/Documents/Study/thesis/experiments/workdir/data/FAK_1B.10';
+%sound_path = '/home/zaur/Documents/Study/thesis/experiments/workdir/data/FAK_1B.10';
+sound_path = '/home/zaur/Documents/Study/thesis/experiments/workdir/data/jamjB';
 
 %sound_path = '/home/zaur/Documents/Study/vadpy2/databases/AURORA2/TRAIN/DATA/N1_SNR5'; 
 %gt_path =    '/home/zaur/Documents/Study/vadpy2/databases/AURORA2/TRAIN/GT/N1_SNR5';
@@ -31,6 +32,8 @@ out_path = '/home/zaur/Documents/Study/vadpy2/output/zaur/tmp.out';
 % s = s / max(abs(s));
 % plot(s);
 
-vad('entropy', '1', 'b', sound_path, out_path);
+%vad('entropy', '1', 'b', sound_path, out_path);
+vad('entropy', '1', 'l', sound_path, out_path);
+
 %svm ('train', 'b', '0.008', sound_path, gt_path, model_path); 
 %svm ('test', 'b', '0.01', sound_path, model_path, gt_path); 

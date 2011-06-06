@@ -55,7 +55,7 @@ class ModFusionHistogram(ComputeModule):
             speech_val = speech_histogram[key]
             noise_val = noise_histogram[key]
 
-            if noise_val == 0 and speech_val == 0:
+            if noise_val == 0 or speech_val == 0:
                 lr_histogram[key] = 0.0
             elif noise_val == 0:
                 lr_histogram[key] = 1.0
@@ -68,17 +68,21 @@ class ModFusionHistogram(ComputeModule):
         self.add_result('lr', lr_histogram)
 
     def _format_results(self):
-        res = self.vadpy.pipeline.histogram
+        res = self._get_results()
+        speech_histogram = res.speech
+        noise_histogram = res.noise
+        lr_histogram = res.lr
+
         s = 'Speech histogram:\n'
         for key in sorted(speech_histogram.keys()):
             s += '{0:<25}{1:.3}\n'.format(key, speech_histogram[key])
             
         s += '\nNoise histogram:\n'
         for key in sorted(noise_histogram.keys()):
-            s += '{0:<25}{1:.3}'.format(key, noise_histogram[key])
+            s += '{0:<25}{1:.3}\n'.format(key, noise_histogram[key])
 
-        s += '\Log likelihood ratio histogram:\n'
+        s += '\nLog likelihood ratio histogram:\n'
         for key in sorted(lr_histogram.keys()):
-            s += '{0:<25}{1:.3}'.format(key, lr_histogram[key])
+            s += '{0:<25}{1:.3}\n'.format(key, lr_histogram[key])
             
         return s

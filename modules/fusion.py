@@ -61,6 +61,8 @@ class ModFusion(Module):
         frames = []        
         frame_len = lo_list[0].frame_len
 
+        use_histogram = hasattr(self.vadpy.pipeline, 'modfusionhistogram')
+
         for i in range(0, frames_count):
             combined_frames = []
             combined_labels = []
@@ -73,15 +75,15 @@ class ModFusion(Module):
                 
 
             decision = None
-            if hasattr(self.vadpy.pipeline, 'histogram'):  # histogram-based method
-                histogram = self.vadpy.pipeline.histogram
+            if use_histogram:
+                histogram = self.vadpy.pipeline.modfusionhistogram
                 lr = histogram.lr # likelihood ratio
                 speech_count = 0
                 sum_lr = 0
                 for cframes in combined_frames:                    
                     sum_lr += lr[cframes]
 
-                decision = sum_lr >= 2
+                decision = sum_lr >= 0
 
             else: # simple majority / temporal context
                 speech_count = len([value for value in combined_labels 
@@ -91,9 +93,9 @@ class ModFusion(Module):
 
             assert decision != None, 'Decision has not been made!'
             frames.append(Frame(i * frame_len, 
-                                    (i + 1) * frame_len,                                  
-                                    decision, 
-                                    frame_len))
+                                (i + 1) * frame_len,                                  
+                                decision, 
+                                frame_len))
 
         lo_combined = Labels(frames, frame_len)
         setattr(element, self.output, lo_combined)

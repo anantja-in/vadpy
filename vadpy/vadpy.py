@@ -31,6 +31,7 @@ class VADpy(object):
                     print('VADpy macro: {0} '.format(self.settings.MACROS[modules]))
                 else:                    
                     module = manager[modules]
+                    print(str(module))
             else:
                 exec_name = sys.argv[0]
                 # print general program help
@@ -41,6 +42,7 @@ class VADpy(object):
                 for module in manager:
                     mod = manager[module]
                     print('{0:<20}{1}'.format(mod.__name__, str(mod.__doc__).split('\n')[0]))
+                    
             exit()
                 
         for module, options in modules:

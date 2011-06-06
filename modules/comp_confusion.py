@@ -108,7 +108,7 @@ class ModConfusion(ComputeModule):
         self.add_result('vur', vur)
 
     def _format_results(self):
-        res = self.vadpy.pipeline.modconfusion
+        res = self._get_results()
         mr = res.mr
         far = res.far
         vur = res.vur
