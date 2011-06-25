@@ -42,8 +42,8 @@ MACROS = {
     'aurora'  : 'dbaurora source-name=Aurora2 dataset=TEST env=1,2,3,4 snr=C,20,15,10,5,0,-5 re="" ' \
                 'source-dir="{dbroot}/AURORA2/{{dataset}}/DATA" ' \
                 'gt-dir="{dbroot}/AURORA2/{{dataset}}/GT" ',
-    'busstop' : 'dbquick source-name=busstop dataset="" flags=8000hz,le,16bps re="" ' \
-                'gt-dir="{dbroot}/busstop/GT" source-dir="{dbroot}/busstop/DATA" ',
+    'busstop' : 'dbquick source-name=busstop dataset="TEST" flags=8000hz,le,16bps re="" ' \
+                'gt-dir="{dbroot}/busstop/{{dataset}}/GT" source-dir="{dbroot}/busstop/{{dataset}}/DATA" ',
     'test'    : 'dbquick source-name=testdb dataset="" flags=8000hz,le,16bps re="" ' \
                 'gt-dir="{dbroot}/TESTDB/GT" source-dir="{dbroot}/TESTDB/DATA/{{dataset}}" ',
     # 'nist08' : 'dbnist08 source-name=NIST08 dataset="" dataunits="" channels="" re="" ' \
@@ -67,7 +67,6 @@ MACROS = {
     # DB->IO aliases
     'iaurora'   : 'igapless frame-len=0.01',
     'inist'     : 'igapless frame-len=0.01',
-    'ibusstop'  : 'dft_iostamps re=(?P<mm>\d+):(?P<ss>\d+) split=" " action=read labels-attr=gt_labels path-attr=gt_path ',
     'ilabra'    : 'dft_iostamps re=(?P<hh>\d+):(?P<mm>\d+):(?P<ss>\d+) split=" " ' \
                   'action=read labels-attr=gt_labels path-attr=gt_path frame-len=1',
     'ibusstop'  : 'igapless frame-len=1',
@@ -84,23 +83,23 @@ MACROS = {
     'isvm'      : 'ivgapless', 
 
     # VAD modulse
-    'g729'     : 'vadg729 mcr_basevad voutdir="{outroot}/g729" exec-path="{binroot}/g729/g729vad" ',
-    'amr1'     : 'vadamr mcr_basevad voutdir="{outroot}/amr1" exec-path="{binroot}/amr/amr1" ',
-    'amr2'     : 'vadamr mcr_basevad voutdir="{outroot}/amr2" exec-path="{binroot}/amr/amr2" ',
-    'afe'      : 'vadafe mcr_basevad voutdir="{outroot}/afe" exec-path="{binroot}/afe/afe" ',
-    'silk'     : 'vadsilk mcr_basevad voutdir="{outroot}/silk" exec-path="{binroot}/silk/silkvad" ', 
-    'svmtrain' : 'vadmatlabsvm mcr_matlab conf_framelen engine=svm script=train ' \
-                 'outpath="{{voutdir}}/{{e_srcname}}/{{e_srcfile}}.mat"',
-    'svmtest'  : 'vadmatlabsvm mcr_matlab conf_framelen engine=svm script=test ' \
-                 'outpath="{{voutdir}}/{{e_srcname}}/{{e_srcfile}}"',
-    'energy.m' : 'dft_matlab engine=vad script=energy',
+    'g729'      : 'vadg729 mcr_basevad voutdir="{outroot}/g729" exec-path="{binroot}/g729/g729vad" ',
+    'amr1'      : 'vadamr mcr_basevad voutdir="{outroot}/amr1" exec-path="{binroot}/amr/amr1" ',
+    'amr2'      : 'vadamr mcr_basevad voutdir="{outroot}/amr2" exec-path="{binroot}/amr/amr2" ',
+    'afe'       : 'vadafe mcr_basevad voutdir="{outroot}/afe" exec-path="{binroot}/afe/afe" ',
+    'silk'      : 'vadsilk mcr_basevad voutdir="{outroot}/silk" exec-path="{binroot}/silk/silkvad" ', 
+    'svmtrain'  : 'vadmatlabsvm mcr_matlab conf_framelen engine=svm script=train ' \
+                  'outpath="{{voutdir}}/{{e_srcname}}/{{e_srcfile}}.mat"',
+    'svmtest'   : 'vadmatlabsvm mcr_matlab conf_framelen engine=svm script=test ' \
+                  'outpath="{{voutdir}}/{{e_srcname}}/{{e_srcfile}}"',
+    'energy.m'  : 'dft_matlab engine=vad script=energy',
     'entropy.m' : 'dft_matlab engine=vad script=entropy',
-    'stat.m'   : 'dft_matlab engine=vad script=logmmse_SPU2 args="1" ' \
-                 'voutdir="{outroot}/matlab/{{engine}}_stat{{args}}"',
-    'stat1.m'  : 'stat.m args="1"',
-    'stat2.m'  : 'stat.m args="2"',
-    'stat3.m'  : 'stat.m args="3"',
-    'stat4.m'  : 'stat.m args="4"',
+    'stat.m'    : 'dft_matlab engine=vad script=logmmse_SPU2 args="1" ' \
+                  'voutdir="{outroot}/matlab/{{engine}}_stat{{args}}"',
+    'stat1.m'   : 'stat.m args="1"',
+    'stat2.m'   : 'stat.m args="2"',
+    'stat3.m'   : 'stat.m args="3"',
+    'stat4.m'   : 'stat.m args="4"',
 
     # Other modules
     'info'       : 'modinfo attr="__summary__"',
@@ -110,7 +109,8 @@ MACROS = {
                    'out-gt-path="{outroot}/split/{{e_srcname}}/GT/{{e_srcfile}}.{{counter}}"', 
     'edit'       : 'modedit attr="" value="{{attr}}" copy-from="" copy-to=""',
     'extract'    : 'modextract mode=speech out-path="{outroot}/fusion/{{e_srcfile}}"',
-    'confusion'  : 'modconfusion mcr_compute inputs=gt_labels,vad_labels fscore-b=1 ctx-size=0',
+    'confusion'  : 'modconfusion mcr_compute inputs=gt_labels,vad_labels ctx-size=0',
+    'sr'         : 'modsr mcr_compute inputs=gt_labels',
     'correlation': 'modcorrelation mcr_compute',
     'histogram'  : 'modfusionhistogram mcr_compute re=""', 
     'fusion'     : 'modfusion output=vad_labels max-diff-rate=0.005 margs=1 method=majority',

@@ -22,10 +22,10 @@ class ModuleMeta(type):
         return type.__new__(meta, classname, bases, class_dict)
 
     def __str__(cls):
-        shelp = 'VADpy module {0}\n{1}\n' \
-                'Options:\n{2:<20}Description'.format(cls.__name__ , 
-                                                      str(cls.__doc__),
-                                                      'Name')
+        shelp = ('VADpy module {0}\n{1}\n'
+                 'Options:\n{2:<20}Description').format(cls.__name__ , 
+                                                        str(cls.__doc__),
+                                                        'Name')
         options = (objattr for objattr in (getattr(cls, attr) for attr in dir(cls))
                    if isinstance(objattr, Option))
 
@@ -48,13 +48,15 @@ class Module(object):
 
         # == setup options == # 
         # get all options defined in class
-        for attr in dir(self.__class__): # because we must iterate through all child classes
+        # because we must iterate through all child classes
+        for attr in dir(self.__class__): 
             objattr = getattr(self.__class__, attr)
             if isinstance(objattr, Option): # option found
                 option = objattr
                 name = option.name or attr
                 if name in options:
-                    setattr(self, attr, option.parse(options[name])) # replace Option object with value
+                    # replace Option object with value
+                    setattr(self, attr, option.parse(options[name])) 
                 else:
                     raise MissingArgumentError(self.name, name)
 
@@ -88,7 +90,8 @@ class Module(object):
 
 class MonotonicPipelineModule(Module):
     def __init__(self, vadpy, options):    
-        assert vadpy.pipeline.is_monotonic(), 'Pipeline contains elements with different flags'
+        assert vadpy.pipeline.is_monotonic(), ('Pipeline contains elements '
+                                               'with different flags')
         super(MonotonicPipelineModule, self).__init__(vadpy, options)
         
             
@@ -116,20 +119,25 @@ class DBModule(Module):
         source_files = common.listdir(source_dir, self.re, *regexps)
         gt_files = common.listdir(gt_dir, self.re, *regexps)
 
+        gt_files_set = set(gt_files)
+
         for source_file in source_files:
             source_file_path = os.path.join(source_dir, source_file)
-            gt_file_path = os.path.join(gt_dir, source_file)
             if os.path.isdir(source_file_path):
                 continue
-            if source_file in gt_files:
+            if source_file in gt_files_set:
+                gt_file_path = os.path.join(gt_dir, source_file)
                 elements.append(
                     Element(source_name,
                             source_file_path, 
                             gt_file_path,
                             flags)
                     )
+                gt_files_set.remove(source_file)
             else:
-                raise VADpyError('Cannot find a GT file for corresponding source file {0}'.format(source_file))
+                raise Exception('Cannot find a GT file for corresponding source file {0}'
+                                .format(source_file))
+
         return elements
 
     
@@ -137,11 +145,15 @@ class IOModule(Module):
     action = Option()
     frame_len = Option('frame-len', float)
     labels_attr = Option('labels-attr', 
-                         description = 'Read/Write GT labels from/to defined element\'s attribute containing Labels object. ' \
-                                       'In most cases the value will be: gt_labels or vad_labels ' )
+                    description = ('Read/Write GT labels from/to defined element\'s '
+                                  'attribute containing Labels object. '
+                                  'In most cases the value will be: '
+                                  'gt_labels or vad_labels '))
     path_attr = Option('path-attr', 
-                       description = 'Read/Write data GT labels from/to defined element\'s attribute containing a valid path. ' \
-                                     'In most cases the value will be: gt_path or vout_path')
+                  description = ('Read/Write data GT labels from/to defined ' 
+                                 'element\'s attribute containing a valid path. '
+                                 'In most cases the value will be: gt_path or vout_path')
+                       )
 
     def __init__(self, vadpy, options):
         super(IOModule, self).__init__(vadpy, options)
@@ -151,7 +163,8 @@ class IOModule(Module):
         if self.action == 'write':
             for element in self.vadpy.pipeline:
                 labels = getattr(element, self.labels_attr)
-                setattr(labels, 'frame_len', self.frame_len) # settings frame-len is crucial!
+                # settings frame-len is crucial!
+                setattr(labels, 'frame_len', self.frame_len) 
 
     def read(self, path):
         log.debug(('Reading {0}').format(path))
@@ -193,9 +206,11 @@ class GenericIOModuleBase(IOModule):
 class VADModule(Module):
     """Base class for all types of VAD modules"""
     voutdir = Option(description = 'VAD output directory')
-    outpath = Option(description = 'Output path template (using Element and Module format arguments)')
+    outpath = Option(description = ('Output path template (using Element and '
+                                    'Module format arguments)'))
     overwrite = Option(parser = bool_parser, 
-                       description = 'Indicates if the module must overwrite existing VAD output (yes/no)')
+                  description = ('Indicates if the module must overwrite '
+                                 'existing VAD output (yes/no)'))
     # filename corresponds to source_path's filename (template)
     def __init__(self, vadpy, options):
         super(VADModule, self).__init__(vadpy, options)
@@ -207,8 +222,9 @@ class VADModule(Module):
             common.makedirs(os.path.dirname(element.vout_path))      # create output paths' dirs
 
     def _get_vout_path(self, element, **kwargs):
-        """The method returns an output path for current VAD executable (The path is based on VADpy's configuration)
+        """The method returns an output path for current VAD executable 
 
+        The path is based on VADpy's configuration.
         This method can be effectively extended by sub classes. 
         Arguments:
         element - element whose vout_path should be generated       
@@ -219,7 +235,6 @@ class VADModule(Module):
                                 **dict(element.format_args,**kwargs))
                                 
 
-        
 class SimpleVADModuleBase(VADModule):
     """Basic wrapper for VADModule
 
@@ -231,10 +246,13 @@ class SimpleVADModuleBase(VADModule):
 
     def __init__(self, vadpy, options):
         super(SimpleVADModuleBase, self).__init__(vadpy, options)
-        self._cmd = '{execpath} {vadoptions} {in_path} {out_path}' # command-line to run VAD
+        # command-line to run VAD
+        self._cmd = '{execpath} {vadoptions} {in_path} {out_path}' 
 
     def _get_exec_options(self, element):
-        """Return VADModule-specific executable options to use before and after commmand-line arguments"""
+        """Return VADModule-specific executable options 
+
+        Theese options are used before and after commmand-line arguments"""
         return [], []
       
     def run(self):
@@ -272,7 +290,8 @@ class MatlabVADModuleBase(VADModule):
     bin = Option(description = 'A path to matlab binary')
     mopts = Option(description = 'Matlab options and arguments')
     engine = Option(description = 'A path to VADpy-to-MATLAB engine\'s function name')
-    scriptdir = Option(description = 'A directory in which VAD algorithms scripts are located; Matlab working directory')
+    scriptdir = Option(description = ('A directory in which VAD algorithms'
+                                      'scripts are located; Matlab working directory'))
     filecount = Option(description = 'Amount of files to be passed to Matlab engine at a time', 
                        parser = int)
 
@@ -297,9 +316,11 @@ class MatlabVADModuleBase(VADModule):
         self._execlist = ['-r', '{__bracket__}'] + self._execlist + [' {__bracket__}']
     
         # set internal flags for matlab engine        
-        assert pipeline.is_monotonic(), "Cannot process non-monotonic pipeline (elements' flags differ)"
+        assert pipeline.is_monotonic(), ("Cannot process non-monotonic pipeline"
+                                         "(elements' flags differ)")
         
-        for elements in pipeline.slice(self.filecount):  # slice generator is used(!)
+        # slice generator is used(!)
+        for elements in pipeline.slice(self.filecount):  
             elements = [elem for elem in elements
                         if self.overwrite or not os.path.exists(elem.vout_path)]
             if not elements:
@@ -321,7 +342,8 @@ class MatlabVADModuleBase(VADModule):
             sexec = sexec.format(**self._execargs)
             lstrun = [self.bin, self.mopts, sexec]
 
-            log.debug('Starting MATLAB-based codec:\t {0} {1} {2}'.format(self.bin, self.mopts, sexec))
+            log.debug('Starting MATLAB-based codec:\t {0} {1} {2}'
+                      .format(self.bin, self.mopts, sexec))
             
             proc = subprocess.Popen(lstrun, 
                                     cwd = self.scriptdir, 

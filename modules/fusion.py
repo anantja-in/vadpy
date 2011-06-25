@@ -66,10 +66,12 @@ class ModFusion(Module):
         for i in range(0, frames_count):
             combined_frames = []
             combined_labels = []
-            for j in range(max(0, i - self._tmp_ctx_size), min(i + self._tmp_ctx_size + 1, frames_count)):
+            for j in range(max(0, i - self._tmp_ctx_size), 
+                           min(i + self._tmp_ctx_size + 1, frames_count)):
                 frame_labels = []
                 for lo in lo_list:
-                    frame_labels.append(int(lo[j][2])) # j-th frame, (start, end, --> speech <-- ) tuple
+                    # j-th frame, (start, end, --> speech <-- ) tuple
+                    frame_labels.append(int(lo[j][2])) 
                     combined_labels.append(lo[j][2])
                 combined_frames.append(tuple(frame_labels))
                 

@@ -1,5 +1,5 @@
 from vadpy.module import ComputeModule
-from vadpy.options import  Option
+from vadpy.options import Option, bool_parser
 from vadpy.labels import equalize_framelen
 
 import logging 
@@ -26,9 +26,9 @@ class ModConfusion(ComputeModule):
     |  0  |  1  | Fp  | Fp rate = Fp / (Tn + Fp)
     |-----------------|
     """
-    # fscore_b = Option('fscore-b', float, "F-measurment's Beta parameter's value")
-    ctx_size =Option('ctx-size', int, 
-                     'Temporal context size of 2nd labels object frames iterator (using majority voting)')
+    ctx_size = Option('ctx-size', int, 
+                      ('Temporal context size of 2nd labels object frames iterator '
+                       '(using majority voting)'))
 
     def __init__(self, vadpy, options):
         super(ModConfusion, self).__init__(vadpy, options)
@@ -69,7 +69,8 @@ class ModConfusion(ComputeModule):
                 valA = speechAB[i][0]
                 
                 if (self.ctx_size < i < len(speechAB) - self.ctx_size):
-                    valB = int(round(sum(vAB[1] for vAB in speechAB[i - self.ctx_size : i + self.ctx_size + 1]) 
+                    valB = int(round(sum(vAB[1] for vAB in speechAB[i - self.ctx_size : 
+                                                                    i + self.ctx_size + 1]) 
                                      / float(self.ctx_size * 2 + 1)))
                 else:
                     valB = speechAB[i][1]
@@ -91,29 +92,22 @@ class ModConfusion(ComputeModule):
         fp = fp_total
         fn = fn_total
 
-        # B2 = self.fscore_b**2
-        # fscore = (1 + B2) * tp / \
-        #     ((1 + B2) * tp + B2 * fn + fp)
         length = tp + tn + fp + fn;
         gt_speech = fn + tp
         gt_noise = fp + tn
 
         mr  = fn / (tp + fn)
         far = fp / (tn + fp)
-        vur = gt_speech / gt_noise
         #total_len = tn + fn + tp + fp
 
         self.add_result('mr', mr)
         self.add_result('far', far)
-        self.add_result('vur', vur)
 
     def _format_results(self):
         res = self._get_results()
         mr = res.mr
         far = res.far
-        vur = res.vur
 
-        return ('{0:<25}{1:.3}\n'.format('Miss rate:', mr) + 
-                '{0:<25}{1:.3}\n'.format('False alarm rate:', far) + 
-                '{0:<25}{1:.3}; ({2:.3}% speech)\n'.format('Speech/Non-speech rate:', vur, 100 * vur / (1 + vur))
-                )
+        ret_str = '{0:<25}{1:.3}\n'.format('Miss rate:', mr)
+        ret_str += '{0:<25}{1:.3}\n'.format('False alarm rate:', far)
+        return ret_str
