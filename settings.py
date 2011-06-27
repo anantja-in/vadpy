@@ -70,7 +70,8 @@ MACROS = {
     'ilabra'    : 'dft_iostamps re=(?P<hh>\d+):(?P<mm>\d+):(?P<ss>\d+) split=" " ' \
                   'action=read labels-attr=gt_labels path-attr=gt_path frame-len=1',
     'ibusstop'  : 'igapless frame-len=1',
-    'itest'     : 'dft_iostamps re=(?P<ss>\d.+) split=" " action=read labels-attr=gt_labels path-attr=gt_path frame-len=0.01',
+    'itest'     : 'dft_iostamps re=(?P<ss>\d.+) split=" " action=read ' \
+                  'labels-attr=gt_labels path-attr=gt_path frame-len=0.01',
 
     # VAD->IO aliases
     'ig729'     : 'ivgapless frame-len=0.01',
@@ -101,6 +102,17 @@ MACROS = {
     'stat3.m'   : 'stat.m args="3"',
     'stat4.m'   : 'stat.m args="4"',
 
+    # Decision modules
+    'mfusion'    : 'modfusion output=vad_labels max-diff-rate=0.005 margs=0 method=majority',
+    'bfusion'    : 'modfusion output=vad_labels max-diff-rate=0.005 margs=gt_labels method=bayes',
+    'hfusion'    : 'modfusion output=vad_labels max-diff-rate=0.005 margs=gt_labels method=simplehist',
+
+    # Computation modules
+    'sr'         : 'modsr mcr_compute inputs=gt_labels',
+    'histogram'  : 'modfusionhistogram mcr_compute re="" print=No',
+    'confusion'  : 'modconfusion mcr_compute inputs=gt_labels,vad_labels ctx-size=0',
+    'correlation': 'modcorrelation mcr_compute',
+
     # Other modules
     'info'       : 'modinfo attr="__summary__"',
     'concat'     : 'modconcat gt=yes source=yes',
@@ -109,11 +121,6 @@ MACROS = {
                    'out-gt-path="{outroot}/split/{{e_srcname}}/GT/{{e_srcfile}}.{{counter}}"', 
     'edit'       : 'modedit attr="" value="{{attr}}" copy-from="" copy-to=""',
     'extract'    : 'modextract mode=speech out-path="{outroot}/fusion/{{e_srcfile}}"',
-    'confusion'  : 'modconfusion mcr_compute inputs=gt_labels,vad_labels ctx-size=0',
-    'sr'         : 'modsr mcr_compute inputs=gt_labels',
-    'correlation': 'modcorrelation mcr_compute',
-    'histogram'  : 'modfusionhistogram mcr_compute re=""', 
-    'fusion'     : 'modfusion output=vad_labels max-diff-rate=0.005 margs=1 method=majority',
     'vurate'     : 'modvurate labels-attr=gt_labels',
     'pipe'       : 'modpipeline ',
 }                   
