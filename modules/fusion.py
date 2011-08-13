@@ -76,16 +76,13 @@ class ModFusion(Module):
             frames = []        
             for i in range(0, frames_count):
                 comb_vec = ()
-                combined_labels = []
 
-                # temporal context is used in majority voting method only
                 for j in range(max(0, i - self._tmp_ctx_size), 
                                min(i + self._tmp_ctx_size + 1, frames_count)):
                     frame_labels = []
                     for lo in lo_list:
                         # j-th frame, (start, end, --> speech <-- ) tuple
-                        frame_labels.append(int(lo[j][2]))
-                        combined_labels.append(lo[j][2])
+                        frame_labels.append(int(lo[j][2]))                        
                     comb_vec = tuple(frame_labels)
                 
                 if self.method == BAYES_METHOD:
@@ -93,7 +90,7 @@ class ModFusion(Module):
                 elif self.method == SIMPLE_HIST_METHOD:
                     decision = self._simple_histogram_method(comb_vec)
                 else: # simple majority / temporal context
-                    decision = self._majority_method(combined_labels)
+                    decision = self._majority_method(comb_vec)
 
                 frames.append(Frame(i * frame_len, 
                                     (i + 1) * frame_len,                                  
@@ -105,9 +102,14 @@ class ModFusion(Module):
 
 
     def _majority_method(self, comb_vec):        
-        speech_count = len([value for value in combined_labels 
-                            if value])
-        noise_count = len(lo_list) - speech_count                
+        speech_count = 0
+        noise_count = 0
+        for value in comb_vec:
+            if value:
+                speech_count += 1
+            else:
+                noise_count += 1
+
         return speech_count > noise_count 
 
     def _simple_histogram_method(self, comb_vec):                
