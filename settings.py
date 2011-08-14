@@ -103,9 +103,10 @@ MACROS = {
     'stat4.m'   : 'stat.m args="4"',
 
     # Decision modules
-    'mfusion'    : 'modfusion output=vad_labels max-diff-rate=0.005 margs=0 method=majority',
-    'bfusion'    : 'modfusion output=vad_labels max-diff-rate=0.005 margs=gt_labels method=bayes',
-    'hfusion'    : 'modfusion output=vad_labels max-diff-rate=0.005 margs=gt_labels method=simplehist',
+    'mcr_fusion' : 'modfusion output=vad_labels max-diff-rate=0.005 margs=""',
+    'mfusion'    : 'mcr_fusion method=majority',
+    'bfusion'    : 'mcr_fusion margs=gt_labels method=bayes',
+    'hfusion'    : 'mcr_fusion margs=gt_labels method=simplehist',
 
     # Computation modules
     'sr'         : 'modsr mcr_compute inputs=gt_labels',

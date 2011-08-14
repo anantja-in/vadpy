@@ -68,7 +68,7 @@ class ModFusionHistogram(ComputeModule):
             elif noise_val == 0:
                 lr_histogram[key] = 1.0
             else:
-                lr_histogram[key] = math.log(speech_val / noise_val)
+                lr_histogram[key] = speech_val / noise_val
                 
         # update pipeline with histogram data
         self.add_result('speech', speech_histogram)
@@ -92,7 +92,7 @@ class ModFusionHistogram(ComputeModule):
         for key in combinations:
             s += '{0:<25}{1:.3}\n'.format(key, noise_histogram[key])
 
-        s += '\nLog likelihood ratio histogram:\n'
+        s += '\Likelihood ratio histogram:\n'
         for key in combinations:
             s += '{0:<25}{1:.3}\n'.format(key, lr_histogram[key])
 
