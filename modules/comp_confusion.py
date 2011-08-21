@@ -106,8 +106,7 @@ class ModConfusion(ComputeModule):
     def _format_results(self):
         res = self._get_results()
         mr = res.mr * 100 
-        far = res.far * 100
-        
-        ret_str = '{0:<25}{1:.4}\n'.format('Miss rate (%):', mr)
-        ret_str += '{0:<25}{1:.3}\n'.format('False alarm rate (%):', far)
+        far = res.far * 100        
+        ret_str = '{0:<25}{1:.1f}\n'.format('Miss rate (%):', mr)
+        ret_str += '{0:<25}{1:.1f}\n'.format('False alarm rate (%):', far)
         return ret_str
