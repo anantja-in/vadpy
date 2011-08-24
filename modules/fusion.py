@@ -126,3 +126,6 @@ class ModFusion(Module):
         return (reduce(operator.mul, 
                        (lr[column_vec] for column_vec in comb_matrix))
                 >= 1 / sr)
+
+
+
