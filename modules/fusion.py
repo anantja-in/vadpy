@@ -125,4 +125,4 @@ class ModFusion(Module):
         sr = self.vadpy.pipeline.modsr.sr[self._sr_attr]
         return (reduce(operator.mul, 
                        (lr[column_vec] for column_vec in comb_matrix))
-                >= len(comb_matrix) / sr)
+                >= 1 / sr)
