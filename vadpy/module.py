@@ -17,7 +17,7 @@ class ModuleMeta(type):
         for item in class_dict:
             attr = class_dict[item]
             if isinstance(attr, Option):
-                if not attr.name:
+                if attr.name is None:
                     attr.name = item
         return type.__new__(meta, classname, bases, class_dict)
 
@@ -327,7 +327,7 @@ class MatlabVADModuleBase(VADModule):
         for elements in pipeline.slice(self.filecount):
             elements = [elem for elem in elements
                         if self.overwrite or not os.path.exists(elem.vout_path)]
-            if not elements:
+            if len(elements) == 0:
                 log.debug("All output files already exist")
                 return
 
@@ -384,7 +384,7 @@ class ComputeModule(Module):
     def add_result(self, name, value, modalias = ''):
         """Add computation result to corresponding pipeline object"""
         pipeline = self.vadpy.pipeline
-        if not modalias:
+        if modalias == '' :
             modalias = self.name.lower()
 
         try:
@@ -400,7 +400,7 @@ class ComputeModule(Module):
 
     def _get_results(self, modalias = ''):
         pipeline = self.vadpy.pipeline
-        if not modalias:
+        if modalias = '':
             modalias = self.name.lower()
 
         try:

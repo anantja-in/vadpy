@@ -28,7 +28,8 @@ class IOGapless(GenericIOModuleBase):
         frames = []
         with open(path) as f:
             for line in f:
-                if not line:
+                line = line.strip()
+                if len(line) == 0:
                     continue
 
                 for char in line: 

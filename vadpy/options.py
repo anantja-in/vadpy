@@ -28,9 +28,7 @@ class Option(object):
 
     @name.setter
     def name(self, value):
-        """Sets option's name and formats description"""
-        if value:
-            self.description = self.description.format(option = value)
+        """Sets option name"""
         self._name = value
 
 
@@ -70,7 +68,7 @@ def bool_parser(value):
         raise VADpyError('What kind of boolean do you think "{0}" is?'.format(value))
 
 def split_parser(value):
-    if not value:
+    if value == '':
         return []
     return value.split(',')
 

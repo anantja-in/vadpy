@@ -22,7 +22,7 @@ def main():
             if line.startswith('#'):
                 continue
 
-            if not classifiers:
+            if classifiers is None:
                 classifiers = line.split(' ')
                 print('Found classifiers: {0}'.format(
                         ', '.join(classifiers)))

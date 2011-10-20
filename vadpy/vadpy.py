@@ -51,7 +51,7 @@ class VADpy(object):
 
     def run(self):
         for module in self._modules:
-            if not len(self.pipeline) and not issubclass(module.__class__, DBModule):
+            if len(self.pipeline) == 0 and not issubclass(module.__class__, DBModule):
                 return
             module.pre_run()
             module.run()

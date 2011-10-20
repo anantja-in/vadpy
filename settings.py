@@ -1,8 +1,8 @@
 import os
 import getpass
 
-#ROOT = '/home/zaur/Documents/Study/vadpy2'
-ROOT = '/home/user/Documents/vadpy/'
+ROOT = '/home/zaur/Documents/Study/vadpy2'
+#ROOT = '/home/user/Documents/vadpy/'
 #ROOT = '/data3/pums/VADpy'
 
 # modules' PATH

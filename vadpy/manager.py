@@ -49,11 +49,14 @@ class ModuleManager(object):
                          if fname.endswith('py')]
             for fname in dir_files:
                 path = os.path.join(edir, fname)
-                try:                    
+                try:     
                     pymod = imp.load_source(fname[:-3], path) # somename.py -> somename
                 except Exception as e:
                     log.error('Error loading module(s) from {0}: {1}'.format(path, str(e)))
-                    continue
+                    if log.getEffectiveLevel() == logging.DEBUG:
+                        raise e
+                    else:
+                        continue
                     
                 module_classes = [attr for attr in pymod.__dict__.values()
                                   if isinstance(attr, type) and

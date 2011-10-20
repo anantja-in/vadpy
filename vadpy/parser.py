@@ -46,25 +46,25 @@ class SeqOptions(object):
 
         for sarg in argv:
             module = None
-            quote = False
+            quoting = False
             module_args = {}
             buf = ''
             for char in sarg:
                 if char != ' ':
                     if char == '"':
-                        quote = not quote
+                        quoting = not quoting
                     else:
                         buf += char
 
                 if char == ' ':
-                    if quote:
+                    if quoting:
                         buf += char
                     elif len(buf):
-                        if not module: # create a module
+                        if module is None: # create a module
                             module = buf
                             buf = ''
                         else:
-                            if not quote: # not module and NOT quote (e.g. quotation is finished)
+                            if not quoting: # not module and NOT quoting (e.g. quotation is finished)
                                 if '=' in buf:
                                     name, val = buf.split('=')
                                     module_args[name] = val

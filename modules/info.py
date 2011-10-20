@@ -25,7 +25,7 @@ class ModInfo(Module):
         super(ModInfo, self).run()
         pipeline = self.vadpy.pipeline
 
-        if not self.attributes:
+        if len(self.attributes) == 0:
             return
         elif '__info__' in self.attributes:
             query = ('Source:\t\t{source_name}\n'
