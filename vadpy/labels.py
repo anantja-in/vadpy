@@ -1,20 +1,21 @@
 import math
+from .error import VADpyError
 
 class Frame(object):
     def __init__(self, start, end, voiced, frame_len):
         """Initialize Frame object
-        
+
         core     -- EvalCore object
         start    -- Frame's start (in seconds)
         end      -- Frame's end  (in seconds)
         voiced   -- Boolean VAD decision for the frame (True / False)
         score    -- Soft VAD score
         """
-        assert end - start >= 0, 'Error creating Frame object: ' \
-            'Frame\'s start stamp is in ' \
-            'future relatively to end stamp.\n' \
-            'A possible reason is incorrect labels\' frame length\n' \
-            'Frame start: {0}; end: {1};'.format(start,end)
+        if end - start < 0:
+            raise VADpyError("Error creating Frame object: Frame's start stamp "
+                             "is in future relatively to end stamp.\n"
+                             "A possible reason is incorrect labels' frame length\n"
+                             "Frame start: {0}; end: {1};").format(start,end)
         self.start = start
         self.end = end
         self.voiced = bool(voiced)
@@ -23,19 +24,19 @@ class Frame(object):
     @property
     def duration(self):
         return self.end - self.start
-   
+
     def __str__(self):
         return '{0} - {1} :{2}]'.format(self.start, self.end, self.voiced)
 
     def compute_count(self, frame_len):
-        self.count = int(round(self.duration / frame_len))        
+        self.count = int(round(self.duration / frame_len))
 
-    
+
 
 def extend_frames(element, frames, frame_len):
     """Extend frames list by two additional (first, last) frames if required
 
-    The function adds two frames (at most) to the list, so that frames timestamps cover 
+    The function adds two frames (at most) to the list, so that frames timestamps cover
     0 .. file length competely
     """
     if frames:
@@ -43,7 +44,7 @@ def extend_frames(element, frames, frame_len):
         if sec.start != 0:
             if sec.start < frame_len: # just a small glitch, no need to insert a new frame
                 sec.start = 0
-            else:                
+            else:
                 frames.insert(0, Frame(0, sec.end, sec.voiced, frame_len))
 
         sec = frames[-1]
@@ -58,26 +59,27 @@ def extend_frames(element, frames, frame_len):
 
     return frames
 
-        
+
 class Labels(object):
     """Labels store for GT or VAD labels"""
     def __init__(self, frames, frame_len = None):
-        """Initialize Generic Labels object 
-        
+        """Initialize Generic Labels object
+
         frames  -- list of Frame objects with GT/VAD labels
         frame_len -- length of every labels frame in seconds
         """
-        assert frames, 'At least one frame should be supplied to create Labels object'
+        if len(frames) == 0:
+            raise VADpyError('At least one frame should be supplied to create Labels object')
 
         self._frames = frames
         self._labels = []
         self._frame_len = 0
         self._compute_count()      # compute self._count
         self.frame_len = frame_len # property
-            
+
     def __str__(self):
         return "Labels object. Frames count: {0}; Frame length: {1}".format(self._count, self._frame_len)
-        
+
     def __len__(self):
         return self._labels and len(self._labels) or self._count
 
@@ -87,7 +89,7 @@ class Labels(object):
     def next(self):
         return self.__next__()
 
-    def __next__(self):        
+    def __next__(self):
         self._labels.next() # to be changed for Python3
 
     def __getitem__(self, index):
@@ -102,7 +104,7 @@ class Labels(object):
     def merge(self):
         """Frames merging by voiced value
 
-        The method merges Frames objects if 
+        The method merges Frames objects if
         two consecutive Frame objects have same voiced values
         """
         frames = self._frames
@@ -111,12 +113,12 @@ class Labels(object):
         prev_voiced = frames[0].voiced
         for frame in frames[1:]:
             if frame.voiced == prev_voiced: # yeap, merge is required
-                merge_required = True 
+                merge_required = True
                 break;
             else:
                 prev_voiced = frame.voiced   # no, continue
 
-        # Now merge.. 
+        # Now merge..
         if not merge_required:
             return frames
 
@@ -128,7 +130,7 @@ class Labels(object):
 
         for frame in frames[1:]:
             if frame.voiced != prev_voiced:
-                merged_frames.append(Frame(big_frame_start, 
+                merged_frames.append(Frame(big_frame_start,
                                                prev_frame.end,
                                                prev_voiced,
                                                self._frame_len))
@@ -137,7 +139,7 @@ class Labels(object):
             prev_voiced = frame.voiced
 
         # last frame
-        merged_frames.append(Frame(big_frame_start, 
+        merged_frames.append(Frame(big_frame_start,
                                        prev_frame.end,
                                        prev_voiced,
                                        self._frame_len))
@@ -155,7 +157,7 @@ class Labels(object):
         # 'small' frame - frame which's len < frame_len
         frame_len = self._frame_len
         ret_frames = []  # list of frames that will be returned
-        
+
         first_small_frame = None
         small_frames_total_length = 0  # length is seconds
         small_frames_voiced = 0        # voiced frames length
@@ -164,18 +166,18 @@ class Labels(object):
         for frame in frames:
             duration = frame.duration
             frame.compute_count(self._frame_len)
-            if duration < frame_len:    # this is a small frame               
+            if duration < frame_len:    # this is a small frame
                 # update counters
                 small_frames_total_length += duration
                 if frame.voiced:
                     small_frames_voiced +=  duration
                 else:
                     small_frames_unvoiced += duration
-                
+
                 if small_frames_total_length > frame_len: # let's create a Frame object
                     new_frame = Frame(first_small_frame.start,
                                       frame.end,
-                                      small_frames_voiced > small_frames_unvoiced, 
+                                      small_frames_voiced > small_frames_unvoiced,
                                       self._frame_len)
                     # Reset counters
                     first_small_frame = None
@@ -194,10 +196,10 @@ class Labels(object):
                         small_frames_voiced +=  duration
                     else:
                         small_frames_unvoiced += duration
-                                    
+
                     new_frame = Frame(first_small_frame.start,
                                           frame.end,
-                                          small_frames_voiced > small_frames_unvoiced, 
+                                          small_frames_voiced > small_frames_unvoiced,
                                           self._frame_len)
                     # Reset counters
                     first_small_frame = None
@@ -205,7 +207,7 @@ class Labels(object):
                     small_frames_voiced = 0
                     small_frames_unvoiced = 0
 
-                    ret_frames.append(new_frame)                
+                    ret_frames.append(new_frame)
                 else:                       # just append this frame to the list
                     ret_frames.append(frame)
         self._compute_count()
@@ -217,25 +219,25 @@ class Labels(object):
         frame_id = 0
         frame = self.frames[0]
 
-        for i in range(1, len(self)):         
-            t_point = i*frame_len            
-            while(True):                
+        for i in range(1, len(self)):
+            t_point = i*frame_len
+            while(True):
                 if frame.start <= t_point <= frame.end or abs(frame.start - t_point) < frame_len :
                     labels.append( (t_point, t_point + frame_len, frame.voiced))
-                    break                                    
+                    break
                 else:
                     frame_id += 1
                     try:
                         frame = self.frames[frame_id]
                     except IndexError:
                         break
-        self._labels = labels        
+        self._labels = labels
 
     @property
     def frames(self):
         return self._frames
-      
-    @property 
+
+    @property
     def frame_len(self):
         return self._frame_len
 

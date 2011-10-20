@@ -1,8 +1,9 @@
-import logging 
+import logging
 
 from vadpy.module import MatlabVADModuleBase
 from vadpy.element import LITTLE_ENDIAN, BIG_ENDIAN
 from vadpy.options import Option
+from vadpy.error import VADpyError
 
 log = logging.getLogger(__name__)
 
@@ -19,15 +20,16 @@ class VADMatlab(MatlabVADModuleBase):
 
     def __init__(self, vadpy, options):
         super(VADMatlab, self).__init__(vadpy, options)
-        assert self.filecount > 0, 'Filecount must be > 0'
+        if self.filecount == 0:
+            raise VADpyError('Filecount must be > 0')
 
         self._execargs['script'] = self.script
         self._execargs['vad_args'] = self.args
-        
-        self._execlist = ['{engine}', 
+
+        self._execlist = ['{engine}',
                           "'{script}'",
                           "'{vad_args}'",
-                          "'{endianness}'",        
+                          "'{endianness}'",
                           "'{in_paths}'",
                           "'{out_paths}'",
                           ]
@@ -37,9 +39,9 @@ class VADMatlab(MatlabVADModuleBase):
                                            script = self.script,
                                            args = self.args)
         return super(VADMatlab, self)._get_vout_path(element)
-                                            
-    
-    def run(self):                                  
+
+
+    def run(self):
         super(VADMatlab, self).run()
-        
+
 

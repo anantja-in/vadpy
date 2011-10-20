@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import sys
-import logging 
+import logging
 import logging.handlers
 import traceback
 
@@ -16,9 +16,10 @@ def main():
         vadpy.run()
     except Exception as e:
         log.critical(str(e))
-        exc_type, exc_value, exc_traceback = sys.exc_info()
-        traceback.print_tb(exc_traceback, limit = None, file = sys.stdout)
-        print('Error: {0}'.format(e))
+        if log.getEffectiveLevel() == logging.DEBUG:
+            print("Debug traceback:")
+            exc_type, exc_value, exc_traceback = sys.exc_info()
+            traceback.print_tb(exc_traceback, limit = None, file = sys.stdout)
         exit(1)
 
 
@@ -32,15 +33,15 @@ def setup_logging():
     elif '-d' in sys.argv:
         loglevel = logging.DEBUG
         # add module name and message time in debug mode
-        console_format = "%(asctime)-10s" + console_format + ' (%(name)s)' 
+        console_format = "%(asctime)-10s" + console_format + ' (%(name)s)'
     elif'-i' in sys.argv or '--info' in sys.argv:
-        loglevel = logging.INFO    
+        loglevel = logging.INFO
     elif  '-q' in sys.argv or '--quiet' in sys.argv:
         loglevel = logging.CRITICAL
 
 
     # Logging to terminal
-    logging.basicConfig(level = loglevel, 
+    logging.basicConfig(level = loglevel,
                         format = console_format,
                         datefmt='%H:%M:%S',)
 

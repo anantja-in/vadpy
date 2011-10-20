@@ -1,7 +1,8 @@
 import os
 import getpass
 
-ROOT = '/home/zaur/Documents/Study/vadpy2' 
+#ROOT = '/home/zaur/Documents/Study/vadpy2'
+ROOT = '/home/user/Documents/vadpy/'
 #ROOT = '/data3/pums/VADpy'
 
 # modules' PATH
@@ -9,17 +10,17 @@ PATH = [os.path.join(ROOT, 'src/modules'),
         ]
 
 format_args = {
-    'root' : ROOT, 
+    'root' : ROOT,
     'binroot' : os.path.join(ROOT, 'bin'),
     'outroot' : os.path.join(ROOT, 'output', getpass.getuser()),
     'dbroot' :  os.path.join(ROOT, 'databases')
 }
 
-MACROS = {   
+MACROS = {
     # configuration values
     'conf_framelen'  : 'frame-len=0.01',
 
-    # macros 
+    # macros
     'mcr_io'         : 'conf_framelen path-attr=""',
     'mcr_basevad'    : 'voutdir="{outroot}/{{modname}}" ' \
                        'outpath="{{voutdir}}/{{e_srcname}}/{{e_srcfile}}" overwrite=No',
@@ -52,8 +53,8 @@ MACROS = {
                 'gt-dir={dbroot}/LABRA/GT source-dir={dbroot}/LABRA/DATA/ ',
 
     #IO modules
-    'isingle'   : 'dft_iosingled mcr_labels_gt action=read', 
-    'ivsingle'  : 'dft_iosingled mcr_labels_vad action=read', 
+    'isingle'   : 'dft_iosingled mcr_labels_gt action=read',
+    'ivsingle'  : 'dft_iosingled mcr_labels_vad action=read',
     'igapless'  : 'dft_iogapless mcr_labels_gt action=read',
     'ivgapless' : 'dft_iogapless mcr_labels_vad action=read',
     'idummy'    : 'genericiomodulebase mcr_io mcr_labels_gt action=read',
@@ -61,7 +62,7 @@ MACROS = {
     'osingle'   : 'dft_iosingled mcr_labels_gt action=write',
     'ogapless'  : 'dft_iogapless mcr_labels_gt action=write',
     'ostamps'   : 'dft_iostamps mcr_labels_gt action=write',
-    'ovstamps'  : 'dft_iostamps mcr_labels_vad action=write', 
+    'ovstamps'  : 'dft_iostamps mcr_labels_vad action=write',
     'ovsingle'  : 'dft_iosingled mcr_labels_vad action=write',
     'ovgapless' : 'dft_iogapless mcr_labels_vad action=write',
     # DB->IO aliases
@@ -81,14 +82,14 @@ MACROS = {
     'imatlab'   : 'ivgapless frame-len=0.01',
     'ienergy'   : 'imatlab',
     'ientropy'  : 'imatlab',
-    'isvm'      : 'ivgapless', 
+    'isvm'      : 'ivgapless',
 
     # VAD modulse
     'g729'      : 'vadg729 mcr_basevad voutdir="{outroot}/g729" exec-path="{binroot}/g729/g729vad" ',
     'amr1'      : 'vadamr mcr_basevad voutdir="{outroot}/amr1" exec-path="{binroot}/amr/amr1" ',
     'amr2'      : 'vadamr mcr_basevad voutdir="{outroot}/amr2" exec-path="{binroot}/amr/amr2" ',
     'afe'       : 'vadafe mcr_basevad voutdir="{outroot}/afe" exec-path="{binroot}/afe/afe" ',
-    'silk'      : 'vadsilk mcr_basevad voutdir="{outroot}/silk" exec-path="{binroot}/silk/silkvad" ', 
+    'silk'      : 'vadsilk mcr_basevad voutdir="{outroot}/silk" exec-path="{binroot}/silk/silkvad" ',
     'svmtrain'  : 'vadmatlabsvm mcr_matlab conf_framelen engine=svm script=train ' \
                   'outpath="{{voutdir}}/{{e_srcname}}/{{e_srcfile}}.mat"',
     'svmtest'   : 'vadmatlabsvm mcr_matlab conf_framelen engine=svm script=test ' \
@@ -119,10 +120,10 @@ MACROS = {
     'concat'     : 'modconcat gt=yes source=yes',
     'split'      : 'modsplit gt=yes source=yes length=60 overwrite=No ' \
                    'out-source-path="{outroot}/split/{{e_srcname}}/{{e_srcfile}}.{{counter}}" ' \
-                   'out-gt-path="{outroot}/split/{{e_srcname}}/GT/{{e_srcfile}}.{{counter}}"', 
+                   'out-gt-path="{outroot}/split/{{e_srcname}}/GT/{{e_srcfile}}.{{counter}}"',
     'edit'       : 'modedit attr="" value="{{attr}}" copy-from="" copy-to=""',
     'extract'    : 'modextract mode=speech out-path="{outroot}/fusion/{{e_srcfile}}"',
     'vurate'     : 'modvurate labels-attr=gt_labels',
     'pipe'       : 'modpipeline ',
-}                   
+}
 

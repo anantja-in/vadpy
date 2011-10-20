@@ -5,7 +5,7 @@ from vadpy.labels import equalize_framelen
 from itertools import product
 import math
 
-import logging 
+import logging
 log = logging.getLogger(__name__)
 
 COMB_MIN_VALUE = 1.0
@@ -33,7 +33,7 @@ class ModFusionHistogram(ComputeModule):
             lr_histogram[comb_vec] = COMB_MIN_VALUE
             probabilites[comb_vec] = COMB_MIN_VALUE
 
-        for element in self.vadpy.pipeline:            
+        for element in self.vadpy.pipeline:
             lo_list = []                        # labels object aka "lo"
             for attr in self.inputs:
                 lo_list.append(getattr(element, attr))
@@ -44,16 +44,16 @@ class ModFusionHistogram(ComputeModule):
 
             for i in range(0, frames_count):
                 # i-th frame, (start, end, --> speech <-- ) tuple
-                comb_vec = tuple(int(lo[i][2]) for lo in lo_list) 
-                
+                comb_vec = tuple(int(lo[i][2]) for lo in lo_list)
+
                 probabilites[comb_vec] += 1
                 if element.gt_labels[i][2]:
                     speech_histogram[comb_vec] += 1
                     speech_frames_count += 1
-                else:                    
+                else:
                     noise_histogram[comb_vec] += 1
                     noise_frames_count += 1
-                
+
         # normalize histograms
         for key in probabilites:
             speech_histogram[key] /= speech_frames_count
@@ -69,7 +69,7 @@ class ModFusionHistogram(ComputeModule):
                 lr_histogram[key] = 1.0
             else:
                 lr_histogram[key] = speech_val / noise_val
-                
+
         # update pipeline with histogram data
         self.add_result('speech', speech_histogram)
         self.add_result('noise', noise_histogram)
@@ -87,7 +87,7 @@ class ModFusionHistogram(ComputeModule):
         s = 'Speech histogram:\n'
         for key in combinations:
             s += '{0:<25}{1:.3}\n'.format(key, speech_histogram[key])
-            
+
         s += '\nNoise histogram:\n'
         for key in combinations:
             s += '{0:<25}{1:.3}\n'.format(key, noise_histogram[key])
@@ -99,5 +99,5 @@ class ModFusionHistogram(ComputeModule):
         s += '\nProbabilities:\n'
         for key in combinations:
             s += '{0:<25}{1:.3}\n'.format(key, p[key])
-            
+
         return s

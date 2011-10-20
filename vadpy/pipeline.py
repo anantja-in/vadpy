@@ -1,6 +1,7 @@
-import logging 
+import logging
 import collections
 
+from .error import VADpyError
 from .element import UNDEFINED
 
 log = logging.getLogger(__name__)
@@ -22,7 +23,8 @@ class Pipeline(object):
         return self._elements[item]
 
     def __iter__(self):
-        assert self.is_ready(), 'The pipeline is not ready to be processed'
+        if not self.is_ready():
+            raise VADpyError('The pipeline is not ready to be processed')
         return self._elements.__iter__()
 
     def __contains__(self, entity):
@@ -41,16 +43,16 @@ class Pipeline(object):
                 yield sliced_elements
                 i += count
             else:
-                return 
+                return
 
     def flush(self):
         self._elements = []
         self._counter = 0
 
     def is_ready(self):
-        is_ready = all(elem.bps and elem.fs and elem.flags != UNDEFINED 
+        is_ready = all(elem.bps and elem.fs and elem.flags != UNDEFINED
                        for elem in self._elements)
         return is_ready
-    
+
     def is_monotonic(self):
         return len(set(elem.flags for elem in self._elements)) <= 1

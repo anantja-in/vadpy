@@ -4,14 +4,15 @@ from vadpy.labels import Frame, Labels
 from vadpy.module import MonotonicPipelineModule
 from vadpy.options import  Option, bool_parser
 from vadpy.element import Element, UNDEFINED
+from vadpy.error import VADpyError
 
-import logging 
+import logging
 log = logging.getLogger(__name__)
 
 class ModConcat(MonotonicPipelineModule):
     """Concatenates all elements' source data and GT labels into one element
 
-    Additional formatting macros: 
+    Additional formatting macros:
     {srcname} - source-name option's value
     """
     out_source_path = Option('out-source-path',
@@ -24,7 +25,8 @@ class ModConcat(MonotonicPipelineModule):
 
     def __init__(self, vadpy, options):
         super(ModConcat, self).__init__(vadpy, options)
-        assert self.opt_gt or self.opt_source, 'Either GT or Source data should be concatenated'
+        if not (self.opt_gt or self.opt_source):
+            raise VADpyError('Either GT or Source data should be concatenated')
 
     def run(self):
         super(ModConcat, self).run()
@@ -32,8 +34,8 @@ class ModConcat(MonotonicPipelineModule):
 
         out_gt_path = self.format_path(self.out_gt_path)
         out_source_path = self.format_path(self.out_source_path)
-        
-        flags = pipeline[0].flags 
+
+        flags = pipeline[0].flags
         frames = []
         previous_time_from = 0
         previous_time_to   = 0
@@ -54,8 +56,8 @@ class ModConcat(MonotonicPipelineModule):
             for element in pipeline:
                 source_io = io.FileIO(element.source_path)
                 out_io.write(source_io.read())
-            source_io.close()            
-        
+            source_io.close()
+
         new_elem = Element(self.source_name, out_source_path, out_gt_path, flags)
         new_elem.gt_labels = gt_labels
         self.vadpy.pipeline.flush()

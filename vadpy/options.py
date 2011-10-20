@@ -1,8 +1,9 @@
 import collections
+from .error import VADpyError
 
 class Option(object):
     """VADpy module's option class"""
-    def __init__(self, 
+    def __init__(self,
                  name = None,
                  parser = str,
                  description = '',):
@@ -14,10 +15,10 @@ class Option(object):
         self.description = description
         self.parser = parser
         self.name = name                # if None, will be set from attribute name by ModuleMetaClass
-        self.module = None              # set by ModuleMetaclass 
+        self.module = None              # set by ModuleMetaclass
 
     def parse(self, value):
-        value = self.parser(value)            
+        value = self.parser(value)
         return value
 
     @property
@@ -38,8 +39,8 @@ class StrictOption(Option):
 
     An assertion error is rased if option's value is not in 'values' list
     """
-    def __init__(self, 
-                 name = None, 
+    def __init__(self,
+                 name = None,
                  parser = str,
                  values = [],
                  description = '', ):
@@ -78,7 +79,8 @@ def split_parser(value):
 
 def odd_parser(value):
     value = int(value)
-    assert value % 2 != 0, '{0} is not an odd number'.format(value)
+    if value % 2 == 0:
+        raise VADpyError('{0} is not an odd number'.format(value))
     return value
 
 class OptionValueError(Exception):

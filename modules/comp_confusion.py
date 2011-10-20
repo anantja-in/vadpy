@@ -1,8 +1,9 @@
 from vadpy.module import ComputeModule
 from vadpy.options import Option, bool_parser
 from vadpy.labels import equalize_framelen
+from vadpy.error import VADpyError
 
-import logging 
+import logging
 log = logging.getLogger(__name__)
 
 class ModConfusion(ComputeModule):
@@ -26,7 +27,7 @@ class ModConfusion(ComputeModule):
     |  0  |  1  | Fp  | Fp rate = Fp / (Tn + Fp)
     |-----------------|
     """
-    ctx_size = Option('ctx-size', int, 
+    ctx_size = Option('ctx-size', int,
                       ('Temporal context size of 2nd labels object frames iterator '
                        '(using majority voting)'))
 
@@ -35,10 +36,11 @@ class ModConfusion(ComputeModule):
 
     def run(self):
         super(ModConfusion, self).run()
-        assert len(set(self.inputs)) == 2, 'Confusion module requires two different inputs'
+        if len(set(self.inputs)) != 2:
+            raise VADpyError('Confusion module requires two different inputs')
 
         # false positives/false negatives per source
-        # the format of every tuple in dictionary is 
+        # the format of every tuple in dictionary is
         # [True Positives, True Negatives, False Positives, False Negatives] tuple (list actually :)
 
         tp_total = 0.0
@@ -46,12 +48,12 @@ class ModConfusion(ComputeModule):
         fp_total = 0.0
         fn_total = 0.0
 
-        for element in self.vadpy.pipeline:            
+        for element in self.vadpy.pipeline:
             # Generate a list of decision (speech/noise) pairs for Labels objects
-            # 
+            #
             gt_labels = getattr(element, self.inputs[0])
             vad_labels = getattr(element, self.inputs[1])
-            
+
             if len(gt_labels) != len(vad_labels):
                 log.warning('Labels length mismatch: {0} / {1}, equlizing frame lengths.'.format(
                         len(gt_labels), len(vad_labels)))
@@ -59,7 +61,7 @@ class ModConfusion(ComputeModule):
                 equalize_framelen(gt_labels, vad_labels)
 
             # zip will concatenate up to min. length of the objects
-            speechAB = zip((int(speech) for start, stop, speech in gt_labels), 
+            speechAB = zip((int(speech) for start, stop, speech in gt_labels),
                            (int(speech) for start, stop, speech in vad_labels))
 
             # Calculate False alarm and Miss rate
@@ -67,27 +69,27 @@ class ModConfusion(ComputeModule):
 
             for i in range(0, len(speechAB)):
                 valA = speechAB[i][0]
-                
+
                 if (self.ctx_size < i < len(speechAB) - self.ctx_size):
-                    valB = int(round(sum(vAB[1] for vAB in speechAB[i - self.ctx_size : 
-                                                                    i + self.ctx_size + 1]) 
+                    valB = int(round(sum(vAB[1] for vAB in speechAB[i - self.ctx_size :
+                                                                    i + self.ctx_size + 1])
                                      / float(self.ctx_size * 2 + 1)))
                 else:
                     valB = speechAB[i][1]
 
                 if valA:                # concluding, valA is a value 'Speech' Ground Truth frame
                   if valB: tp += 1      # true positive
-                  else:    fn += 1      # false negative, miss 
-                else:                     
+                  else:    fn += 1      # false negative, miss
+                else:
                   if valB: fp += 1      # false positive, false alarm
                   else:    tn += 1      # true negative
-                        
+
             tp_total += tp
             tn_total += tn
             fp_total += fp
             fn_total += fn
 
-        tp = tp_total 
+        tp = tp_total
         tn = tn_total
         fp = fp_total
         fn = fn_total
@@ -105,8 +107,8 @@ class ModConfusion(ComputeModule):
 
     def _format_results(self):
         res = self._get_results()
-        mr = res.mr * 100 
-        far = res.far * 100        
+        mr = res.mr * 100
+        far = res.far * 100
         ret_str = '{0:<25}{1:.1f}\n'.format('Miss rate (%):', mr)
         ret_str += '{0:<25}{1:.1f}\n'.format('False alarm rate (%):', far)
         return ret_str

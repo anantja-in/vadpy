@@ -1,10 +1,11 @@
 from vadpy.module import ComputeModule
 from vadpy.options import  Option
 from vadpy.labels import equalize_framelen
+from vadpy.error import VADpyError
 
 import math
 
-import logging 
+import logging
 log = logging.getLogger(__name__)
 
 class ModCorrelation(ComputeModule):
@@ -27,10 +28,12 @@ class ModCorrelation(ComputeModule):
 
     def run(self):
         super(ModCorrelation, self).run()
-        assert len(set(self.inputs)) == 3, 'Q-statistics module requires three different inputs (GT, VAD1, VAD2)'
+        if len(set(self.inputs)) != 3:
+            raise VADpyError('Q-statistics module requires three different inputs '
+                             '(GT, VAD1, VAD2)')
 
         # false positives/false negatives per source
-        # the format of every tuple in dictionary is 
+        # the format of every tuple in dictionary is
         # [True Positives, True Negatives, False Positives, False Negatives] tuple (list actually :)
 
         a_total = 0.0
@@ -38,17 +41,17 @@ class ModCorrelation(ComputeModule):
         c_total = 0.0
         d_total = 0.0
 
-        for element in self.vadpy.pipeline:            
+        for element in self.vadpy.pipeline:
             gt_labels = getattr(element, self.inputs[0])
             vad1_labels = getattr(element, self.inputs[1])
             vad2_labels = getattr(element, self.inputs[2])
-            
+
             if len(set([len(gt_labels), len(vad1_labels), len(vad2_labels)])) != 1:
                 log.warning('Labels length mismatch: {0} / {1} / {2}, equlizing frame lengths.'.format(
                         len(gt_labels), len(vad1_labels), len(vad2_labels) ))
                 equalize_framelen(gt_labels, vad1_labels, vad2_labels)
 
-            speechData = zip((int(speech) for start, stop, speech in gt_labels), 
+            speechData = zip((int(speech) for start, stop, speech in gt_labels),
                              (int(speech) for start, stop, speech in vad1_labels),
                              (int(speech) for start, stop, speech in vad2_labels))
 
@@ -58,7 +61,7 @@ class ModCorrelation(ComputeModule):
                 valGT = speechData[i][0]
                 valV1 = speechData[i][1]
                 valV2 = speechData[i][2]
-                
+
                 if valV1 == valGT and valV2 == valGT:
                     a += 1
                 elif valV1 != valGT and valV2 == valGT:
@@ -90,6 +93,6 @@ class ModCorrelation(ComputeModule):
         res = self._get_results()
         corrQ = res.corrQ
         corrp = res.corrp
-        return ('{0:<25}{1:.3}\n'.format('Q-Statistics (Q):', corrQ) + 
+        return ('{0:<25}{1:.3}\n'.format('Q-Statistics (Q):', corrQ) +
                 '{0:<25}{1:.3}'.format('Correlation (p):', corrp)
                 )

@@ -8,18 +8,18 @@ from vadpy.module import Module
 from vadpy.options import  Option, bool_parser
 from vadpy.element import Element, UNDEFINED
 
-import logging 
+import logging
 log = logging.getLogger(__name__)
 
 class ModSplit(Module):
     """Split elements' data and GT labels into one or more elements
-    
+
     Additional formatting macros:
-    {counter} - 1,2...length counter for splitted files 
+    {counter} - 1,2...length counter for splitted files
                 Counter should be used, as long as you don't want to overwrite the same file.'
     """
 
-    out_source_path = Option('out-source-path', 
+    out_source_path = Option('out-source-path',
                              description = 'Optput files\' paths, to which the splitted data should be written')
     out_gt_path = Option('out-gt-path', description = 'Optput GT files\' path')
     length = Option(parser = int, description = 'The length of every data slice in seconds')
@@ -29,45 +29,46 @@ class ModSplit(Module):
 
     def __init__(self, vadpy, options):
         super(ModSplit, self).__init__(vadpy, options)
-        assert self.split_gt or self.split_source, 'Either GT or Source data should be splitted'
+        if not (self.split_gt or self.split_source):
+            raise VADpyError('Either GT or Source data should be splitted')
 
     def run(self):
         super(ModSplit, self).run()
         pipeline = self.vadpy.pipeline
-        
+
         new_elements = []
         for element in pipeline:
             slices_count = self._get_slices_count(element)
             # create dummy elements
-            split_elements = [Element(element.source_name, flags = element.flags) 
+            split_elements = [Element(element.source_name, flags = element.flags)
                               for i in range(0, slices_count)]
 
             if self.split_gt:
-                labels = element.gt_labels                   
+                labels = element.gt_labels
                 frames_slice_count = int(round(self.length / labels.frame_len))
                 for i in range(0, slices_count):
                     # a list of (start, end, decision) tuples
-                    frames = labels[i * frames_slice_count : 
+                    frames = labels[i * frames_slice_count :
                                       min((i + 1) * frames_slice_count, len(labels))]
 
                     # 'start' position of first frame in the list
-                    frame_start = frames[0][0]   
-                    new_frames = [Frame(sec[0] - frame_start, 
-                                            sec[1] - frame_start, 
-                                            sec[2], 
+                    frame_start = frames[0][0]
+                    new_frames = [Frame(sec[0] - frame_start,
+                                            sec[1] - frame_start,
+                                            sec[2],
                                             labels.frame_len)
                                     for sec in frames]
-                    path = self.format_path(self.out_gt_path, 
-                                            counter = i, 
+                    path = self.format_path(self.out_gt_path,
+                                            counter = i,
                                             **element.format_args)
                     split_elements[i].gt_labels = Labels(new_frames, labels.frame_len)
                     split_elements[i].gt_path = path
-                    
+
             if self.split_source:
                 source_io = io.FileIO(element.source_path)
                 for i in range(0, slices_count):
-                    path = self.format_path(self.out_source_path, 
-                                            counter = i, 
+                    path = self.format_path(self.out_source_path,
+                                            counter = i,
                                             **element.format_args)
                     split_elements[i].source_path = path
                     if os.path.exists(path) and not self.overwrite:
@@ -84,7 +85,7 @@ class ModSplit(Module):
 
             new_elements.extend(split_elements)
         self.vadpy.pipeline.flush()
-        self.vadpy.pipeline.add(*new_elements)        
+        self.vadpy.pipeline.add(*new_elements)
 
 
     def _get_slices_count(self, element):
