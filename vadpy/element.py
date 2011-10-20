@@ -1,5 +1,5 @@
 import os
-import logging 
+import logging
 
 log = logging.getLogger(__name__)
 
@@ -13,14 +13,14 @@ BPS_16 = 0x100
 class Element(object):
     """The class represents VADpy pipeline's element object"""
     def __init__(self, source_name = '', source_path = '', gt_path = '', flags = UNDEFINED):
-        """        
+        """
         source_name - Name of the element's source
-        source_path - Path to the data file 
+        source_path - Path to the data file
         gt_path     - Path to the GT file
         flags       - Logical combination of flags describing the element
         """
         # defined by pipeline
-        self.id = 0 
+        self.id = 0
         # defined by DB module
         self.flags = flags
         self.source_name = source_name
@@ -50,7 +50,7 @@ class Element(object):
         if self.gt_labels:
             return self.gt_labels.frame_len * len(self.gt_labels)
         if self.vad_labels:
-            return self.gt_labels.frame_len * len(self.gt_labels)        
+            return self.gt_labels.frame_len * len(self.gt_labels)
         return 0
 
     @property
@@ -65,28 +65,28 @@ class Element(object):
             return 8000
         elif self._flags & FS_4000:
             return 4000
-        
+
         raise Exception('Invalid FS flag')
-    
+
     @property
     def flags(self):
         return self._flags
 
     @flags.setter
-    def flags(self, value):        
+    def flags(self, value):
         self._flags = value
 
     @property
     def format_args(self):
-        """Dynamic (built from element's arguments) string formatting arguments dictionary"""        
+        """Dynamic (built from element's arguments) string formatting arguments dictionary"""
         source_dir, source_file = os.path.split(self.source_path)
         gt_dir, gt_file = os.path.split(self.source_path)
         vout_dir, vout_file = os.path.split(self.vout_path)
-        return {'e_srcname' : self.source_name, 
-                'e_srcdir' : source_dir, 
-                'e_srcfile' : source_file, 
-                'e_gtdir' : gt_dir, 
-                'e_gtfile' : gt_file, 
-                'e_voutdir' : vout_dir, 
-                'e_voutfile' : vout_file, 
+        return {'e_srcname' : self.source_name,
+                'e_srcdir' : source_dir,
+                'e_srcfile' : source_file,
+                'e_gtdir' : gt_dir,
+                'e_gtfile' : gt_file,
+                'e_voutdir' : vout_dir,
+                'e_voutfile' : vout_file,
                 }

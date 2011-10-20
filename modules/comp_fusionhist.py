@@ -26,7 +26,7 @@ class ModFusionHistogram(ComputeModule):
         lr_histogram = {}
         probabilites = {}
 
-        vad_combinations = product([0,1], repeat = len(self.inputs))
+        vad_combinations = product([0, 1], repeat = len(self.inputs))
         for comb_vec in vad_combinations:
             speech_histogram[comb_vec] = COMB_MIN_VALUE
             noise_histogram[comb_vec] = COMB_MIN_VALUE

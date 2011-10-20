@@ -1,7 +1,7 @@
 import sys
 import logging
 import re
-from copy import deepcopy 
+from copy import deepcopy
 
 from .error import ParseError
 
@@ -23,7 +23,7 @@ class SeqOptions(object):
             return help_modules
         else:
             return self._parse_args()
-        
+
     def _parse_help(self):
         argv = sys.argv
         if len(argv) <= 1 or (len(argv) >= 2 and any(argv[i] in ['-h', '--help', 'help'] for i in range(1, 3))):
@@ -31,25 +31,25 @@ class SeqOptions(object):
             if len(argv) == 3:
                 return argv[2]
         return None
-        
+
     def _parse_args(self):
         # vad.py [OPTIONS] ! module property1=val property2=val ... \
         #                    property_flag1 property_flag2 ... ! module2 ... !
         # Cases:
         # ! corpus ! intput ! VAD program ! error_metrics ! output
-        # 
+        #
         args = ' '.join(sys.argv) + ' '
         args = self._macro_replace(args)
 
         argv = args.split('!')[1:]
         modules = []
-        
+
         for sarg in argv:
             module = None
             quote = False
             module_args = {}
             buf = ''
-            for char in sarg: 
+            for char in sarg:
                 if char != ' ':
                     if char == '"':
                         quote = not quote
@@ -77,7 +77,7 @@ class SeqOptions(object):
     def _macro_replace(self, s):
         s_old = s
         for macro in self._macros:
-            s = s.replace(' ' + macro + ' ', 
+            s = s.replace(' ' + macro + ' ',
                           ' ' + (self._macros[macro].format(**self._format_args)) + ' ')
         if s != s_old:
             s = self._macro_replace(s)

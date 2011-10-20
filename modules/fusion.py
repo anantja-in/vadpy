@@ -46,11 +46,11 @@ class ModFusion(Module):
     def run(self):
         super(ModFusion, self).run()
 
-        use_histogram = hasattr(self.vadpy.pipeline, 'modfusionhistogram')
-        use_bayes = hasattr(self.vadpy.pipeline, 'modsr') and use_histogram
+        use_fusion_histogram = hasattr(self.vadpy.pipeline, 'modfusionhistogram')
+        use_bayes = hasattr(self.vadpy.pipeline, 'modsr') and use_fusion_histogram
 
         if self.method == SIMPLE_HIST_METHOD:
-            if not use_histogram:
+            if not use_fusion_histogram:
                 raise VADpyError('Simple histogram method was selected, '
                                  'but histogram was not provided')
         elif self.method == BAYES_METHOD:

@@ -37,7 +37,7 @@ class Option(object):
 class StrictOption(Option):
     """VADpy module's strict option class
 
-    An assertion error is rased if option's value is not in 'values' list
+    An error is rased if option's value is not in 'values' list
     """
     def __init__(self,
                  name = None,
@@ -60,7 +60,6 @@ class StrictOption(Option):
                 raise OptionValueError(parsed_value)
         return parsed_value
 
-
 def bool_parser(value):
     value = value.lower()
     if value in ['', '""', "''", 'no', 'false']:
@@ -68,14 +67,12 @@ def bool_parser(value):
     elif value in ['true', 'yes']:
         return True
     else:
-        raise Exception('What kind of boolean do you think "{0}" is?'.format(value))
-
+        raise VADpyError('What kind of boolean do you think "{0}" is?'.format(value))
 
 def split_parser(value):
     if not value:
         return []
     return value.split(',')
-
 
 def odd_parser(value):
     value = int(value)

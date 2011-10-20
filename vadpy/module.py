@@ -282,7 +282,7 @@ class SimpleVADModuleBase(VADModule):
                                     stderr = subprocess.PIPE,
                                     )
             stdoutdata, stderrdata = proc.communicate()
-            if stderrdata is not None:
+            if len(stderrdata) > 0:
                 raise VADpyError(stderrdata)
 
 
@@ -357,7 +357,7 @@ class MatlabVADModuleBase(VADModule):
                                     stderr = subprocess.PIPE,
                                     )
             stdoutdata, stderrdata = proc.communicate()
-            if stderrdata is not None:
+            if len(stderrdata) > 0:
                 raise VADpyError(stderrdata)
 
 
