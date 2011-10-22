@@ -1,4 +1,4 @@
-import logging 
+import logging
 import re
 from datetime import timedelta
 
@@ -11,19 +11,19 @@ log = logging.getLogger(__name__)
 class IOSingleD(GenericIOModuleBase):
     """Parse GT/VAD output Label files with decisions-only strings
 
-    The format is: 
+    The format is:
     <time_from (in seconds)> <time_to (in seconds)> <decision (0|1)>
-    """   
+    """
     k_factor = Option('k', parser = int)
 
     def __init__(self, vadpy, options):
         super(IOSingleD, self).__init__(vadpy, options)
         # regular expressions for parsing
-        self._reo = re.compile(r'\s*([\d.,]+)\s*([\d.,]+)\s([-+\d\.]+)') 
+        self._reo = re.compile(r'\s*([\d.,]+)\s*([\d.,]+)\s([-+\d\.]+)')
 
     def run(self):
         super(IOSingleD, self).run()
-                
+
     def read(self, path):
         super(IOSingleD, self).read(path)
 
@@ -48,7 +48,7 @@ class IOSingleD(GenericIOModuleBase):
 
                     frame = Frame(start * self.k_factor,
                                       end * self.k_factor,
-                                      decision, 
+                                      decision,
                                       self.frame_len)
 
                     frames.append(frame)   # create new frame (above) and append it to frames list
