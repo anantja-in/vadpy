@@ -1,4 +1,4 @@
-import logging 
+import logging
 import re
 
 from vadpy.labels import Frame
@@ -11,16 +11,16 @@ class IOGapless(GenericIOModuleBase):
     """Parse GT/VAD output Label files with decision labels in a gapless line format.
 
     The format is :
-    <decision><decision>... 
+    <decision><decision>...
     Example:
     111111000000000000001111111111111100011111
-    """   
+    """
     def __init__(self, vadpy, options):
         super(IOGapless, self).__init__(vadpy, options)
 
     def run(self):
         super(IOGapless, self).run()
-                
+
     def read(self, path):
         super(IOGapless, self).read(path)
 
@@ -32,11 +32,11 @@ class IOGapless(GenericIOModuleBase):
                 if len(line) == 0:
                     continue
 
-                for char in line: 
-                    decision = int(char)                    
+                for char in line:
+                    decision = int(char)
                     frame = Frame(i * self.frame_len,
                                       (i + 1) * self.frame_len,
-                                      decision, 
+                                      decision,
                                       self.frame_len)
                     frames.append(frame)   # create new frame (above) and append it to frames list
                     i+= 1
@@ -49,4 +49,4 @@ class IOGapless(GenericIOModuleBase):
         with open(path, 'w') as f:
             sout = ''.join(str(int(frame[2])) for frame in labels)
             f.write(sout)
-    
+

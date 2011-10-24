@@ -1,9 +1,9 @@
 import os
 import imp
-import logging 
+import logging
 
 from .error import ModuleNotFoundError, ParseError
-from . import module 
+from . import module
 
 log = logging.getLogger(__name__)
 
@@ -14,14 +14,14 @@ class ModuleManager(object):
         self._modules_dirs = vadpy.settings.PATH
         self._modules = {}          # enabled modules {name : module}
         self._sorted_mod_names = [] # modules' names sorted by base class
-        self._base_modules = [module.Module, 
-                              module.IOModule, 
-                              module.DBModule, 
-                              module.VADModule, 
-                              module.SimpleVADModuleBase, 
+        self._base_modules = [module.Module,
+                              module.IOModule,
+                              module.DBModule,
+                              module.VADModule,
+                              module.SimpleVADModuleBase,
                               module.MatlabVADModuleBase]
-        self._scan()             # find and store modules 
-            
+        self._scan()             # find and store modules
+
     def enable(self, name, options):
         """Create and return an instance of an Module-derived class"""
         name = name.lower()
@@ -36,20 +36,20 @@ class ModuleManager(object):
     def _scan(self):
         """Search for modules in vadpy modules directories"""
         # modules' base classes that should not(!) be loaded by manager
-        # base_classes = [cls for cls in module.__dict__.values() 
+        # base_classes = [cls for cls in module.__dict__.values()
         #                 if isinstance(cls, type) and
         #                 issubclass (cls, module.Module)]
         # and attr not in base_classes]
         for edir in self._modules_dirs:
             if not os.path.exists(edir):
                 log.debug("{0} doesn't exist".format(edir))
-                continue 
+                continue
 
-            dir_files = [fname for fname in os.listdir(edir) 
+            dir_files = [fname for fname in os.listdir(edir)
                          if fname.endswith('py')]
             for fname in dir_files:
                 path = os.path.join(edir, fname)
-                try:     
+                try:
                     pymod = imp.load_source(fname[:-3], path) # somename.py -> somename
                 except Exception as e:
                     log.error('Error loading module(s) from {0}: {1}'.format(path, str(e)))
@@ -57,10 +57,10 @@ class ModuleManager(object):
                         raise e
                     else:
                         continue
-                    
+
                 module_classes = [attr for attr in pymod.__dict__.values()
                                   if isinstance(attr, type) and
-                                  issubclass (attr, module.Module) and 
+                                  issubclass (attr, module.Module) and
                                   attr not in self._base_modules]
                 if len(module_classes) == 0:
                     log.debug('No Module sub-classes found in {0}'.format(path))
