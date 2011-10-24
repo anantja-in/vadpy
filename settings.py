@@ -1,14 +1,17 @@
 import os
 import getpass
 
-ROOT = '/home/zaur/Documents/Study/vadpy2'
-#ROOT = '/home/user/Documents/vadpy/'
-#ROOT = '/data3/pums/VADpy'
+# ROOT is the path to VADpy directory
+# For example ROOT = '/home/user/.vadpy/'
+ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
 # modules' PATH
 PATH = [os.path.join(ROOT, 'src/modules'),
         ]
 
+# The format_args are used in VADpy macros as following:
+# 'voutdir="{outroot}/vad" '
+# here, {outroot} is defined in format_args
 format_args = {
     'root' : ROOT,
     'binroot' : os.path.join(ROOT, 'bin'),
@@ -29,13 +32,14 @@ MACROS = {
     'mcr_compute'    : 'print=Yes',
     'mcr_matlab'     : 'mcr_basevad voutdir="{outroot}/matlab/{{engine}}_{{script}}" ' \
                        'bin=matlab mopts="-nojvm, -nosplash" ' \
-                       'scriptdir={binroot}/matlab fread=600 filecount=128 args=""',
+                       'scriptdir={binroot}/matlab fread=600 filecount=128 Argos=""',
 
     # Default modules' configurations
     'dft_iosingled' : 'iosingled mcr_io k=1',
     'dft_iostamps'  : 'iostamps mcr_io re="" split=""',
     'dft_iogapless' : 'iogapless mcr_io',
     'dft_matlab'    : 'vadmatlab mcr_matlab fread=600 filecount=128 args=""',
+
     # DB modules
     'nist05'  : 'dbnist05 source-name=NIST05 re="" ' \
                 'source-dir="{dbroot}/NIST05/{{dataset}}/DATA" dataset=TEST ' \
@@ -65,6 +69,7 @@ MACROS = {
     'ovstamps'  : 'dft_iostamps mcr_labels_vad action=write',
     'ovsingle'  : 'dft_iosingled mcr_labels_vad action=write',
     'ovgapless' : 'dft_iogapless mcr_labels_vad action=write',
+
     # DB->IO aliases
     'iaurora'   : 'igapless frame-len=0.01',
     'inist'     : 'igapless frame-len=0.01',
@@ -111,7 +116,8 @@ MACROS = {
 
     # Computation modules
     'sr'         : 'modsr mcr_compute inputs=gt_labels',
-    'histogram'  : 'modfusionhistogram mcr_compute re="" print=No',
+    'histogram'  : 'modfusionhistogram mcr_compute print=No',
+    'chistogram' : 'modsourcehistogram mcr_compute',
     'confusion'  : 'modconfusion mcr_compute inputs=gt_labels,vad_labels ctx-size=0',
     'correlation': 'modcorrelation mcr_compute',
 

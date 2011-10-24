@@ -400,7 +400,7 @@ class ComputeModule(Module):
 
     def _get_results(self, modalias = ''):
         pipeline = self.vadpy.pipeline
-        if modalias = '':
+        if modalias == '':
             modalias = self.name.lower()
 
         try:

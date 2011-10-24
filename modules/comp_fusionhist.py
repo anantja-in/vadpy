@@ -1,8 +1,8 @@
 from vadpy.module import ComputeModule
-from vadpy.options import  Option
 from vadpy.labels import equalize_framelen
 
 from itertools import product
+from copy import deepcopy
 import math
 
 import logging
@@ -21,17 +21,15 @@ class ModFusionHistogram(ComputeModule):
         noise_frames_count = 0.0
 
         # initialize histograms
-        speech_histogram = {}
-        noise_histogram = {}
-        lr_histogram = {}
-        probabilites = {}
-
+        base_histogram = {}
         vad_combinations = product([0, 1], repeat = len(self.inputs))
         for comb_vec in vad_combinations:
-            speech_histogram[comb_vec] = COMB_MIN_VALUE
-            noise_histogram[comb_vec] = COMB_MIN_VALUE
-            lr_histogram[comb_vec] = COMB_MIN_VALUE
-            probabilites[comb_vec] = COMB_MIN_VALUE
+            base_histogram[comb_vec] = COMB_MIN_VALUE
+
+        speech_histogram = deepcopy(base_histogram)
+        noise_histogram = deepcopy(base_histogram)
+        prob_histogram = deepcopy(base_histogram)
+        lr_histogram = deepcopy(base_histogram)
 
         for element in self.vadpy.pipeline:
             lo_list = []                        # labels object aka "lo"
@@ -46,7 +44,7 @@ class ModFusionHistogram(ComputeModule):
                 # i-th frame, (start, end, --> speech <-- ) tuple
                 comb_vec = tuple(int(lo[i][2]) for lo in lo_list)
 
-                probabilites[comb_vec] += 1
+                prob_histogram[comb_vec] += 1
                 if element.gt_labels[i][2]:
                     speech_histogram[comb_vec] += 1
                     speech_frames_count += 1
@@ -55,10 +53,10 @@ class ModFusionHistogram(ComputeModule):
                     noise_frames_count += 1
 
         # normalize histograms
-        for key in probabilites:
+        for key in prob_histogram:
             speech_histogram[key] /= speech_frames_count
             noise_histogram[key] /= noise_frames_count
-            probabilites[key] /= (speech_frames_count + noise_frames_count)
+            prob_histogram[key] /= (speech_frames_count + noise_frames_count)
 
             speech_val = speech_histogram[key]
             noise_val = noise_histogram[key]
@@ -74,7 +72,7 @@ class ModFusionHistogram(ComputeModule):
         self.add_result('speech', speech_histogram)
         self.add_result('noise', noise_histogram)
         self.add_result('lr', lr_histogram)
-        self.add_result('p', probabilites)
+        self.add_result('p', prob_histogram)
 
     def _format_results(self):
         res = self._get_results()
