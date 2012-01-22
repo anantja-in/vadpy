@@ -29,7 +29,7 @@ class IOGapless(GenericIOModuleBase):
         with open(path) as f:
             for line in f:
                 line = line.strip()
-                if len(line) == 0:
+                if line == '':
                     continue
 
                 for char in line:

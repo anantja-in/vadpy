@@ -64,7 +64,7 @@ class ModConfusion(ComputeModule):
             speechAB = zip((int(speech) for start, stop, speech in gt_labels),
                            (int(speech) for start, stop, speech in vad_labels))
 
-            # Calculate False alarm and Miss rate
+            # Calculate False alarm and Miss rates
             tp = 0; tn = 0; fp = 0; fn = 0;
 
             for i in range(0, len(speechAB)):
@@ -100,15 +100,19 @@ class ModConfusion(ComputeModule):
 
         mr  = fn / (tp + fn)
         far = fp / (tn + fp)
+        ter = (fn + fp) / length
         #total_len = tn + fn + tp + fp
 
         self.add_result('mr', mr)
         self.add_result('far', far)
+        self.add_result('ter', ter)
 
     def _format_results(self):
         res = self._get_results()
         mr = res.mr * 100
         far = res.far * 100
+        ter = res.ter * 100
         ret_str = '{0:<25}{1:.1f}\n'.format('Miss rate (%):', mr)
         ret_str += '{0:<25}{1:.1f}\n'.format('False alarm rate (%):', far)
+        ret_str += '{0:<25}{1:.1f}\n'.format('Total error rate (%):', ter)
         return ret_str

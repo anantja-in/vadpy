@@ -4,7 +4,7 @@ from vadpy.labels import equalize_framelen
 
 import math
 
-import logging 
+import logging
 log = logging.getLogger(__name__)
 
 class ModSR(ComputeModule):
@@ -15,10 +15,10 @@ class ModSR(ComputeModule):
 
     def run(self):
         super(ModSR, self).run()
-        
+
         sr = {}
-        for input_name in self.inputs:            
-            for element in self.vadpy.pipeline:                                    
+        for input_name in self.inputs:
+            for element in self.vadpy.pipeline:
                 labels = getattr(element, input_name)
 
                 sp_labels = 0.0
@@ -38,8 +38,8 @@ class ModSR(ComputeModule):
         for input_name in sr:
             sr_val = sr[input_name]
             ret_str += '{0} / {1:<25}{2:.3}; ({3:.3}% speech)\n'.format(
-                'Speech/Non-speech rate', 
-                input_name, 
-                sr_val, 
+                'Speech/Non-speech rate',
+                input_name,
+                sr_val,
                 100 * sr_val / (1 + sr_val))
         return ret_str

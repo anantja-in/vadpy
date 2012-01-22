@@ -1,5 +1,5 @@
 import os
-import logging 
+import logging
 
 from vadpy.module import Module
 from vadpy.options import Option
@@ -11,7 +11,7 @@ class ModPipeline(Module):
     """Pipeline control module"""
     ACTION_FLUSH = 'flush'
     action = Option(description = 'Pipeline action: flush| ')
-    
+
     def __init__(self, vadpy, options):
         super(ModPipeline, self).__init__(vadpy, options)
 

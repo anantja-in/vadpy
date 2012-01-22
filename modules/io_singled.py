@@ -35,7 +35,7 @@ class IOSingleD(GenericIOModuleBase):
         with open(path) as f:
             for line in f:
                 line = line.strip()
-                if len(line) == 0:
+                if line == '':
                     continue
 
                 match = self._reo.match(line)       # regex match
