@@ -44,7 +44,7 @@ MACROS = {
     'nist05'  : 'dbnist05 source-name=NIST05 re="" ' \
                 'source-dir="{dbroot}/NIST05/{{dataset}}/DATA" dataset=TEST ' \
                 'gt-dir="{dbroot}/NIST05/{{dataset}}/GT"',
-    'aurora'  : 'dbaurora source-name=Aurora2 dataset=TEST env=1,2,3,4 snr=C,20,15,10,5,0,-5 re="" ' \
+    'aurora'  : 'dbaurora source-name=Aurora2/{{set}} dataset=TEST env=1,2,3,4 snr=C,20,15,10,5,0,-5 re="" ' \
                 'source-dir="{dbroot}/AURORA2/{{dataset}}/DATA" ' \
                 'gt-dir="{dbroot}/AURORA2/{{dataset}}/GT" ',
     'busstop' : 'dbquick source-name=busstop dataset="TEST" flags=8000hz,le,16bps re="" ' \
