@@ -129,7 +129,7 @@ class DBModule(Module):
             if source_file in gt_files_set:
                 gt_file_path = os.path.join(gt_dir, source_file)
                 elements.append(
-                    Element(source_name,
+                    Element(source_name.format(dataset = self.dataset),
                             source_file_path,
                             gt_file_path,
                             flags)

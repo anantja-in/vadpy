@@ -41,20 +41,23 @@ MACROS = {
     'dft_matlab'    : 'vadmatlab mcr_matlab fread=600 filecount=128 args=""',
 
     # DB modules
-    'nist05'  : 'dbnist05 source-name=NIST05 re="" ' \
-                'source-dir="{dbroot}/NIST05/{{dataset}}/DATA" dataset=TEST ' \
-                'gt-dir="{dbroot}/NIST05/{{dataset}}/GT"',
-    'aurora'  : 'dbaurora source-name=Aurora2/{{set}} dataset=TEST env=1,2,3,4 snr=C,20,15,10,5,0,-5 re="" ' \
-                'source-dir="{dbroot}/AURORA2/{{dataset}}/DATA" ' \
-                'gt-dir="{dbroot}/AURORA2/{{dataset}}/GT" ',
-    'busstop' : 'dbquick source-name=busstop dataset="TEST" flags=8000hz,le,16bps re="" ' \
-                'gt-dir="{dbroot}/busstop/{{dataset}}/GT" source-dir="{dbroot}/busstop/{{dataset}}/DATA" ',
+    'aurora'  : ('dbaurora source-name=Aurora2/{{dataset}} '
+                 'dataset=TEST env=1,2,3,4 snr=C,20,15,10,5,0,-5 re="" '
+                 'source-dir="{dbroot}/AURORA2/{{dataset}}/DATA" '
+                 'gt-dir="{dbroot}/AURORA2/{{dataset}}/GT" '),
+    'nist05'  : ('dbnist05 source-name=NIST05 re="" '
+                'source-dir="{dbroot}/NIST05/{{dataset}}/DATA" dataset=TEST '
+                'gt-dir="{dbroot}/NIST05/{{dataset}}/GT"'),
+    'busstop' : ('dbquick source-name=busstop/{{dataset}} '
+                 'dataset="TEST" flags=8000hz,le,16bps re="" '
+                 'gt-dir="{dbroot}/busstop/{{dataset}}/GT" '
+                 'source-dir="{dbroot}/busstop/{{dataset}}/DATA" '),
     'test'    : 'dbquick source-name=testdb dataset="" flags=8000hz,le,16bps re="" ' \
                 'gt-dir="{dbroot}/TESTDB/GT" source-dir="{dbroot}/TESTDB/DATA/{{dataset}}" ',
-    # 'nist08' : 'dbnist08 source-name=NIST08 dataset="" dataunits="" channels="" re="" ' \
-    #            ' source-dir="{dbroot}/NIST08/DATA/" gt-dir="{dbroot}/NIST08/GT/"',
     'labra'  :  'dbquick source-name=labra dataset="" flags=8000hz,le,16bps re="" ' \
                 'gt-dir={dbroot}/LABRA/GT source-dir={dbroot}/LABRA/DATA/ ',
+    # 'nist08' : 'dbnist08 source-name=NIST08 dataset="" dataunits="" channels="" re="" ' \
+    #            ' source-dir="{dbroot}/NIST08/DATA/" gt-dir="{dbroot}/NIST08/GT/"',
 
     #IO modules
     'isingle'   : 'dft_iosingled mcr_labels_gt action=read',

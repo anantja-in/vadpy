@@ -1,4 +1,4 @@
-import logging 
+import logging
 import os
 
 from vadpy import element
@@ -23,7 +23,7 @@ class DBQUICK(DBModule):
     Flags:
     le      - Little endian encoding
     be      - Big endian encoding
-    8000hz  - Data framerate is 8000hz 
+    8000hz  - Data framerate is 8000hz
     16bps   - 16 bits per frame
     """
     flags = Option(parser = split_parser, description = 'Flags describing data in the database. ')
@@ -41,8 +41,8 @@ class DBQUICK(DBModule):
 
     def run(self):
         super(DBQUICK, self).run()
-        elements = self.elements_from_dirs(self.source_name, 
-                                           self.source_dir, 
-                                           self.gt_dir, 
+        elements = self.elements_from_dirs(self.source_name,
+                                           self.source_dir,
+                                           self.gt_dir,
                                            self.flags)
         self.vadpy.pipeline.add(*elements)
